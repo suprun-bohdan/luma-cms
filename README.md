@@ -46,13 +46,16 @@ luma-cms/
   apps/
     api/          # Laravel backend
     studio/       # React TypeScript admin
-  packages/       # SDK, plugin SDK, shared UI
+  packages/
+    sdk/          # Public TypeScript SDK
+    plugin-sdk/   # Plugin development kit
+    ui/           # Shared UI components
   docs/           # Public documentation
 ```
 
 ## Development status
 
-Early development. Application code has not been scaffolded yet.
+Early development. Monorepo skeleton is in place; Laravel and React scaffolds are not yet created.
 
 Installation instructions will be added once the first runnable development version is available.
 

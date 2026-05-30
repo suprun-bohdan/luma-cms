@@ -8,24 +8,29 @@ Guide for contributors working on Luma CMS.
 
 This repository is the clean open-source Luma CMS product:
 
+The monorepo skeleton is in place. Application scaffolds (Laravel, React) are not yet created.
+
 ```text
 luma-cms/
   apps/
-    api/          # Laravel backend (planned)
-    studio/       # React TypeScript admin (planned)
-  packages/       # SDK, plugin SDK, shared UI (planned)
-  docs/           # Public documentation (this directory)
+    api/          # Laravel backend (Phase 1B)
+    studio/       # React TypeScript admin (Phase 1C)
+  packages/
+    sdk/          # Public TypeScript SDK
+    plugin-sdk/   # Plugin development kit
+    ui/           # Shared UI components
+  docs/
   README.md
   LICENSE
 ```
 
-The monorepo skeleton (`apps/`, `packages/`) will be created in Phase 1A, after this documentation foundation.
-
 ## Current phase
 
-**Phase 0: Foundation** — product documentation and repository structure.
+**Phase 1: Content Core (MVP 0.1)** — next up.
 
-Next: **Phase 1A** — monorepo skeleton, then Laravel API and React Studio scaffolds.
+1. **Phase 1B** — Laravel API scaffold (`apps/api/`)
+2. **Phase 1C** — React Studio scaffold (`apps/studio/`)
+3. **Phase 1D** — Content Core (collections, fields, entries, API v1)
 
 See [roadmap.md](roadmap.md) for the full plan.
 

@@ -7,17 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.1] - 2026-05-30
+
 ### Added
 
-- Product foundation documentation (README, CONTRIBUTING, SECURITY, CODE_OF_CONDUCT)
-- Public docs: vision, architecture, roadmap, content model, permissions, extensions, versioning, security, development
+- Monorepo skeleton: `apps/api/`, `apps/studio/`, `packages/{sdk,plugin-sdk,ui}/`
+- Placeholder README files describing planned structure for each package
 
 ## [0.0.0] - 2026-05-30
 
 ### Added
 
 - MIT License
-- Repository initialized
+- Product foundation documentation (README, CONTRIBUTING, docs/)
 
 ### Notes
 

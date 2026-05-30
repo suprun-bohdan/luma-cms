@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status:** Pre-alpha. Phase 0 in progress.
+> **Status:** Pre-alpha. Phase 0 complete; Phase 1 next.
 
 ## Phase 0: Foundation
 
@@ -8,8 +8,8 @@
 
 - [x] License (MIT)
 - [x] Product documentation
-- [ ] Monorepo skeleton (`apps/`, `packages/`)
-- [ ] Contribution and security docs (ongoing)
+- [x] Monorepo skeleton (`apps/`, `packages/`)
+- [x] Contribution and security docs
 
 ## Phase 1: Content Core (MVP 0.1)
 
