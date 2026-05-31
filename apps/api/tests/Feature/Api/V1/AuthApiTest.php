@@ -23,8 +23,8 @@ final class AuthApiTest extends TestCase
     public function test_login_returns_token_and_user(): void
     {
         $response = $this->postJson('/api/v1/auth/login', [
-            'email' => 'admin@luma.test',
-            'password' => 'password',
+            'email' => env('LUMA_SEED_ADMIN_EMAIL', 'admin@luma.test'),
+            'password' => env('LUMA_SEED_ADMIN_PASSWORD', 'password'),
         ]);
 
         $response

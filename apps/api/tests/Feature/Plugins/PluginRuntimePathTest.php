@@ -66,4 +66,30 @@ final class PluginRuntimePathTest extends TestCase
             'subject_id' => 'luma.test-path-escape',
         ]);
     }
+
+    public function test_plugin_entrypoint_sibling_directory_prefix_is_rejected(): void
+    {
+        Plugin::query()->create([
+            'plugin_id' => 'luma.test-foo',
+            'name' => 'Test Foo Prefix Plugin',
+            'version' => '0.1.0',
+            'status' => PluginStatus::Enabled,
+            'manifest' => json_decode(
+                (string) file_get_contents(base_path('tests/fixtures/plugins/luma.test-foo/luma.plugin.json')),
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            ),
+            'path' => 'luma.test-foo',
+            'installed_at' => now(),
+            'enabled_at' => now(),
+        ]);
+
+        app(PluginRuntimeService::class)->bootEnabledPlugins();
+
+        $this->assertDatabaseHas('plugins', [
+            'plugin_id' => 'luma.test-foo',
+            'status' => PluginStatus::Failed->value,
+        ]);
+    }
 }

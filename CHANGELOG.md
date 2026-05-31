@@ -7,22 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.1] - 2026-05-31
+
 ### Added
 
 - Phase 8.2 clean-room validation: expanded `docs/installation-validation.md` (shared zip + Docker prod, Setup vs Onboarding)
 - Automated release artifact content checks in `DistributionArtifactsTest` and `DistributionStudioCopyTest`
 - PHPUnit coverage for setup token edge cases, owner/update RBAC, plugin path containment, webhook dispatch isolation, update failure audit
+- Phase 8.4 real-user install rehearsal log (shared zip SQLite path)
 
 ### Changed
 
 - Phase 8.3 Studio UX cleanup: grouped sidebar navigation, dashboard welcome and action cards, setup/onboarding copy separation, owner-only update confirm and permission messaging, plugin trusted-PHP and failed-state display, forms/media/pages empty states and helper text, settings documentation links
 - `UpdateService` is no longer `final` to allow failure-path testing via container mock
 - `apps/api/.env.production.example` admin password placeholder avoids production guard blocked value
+- Runtime version synchronized to `0.0.25-rc.1` in `bootstrap/luma-requirements.php`
 
 ### Fixed
 
 - Manual clean-room validation (2026-05-31): documented `make prod-setup` fixes for root-owned `.env` and production install password (outer `Makefile`)
-- Phase 8.4 rehearsal: `.env.shared.example` now uses file cache/session until Setup migrations complete; `INSTALL.txt` note added
+- Phase 8.4 rehearsal: `.env.shared.example` uses file cache/session until Setup migrations complete; `INSTALL.txt` note added
+- Phase 8.5: `.env.shared.example` seed password placeholder no longer uses a production-guard blocked value
+- Plugin runtime path containment: normalize plugin root with trailing directory separator to block sibling-prefix escapes (`/plugins/foo` vs `/plugins/foo-evil`)
 
 ## [0.0.24] - 2026-05-30
 

@@ -29,6 +29,7 @@ final class SystemApiTest extends TestCase
         $this->getJson('/api/v1/system/version')
             ->assertOk()
             ->assertJsonStructure(['data' => ['version', 'installed']])
+            ->assertJsonPath('data.version', '0.0.25-rc.1')
             ->assertJsonPath('data.installed', false);
     }
 
@@ -85,7 +86,7 @@ final class SystemApiTest extends TestCase
 
         File::put($manifestPath, json_encode([
             'product' => 'luma-cms',
-            'version' => '0.0.24-dev',
+            'version' => '0.0.26-dev',
             'flavor' => 'shared',
             'build' => '20260531',
         ], JSON_THROW_ON_ERROR));
@@ -94,7 +95,7 @@ final class SystemApiTest extends TestCase
             $this->getJson('/api/v1/system/update/check', $this->withBearer($this->adminUser()))
                 ->assertOk()
                 ->assertJsonPath('data.update_available', true)
-                ->assertJsonPath('data.latest', '0.0.24-dev');
+                ->assertJsonPath('data.latest', '0.0.26-dev');
         } finally {
             if ($backup === null) {
                 File::delete($manifestPath);

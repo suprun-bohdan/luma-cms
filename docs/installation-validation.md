@@ -132,3 +132,19 @@ Automated smoke (same HTTP/API steps as manual R1–R7): outer [`scripts/rehears
 
 **Phase 8.4 gate:** **Pass** (with blocker fix committed). Next: tag release candidate or plan Phase 9 — not started here.
 
+---
+
+## Phase 8.5 — Release candidate finalization (`0.0.25-rc.1`)
+
+| Item | Result | Notes |
+|------|--------|-------|
+| Version sync | **Pass** | README, CHANGELOG `[0.0.25-rc.1]`, `bootstrap/luma-requirements.php`, `config/luma.php`, product READMEs |
+| Shared env placeholder | **Pass** | `LUMA_SEED_ADMIN_PASSWORD=Set-a-strong-password-min-12-chars` in `.env.shared.example` |
+| Plugin path containment | **Pass** | Trailing-separator root check; `PluginRuntimePathTest` sibling-prefix fixture |
+| PHPUnit + Studio lint/build | **Pass** | Docker `make test-api`; `npm run lint`; `VITE_BASE_PATH=/admin/ npm run build` |
+| Shared artifact | **Pass** | `make release-shared VERSION=0.0.25-rc.1` — manifest version matches |
+| MySQL + setup token browser E2E | **Not run** | Deferred to post-tag validation (see Phase 8.4 friction table) |
+| GitHub Actions | **Manual** | Verify workflow runs on GitHub after push |
+
+**Phase 8.5 gate:** **Pass** — ready for tag `v0.0.25-rc.1`.
+

@@ -37,5 +37,5 @@ return [
         ],
     ],
 
-    'version' => '0.0.23-dev',
+    'version' => '0.0.25-rc.1',
 ];

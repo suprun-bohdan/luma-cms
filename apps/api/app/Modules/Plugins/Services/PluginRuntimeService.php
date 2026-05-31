@@ -131,7 +131,7 @@ final class PluginRuntimeService
         $absolutePath = $pluginRoot.DIRECTORY_SEPARATOR.ltrim($backendEntry, DIRECTORY_SEPARATOR);
         $entry = realpath($absolutePath);
 
-        if ($entry === false || ! is_file($entry) || ! str_starts_with($entry, $pluginRoot)) {
+        if ($entry === false || ! is_file($entry) || ! str_starts_with($entry, $this->normalizedPluginRoot($pluginRoot))) {
             throw new RuntimeException('Plugin entrypoint escapes plugin directory.');
         }
 
@@ -151,6 +151,11 @@ final class PluginRuntimeService
         }
 
         return $instance;
+    }
+
+    private function normalizedPluginRoot(string $pluginRoot): string
+    {
+        return rtrim($pluginRoot, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
     }
 
     private function resolvePluginClass(string $absolutePath): ?string

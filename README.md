@@ -6,7 +6,7 @@
 
 Open-source CMS for developers, agencies, and SMB — structured content, clean Laravel architecture, and Luma Studio admin.
 
-> **Status: Pre-alpha `[0.0.24]`.** Content Core through Integrations (Phase 6), production installer (Phase 7), and web setup / onboarding / shared-hosting updates (Phase 8) are implemented.
+> **Status: Pre-alpha `[0.0.25-rc.1]`.** Content Core through Integrations (Phase 6), production installer (Phase 7), web setup / onboarding / shared-hosting updates (Phase 8), and install rehearsal (Phase 8.4) are implemented.
 
 [![PHP](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml)
 [![Studio](https://github.com/suprun-bohdan/luma-cms/actions/workflows/studio.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/studio.yml)
