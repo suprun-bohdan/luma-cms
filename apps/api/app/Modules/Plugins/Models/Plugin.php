@@ -17,6 +17,7 @@ class Plugin extends Model
         'status',
         'manifest',
         'path',
+        'last_error',
         'installed_at',
         'enabled_at',
     ];

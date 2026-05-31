@@ -4,41 +4,89 @@ declare(strict_types=1);
 
 namespace App\Modules\Setup\Services;
 
+use Illuminate\Support\Facades\File;
+use RuntimeException;
+
 final class EnvFileWriter
 {
+    /** @var list<string> */
+    private const ALLOWED_KEYS = [
+        'APP_NAME',
+        'DB_CONNECTION',
+        'DB_HOST',
+        'DB_PORT',
+        'DB_DATABASE',
+        'DB_USERNAME',
+        'DB_PASSWORD',
+    ];
+
     /**
      * @param  array<string, scalar|null>  $values
      */
     public function merge(string $path, array $values): void
     {
-        $lines = is_file($path) ? file($path, FILE_IGNORE_NEW_LINES) : [];
-        $updatedKeys = [];
+        $values = array_intersect_key(
+            $values,
+            array_flip(self::ALLOWED_KEYS),
+        );
 
-        foreach ($lines as $index => $line) {
-            if (! str_contains($line, '=') || str_starts_with(ltrim($line), '#')) {
-                continue;
+        if ($values === []) {
+            return;
+        }
+
+        $lockPath = $path.'.lock';
+        $lockHandle = fopen($lockPath, 'c+');
+
+        if ($lockHandle === false) {
+            throw new RuntimeException('Unable to open environment file lock.');
+        }
+
+        try {
+            if (! flock($lockHandle, LOCK_EX)) {
+                throw new RuntimeException('Unable to acquire environment file lock.');
             }
 
-            [$key] = explode('=', $line, 2);
+            $lines = is_file($path) ? file($path, FILE_IGNORE_NEW_LINES) : [];
 
-            if (! array_key_exists($key, $values)) {
-                continue;
+            foreach ($lines as $index => $line) {
+                if (! str_contains($line, '=') || str_starts_with(ltrim($line), '#')) {
+                    continue;
+                }
+
+                [$key] = explode('=', $line, 2);
+
+                if (! array_key_exists($key, $values)) {
+                    continue;
+                }
+
+                $lines[$index] = $this->formatLine($key, $values[$key]);
+                unset($values[$key]);
             }
 
-            $lines[$index] = $this->formatLine($key, $values[$key]);
-            unset($values[$key]);
-            $updatedKeys[] = $key;
-        }
+            foreach ($values as $key => $value) {
+                $lines[] = $this->formatLine($key, $value);
+            }
 
-        foreach ($values as $key => $value) {
-            $lines[] = $this->formatLine($key, $value);
-        }
+            if (is_file($path)) {
+                File::copy($path, $path.'.bak');
+            }
 
-        if (is_file($path)) {
-            copy($path, $path.'.bak');
-        }
+            $contents = implode(PHP_EOL, $lines).PHP_EOL;
+            $temporaryPath = $path.'.tmp.'.getmypid();
 
-        file_put_contents($path, implode(PHP_EOL, $lines).PHP_EOL);
+            if (file_put_contents($temporaryPath, $contents, LOCK_EX) === false) {
+                throw new RuntimeException('Unable to write temporary environment file.');
+            }
+
+            if (! rename($temporaryPath, $path)) {
+                @unlink($temporaryPath);
+
+                throw new RuntimeException('Unable to replace environment file.');
+            }
+        } finally {
+            flock($lockHandle, LOCK_UN);
+            fclose($lockHandle);
+        }
     }
 
     private function formatLine(string $key, mixed $value): string

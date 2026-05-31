@@ -37,4 +37,22 @@ final class SettingsApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.site.title', 'Acme Corp');
     }
+
+    public function test_arbitrary_settings_keys_are_ignored(): void
+    {
+        $this->patchJson(
+            '/api/v1/settings',
+            [
+                'app.debug' => true,
+                'site.title' => 'Still Safe',
+            ],
+            $this->withBearer($this->adminUser()),
+        )
+            ->assertOk()
+            ->assertJsonPath('data.site.title', 'Still Safe');
+
+        $this->assertDatabaseMissing('settings', [
+            'key' => 'app.debug',
+        ]);
+    }
 }

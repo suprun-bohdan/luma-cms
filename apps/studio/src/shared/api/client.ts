@@ -27,6 +27,7 @@ type ApiRequestOptions<T> = {
   schema: z.ZodType<T>
   token?: string | null
   auth?: boolean
+  headers?: Record<string, string>
 }
 
 async function parseJson(response: Response): Promise<unknown> {
@@ -45,9 +46,11 @@ export async function apiRequest<T>({
   schema,
   token,
   auth = false,
+  headers: extraHeaders,
 }: ApiRequestOptions<T> & { path: string }): Promise<T> {
   const headers: Record<string, string> = {
     Accept: 'application/json',
+    ...extraHeaders,
   }
 
   if (body !== undefined) {

@@ -7,6 +7,7 @@ namespace App\Modules\Onboarding\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Modules\Onboarding\Services\OnboardingService;
 use App\Modules\Settings\Models\Setting;
+use App\Modules\Setup\Models\SetupLog;
 use App\Modules\Setup\Services\SetupLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ final class OnboardingController extends Controller
 
     public function journal(SetupLogService $setupLog): JsonResponse
     {
-        $this->authorize('viewAny', Setting::class);
+        $this->authorize('viewAny', SetupLog::class);
 
         $logs = array_values(array_filter(
             $setupLog->recent(50),

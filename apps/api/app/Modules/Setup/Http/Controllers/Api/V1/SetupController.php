@@ -132,7 +132,7 @@ final class SetupController extends Controller
 
         return response()->json([
             'ok' => true,
-            'redirect' => '/studio/login',
+            'redirect' => '/admin/login',
         ]);
     }
 }

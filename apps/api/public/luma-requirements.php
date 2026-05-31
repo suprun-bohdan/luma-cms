@@ -40,9 +40,9 @@ if (isset($_GET['format']) && $_GET['format'] === 'json') {
 }
 
 if ($meetsMinimum) {
-    header('Location: /studio/setup', true, 302);
+    header('Location: /admin/setup', true, 302);
     echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Luma CMS</title></head><body>';
-    echo '<p>PHP '.$current.' is supported. Continue to <a href="/studio/setup">/studio/setup</a>.</p>';
+    echo '<p>PHP '.$current.' is supported. Continue to <a href="/admin/setup">/admin/setup</a>.</p>';
     echo '</body></html>';
 
     exit(0);

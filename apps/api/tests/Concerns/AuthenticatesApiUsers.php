@@ -37,6 +37,22 @@ trait AuthenticatesApiUsers
         return $user->fresh('roles');
     }
 
+    protected function ownerUser(): User
+    {
+        $user = User::query()->updateOrCreate(
+            ['email' => 'owner@luma.test'],
+            [
+                'name' => 'Luma Owner',
+                'password' => Hash::make('password'),
+            ],
+        );
+
+        $ownerRole = Role::query()->where('slug', 'owner')->firstOrFail();
+        $user->roles()->sync([$ownerRole->id]);
+
+        return $user->fresh('roles');
+    }
+
     protected function bearerToken(User $user): string
     {
         return $user->createToken('test')->plainTextToken;

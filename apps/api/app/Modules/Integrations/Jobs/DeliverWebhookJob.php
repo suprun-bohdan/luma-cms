@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 final class DeliverWebhookJob implements ShouldQueue
@@ -60,7 +61,7 @@ final class DeliverWebhookJob implements ShouldQueue
             if ($response->successful()) {
                 $delivery->update([
                     'status' => WebhookDeliveryStatus::Success,
-                    'attempts' => $delivery->attempts + 1,
+                    'attempts' => $this->attempts(),
                     'response_status' => $response->status(),
                     'response_body' => $responseBody,
                     'error_message' => null,
@@ -71,47 +72,84 @@ final class DeliverWebhookJob implements ShouldQueue
                 return;
             }
 
-            $this->markFailure(
+            $this->markRetryableFailure(
                 $delivery,
                 $response->status(),
                 $responseBody,
                 'HTTP '.$response->status(),
             );
         } catch (Throwable $exception) {
+            if ($exception instanceof RuntimeException && str_starts_with($exception->getMessage(), 'HTTP ')) {
+                throw $exception;
+            }
+
             Log::warning('Webhook delivery failed', [
                 'delivery_id' => $delivery->id,
                 'webhook_id' => $webhook->id,
                 'message' => $exception->getMessage(),
             ]);
 
-            $this->markFailure($delivery, null, null, $exception->getMessage());
+            $this->markRetryableFailure($delivery, null, null, $exception->getMessage());
         }
     }
 
-    private function markFailure(
+    public function failed(?Throwable $exception): void
+    {
+        $delivery = WebhookDelivery::query()->find($this->deliveryId);
+
+        if ($delivery === null || $delivery->status === WebhookDeliveryStatus::Success) {
+            return;
+        }
+
+        if ($this->attempts() < $this->tries) {
+            return;
+        }
+
+        if ($delivery->status === WebhookDeliveryStatus::Failed) {
+            return;
+        }
+
+        $delivery->update([
+            'status' => WebhookDeliveryStatus::Failed,
+            'attempts' => $this->attempts(),
+            'error_message' => substr($exception?->getMessage() ?? 'Delivery failed', 0, 1000),
+            'next_retry_at' => null,
+        ]);
+    }
+
+    private function markRetryableFailure(
         WebhookDelivery $delivery,
         ?int $responseStatus,
         ?string $responseBody,
         string $errorMessage,
     ): void {
-        $attempts = $delivery->attempts + 1;
-        $isFinal = $attempts >= $this->tries;
+        $attempt = $this->attempts();
+        $delay = $this->backoff[min(max($attempt - 1, 0), count($this->backoff) - 1)] ?? 600;
+
+        if ($attempt >= $this->tries) {
+            $delivery->update([
+                'status' => WebhookDeliveryStatus::Failed,
+                'attempts' => $attempt,
+                'response_status' => $responseStatus,
+                'response_body' => $responseBody,
+                'error_message' => substr($errorMessage, 0, 1000),
+                'next_retry_at' => null,
+                'delivered_at' => null,
+            ]);
+
+            return;
+        }
 
         $delivery->update([
-            'status' => $isFinal ? WebhookDeliveryStatus::Failed : WebhookDeliveryStatus::Pending,
-            'attempts' => $attempts,
+            'status' => WebhookDeliveryStatus::Pending,
+            'attempts' => $attempt,
             'response_status' => $responseStatus,
             'response_body' => $responseBody,
             'error_message' => substr($errorMessage, 0, 1000),
-            'next_retry_at' => $isFinal ? null : now()->addSeconds($this->backoff[min($attempts - 1, count($this->backoff) - 1)] ?? 600),
+            'next_retry_at' => now()->addSeconds($delay),
             'delivered_at' => null,
         ]);
 
-        if (! $isFinal && config('queue.connections.'.config('queue.default').'.driver') !== 'sync') {
-            $delay = $this->backoff[min($attempts - 1, count($this->backoff) - 1)] ?? 600;
-            self::dispatch($delivery->id)
-                ->onQueue('webhooks')
-                ->delay(now()->addSeconds($delay));
-        }
+        throw new RuntimeException($errorMessage);
     }
 }

@@ -25,11 +25,33 @@ final class EnvFileWriterTest extends TestCase
 
         $this->assertStringContainsString('DB_CONNECTION=mysql', $contents);
         $this->assertStringContainsString('DB_HOST=127.0.0.1', $contents);
-        $this->assertStringContainsString('APP_URL=http://localhost', $contents);
+        $this->assertStringNotContainsString('APP_URL=', $contents);
         $this->assertStringContainsString('APP_NAME=Laravel', $contents);
         $this->assertFileExists($path.'.bak');
 
         @unlink($path);
         @unlink($path.'.bak');
+        @unlink($path.'.lock');
+    }
+
+    public function test_merge_ignores_keys_outside_allowlist(): void
+    {
+        $path = storage_path('framework/testing-env-writer-allowlist.env');
+        file_put_contents($path, "APP_KEY=secret\n");
+
+        $writer = new EnvFileWriter();
+        $writer->merge($path, [
+            'APP_KEY' => 'hacked',
+            'APP_NAME' => 'Safe Site',
+        ]);
+
+        $contents = file_get_contents($path);
+
+        $this->assertStringContainsString('APP_KEY=secret', $contents);
+        $this->assertStringContainsString('APP_NAME="Safe Site"', $contents);
+
+        @unlink($path);
+        @unlink($path.'.bak');
+        @unlink($path.'.lock');
     }
 }

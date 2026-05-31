@@ -15,6 +15,7 @@ use App\Modules\Settings\Services\SettingsService;
 use App\Modules\Users\Database\Seeders\RolesAndPermissionsSeeder;
 use App\Modules\Users\Models\Role;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use RuntimeException;
@@ -28,6 +29,7 @@ final class InstallService
         private readonly StarterSiteService $starterSite,
         private readonly OnboardingService $onboarding,
         private readonly SettingsService $settings,
+        private readonly ProductionPasswordGuard $passwordGuard,
     ) {}
 
     public function requirements(): RequirementReport
@@ -45,13 +47,15 @@ final class InstallService
         if ($driver === 'sqlite') {
             $path = $database['database'] ?? database_path('database.sqlite');
             File::ensureDirectoryExists(dirname($path));
-            if (! file_exists($path)) {
-                touch($path);
+
+            if (! File::exists($path)) {
+                File::put($path, '');
             }
 
-            return is_writable($path);
+            return File::isWritable($path);
         }
 
+        // Raw PDO is intentional: setup may test credentials before Laravel reloads database config from .env.
         $dsn = match ($driver) {
             'mysql', 'mariadb' => sprintf(
                 'mysql:host=%s;port=%s;dbname=%s',
@@ -138,15 +142,19 @@ final class InstallService
         $email = $options->adminEmail ?: env('LUMA_SEED_ADMIN_EMAIL', 'admin@luma.test');
         $password = $options->adminPassword ?: env('LUMA_SEED_ADMIN_PASSWORD', 'password');
 
-        $adminRole = Role::query()->where('slug', 'admin')->firstOrFail();
+        $this->passwordGuard->assertAllowed($password);
 
-        $user = User::query()->firstOrNew(['email' => $email]);
-        $user->name = $options->siteTitle ?: ($user->name ?: 'Luma Admin');
-        $user->password = Hash::make($password);
-        $user->save();
-        $user->roles()->sync([$adminRole->id]);
+        $ownerRole = Role::query()->where('slug', 'owner')->firstOrFail();
 
-        return $user;
+        return DB::transaction(function () use ($email, $password, $options, $ownerRole): User {
+            $user = User::query()->firstOrNew(['email' => $email]);
+            $user->name = $options->siteTitle ?: ($user->name ?: 'Luma Admin');
+            $user->password = Hash::make($password);
+            $user->save();
+            $user->roles()->sync([$ownerRole->id]);
+
+            return $user;
+        });
     }
 
     private function log(string $step, string $status, string $message): void

@@ -72,3 +72,7 @@ Install via Studio **Plugins → Discover → Install → Enable**, or API.
 **Manifest upgrades:** uninstall and reinstall to refresh the DB snapshot (auto-upgrade is not implemented yet).
 
 Override scan path with `LUMA_PLUGINS_PATH` in API `.env`.
+
+## Security model
+
+Luma plugins are **trusted server-side PHP code**, not sandboxed extensions. The runtime validates backend entrypoint paths with `realpath()` and rejects path traversal, but a malicious plugin can still execute arbitrary PHP once enabled. Only install plugins from sources you trust, review capabilities before approval, and treat `routes.register` as a dangerous capability.

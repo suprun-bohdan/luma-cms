@@ -13,7 +13,9 @@ use App\Modules\Integrations\Jobs\DeliverWebhookJob;
 use App\Modules\Integrations\Models\Webhook;
 use App\Modules\Integrations\Models\WebhookDelivery;
 use App\Modules\Pages\Models\Page;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class IntegrationEventEmitter
 {
@@ -51,7 +53,15 @@ final class IntegrationEventEmitter
                     'attempts' => 0,
                 ]);
 
-                DeliverWebhookJob::dispatch($delivery->id)->onQueue('webhooks');
+                try {
+                    DeliverWebhookJob::dispatch($delivery->id)->onQueue('webhooks');
+                } catch (Throwable $exception) {
+                    Log::warning('Webhook delivery dispatch failed', [
+                        'delivery_id' => $delivery->id,
+                        'webhook_id' => $webhook->id,
+                        'message' => $exception->getMessage(),
+                    ]);
+                }
             });
     }
 

@@ -30,14 +30,14 @@ final class SystemApiTest extends TestCase
             ->assertJsonPath('data.installed', false);
     }
 
-    public function test_admin_runs_web_update_after_install(): void
+    public function test_owner_runs_web_update_after_install(): void
     {
         LumaInstallation::query()->create([
             'completed_at' => now(),
             'version' => '0.0.23-dev',
         ]);
 
-        $this->postJson('/api/v1/system/update/run', [], $this->withBearer($this->adminUser()))
+        $this->postJson('/api/v1/system/update/run', [], $this->withBearer($this->ownerUser()))
             ->assertOk()
             ->assertJsonPath('ok', true)
             ->assertJsonStructure(['data' => ['migrations']]);
@@ -46,6 +46,29 @@ final class SystemApiTest extends TestCase
             'step' => 'system.update',
             'status' => 'success',
         ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'system.update.started',
+            'subject_type' => 'system',
+            'subject_id' => 'luma',
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'action' => 'system.update.succeeded',
+            'subject_type' => 'system',
+            'subject_id' => 'luma',
+        ]);
+    }
+
+    public function test_admin_without_owner_permission_cannot_run_update(): void
+    {
+        LumaInstallation::query()->create([
+            'completed_at' => now(),
+            'version' => '0.0.23-dev',
+        ]);
+
+        $this->postJson('/api/v1/system/update/run', [], $this->withBearer($this->adminUser()))
+            ->assertForbidden();
     }
 
     public function test_update_check_uses_manifest_version_when_present(): void
@@ -81,7 +104,7 @@ final class SystemApiTest extends TestCase
 
     public function test_web_update_requires_installation(): void
     {
-        $this->postJson('/api/v1/system/update/run', [], $this->withBearer($this->adminUser()))
+        $this->postJson('/api/v1/system/update/run', [], $this->withBearer($this->ownerUser()))
             ->assertStatus(422)
             ->assertJsonPath('ok', false);
     }

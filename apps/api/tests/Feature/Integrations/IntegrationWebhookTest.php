@@ -162,6 +162,7 @@ final class IntegrationWebhookTest extends TestCase
 
         $delivery = WebhookDelivery::query()->firstOrFail();
         $this->assertSame(WebhookDeliveryStatus::Pending, $delivery->status);
+        $this->assertSame(1, $delivery->attempts);
 
         $this->postJson(
             "/api/v1/integrations/webhooks/{$webhookId}/deliveries/{$delivery->id}/retry",

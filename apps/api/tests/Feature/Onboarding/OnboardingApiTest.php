@@ -73,11 +73,17 @@ final class OnboardingApiTest extends TestCase
                 'site_title' => 'Journal Site',
                 'industry' => 'retail',
             ],
-            $this->withBearer($this->adminUser()),
+            $this->withBearer($this->ownerUser()),
         )->assertOk();
 
-        $this->getJson('/api/v1/onboarding/journal', $this->withBearer($this->adminUser()))
+        $this->getJson('/api/v1/onboarding/journal', $this->withBearer($this->ownerUser()))
             ->assertOk()
             ->assertJsonStructure(['data' => [['id', 'step', 'status', 'message']]]);
+    }
+
+    public function test_admin_cannot_view_setup_journal_without_permission(): void
+    {
+        $this->getJson('/api/v1/onboarding/journal', $this->withBearer($this->adminUser()))
+            ->assertForbidden();
     }
 }

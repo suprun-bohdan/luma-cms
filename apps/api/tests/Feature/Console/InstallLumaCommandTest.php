@@ -26,6 +26,6 @@ final class InstallLumaCommandTest extends TestCase
         ]);
 
         $admin = User::query()->where('email', 'installer@luma.test')->firstOrFail();
-        $this->assertTrue($admin->roles()->where('slug', 'admin')->exists());
+        $this->assertTrue($admin->roles()->where('slug', 'owner')->exists());
     }
 }

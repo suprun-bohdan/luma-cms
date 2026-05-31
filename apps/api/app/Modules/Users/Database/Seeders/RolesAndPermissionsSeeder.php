@@ -41,6 +41,9 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Manage integration tokens', 'slug' => 'integrations.tokens.manage'],
             ['name' => 'Read webhook deliveries', 'slug' => 'integrations.deliveries.read'],
             ['name' => 'Manage site settings', 'slug' => 'settings.manage'],
+            ['name' => 'Check system updates', 'slug' => 'system.update.check'],
+            ['name' => 'Run system updates', 'slug' => 'system.update.run'],
+            ['name' => 'View setup logs', 'slug' => 'setup.view_logs'],
         ];
 
         foreach ($permissions as $permission) {
@@ -55,13 +58,27 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Administrator', 'description' => 'Full content access'],
         );
 
+        $owner = Role::query()->updateOrCreate(
+            ['slug' => 'owner'],
+            ['name' => 'Owner', 'description' => 'Site owner with full access including system updates'],
+        );
+
         $editor = Role::query()->updateOrCreate(
             ['slug' => 'editor'],
             ['name' => 'Editor', 'description' => 'Create and edit content'],
         );
 
+        $allPermissionIds = Permission::query()->pluck('id');
+
+        $owner->permissions()->sync($allPermissionIds);
+
         $admin->permissions()->sync(
-            Permission::query()->pluck('id'),
+            Permission::query()
+                ->whereNotIn('slug', [
+                    'system.update.run',
+                    'setup.view_logs',
+                ])
+                ->pluck('id'),
         );
 
         $editor->permissions()->sync(
@@ -95,5 +112,9 @@ class RolesAndPermissionsSeeder extends Seeder
         );
 
         $user->roles()->sync([$admin->id]);
+
+        if (filter_var(env('LUMA_SEED_AS_OWNER', false), FILTER_VALIDATE_BOOL)) {
+            $user->roles()->sync([$owner->id]);
+        }
     }
 }

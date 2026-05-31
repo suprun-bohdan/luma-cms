@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import { defineConfig } from 'vite'
 
-const studioBase = process.env.VITE_BASE_PATH ?? '/'
+const studioBase = process.env.VITE_BASE_PATH ?? '/admin/'
 
 export default defineConfig({
   base: studioBase,

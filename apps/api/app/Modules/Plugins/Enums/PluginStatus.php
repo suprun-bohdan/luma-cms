@@ -9,4 +9,5 @@ enum PluginStatus: string
     case Installed = 'installed';
     case Enabled = 'enabled';
     case Disabled = 'disabled';
+    case Failed = 'failed';
 }

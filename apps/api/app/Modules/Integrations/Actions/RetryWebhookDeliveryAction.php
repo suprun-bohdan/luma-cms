@@ -7,6 +7,8 @@ namespace App\Modules\Integrations\Actions;
 use App\Modules\Integrations\Enums\WebhookDeliveryStatus;
 use App\Modules\Integrations\Jobs\DeliverWebhookJob;
 use App\Modules\Integrations\Models\WebhookDelivery;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class RetryWebhookDeliveryAction
 {
@@ -26,7 +28,14 @@ final class RetryWebhookDeliveryAction
             'delivered_at' => null,
         ]);
 
-        DeliverWebhookJob::dispatch($delivery->id)->onQueue('webhooks');
+        try {
+            DeliverWebhookJob::dispatchSync($delivery->id);
+        } catch (Throwable $exception) {
+            Log::warning('Manual webhook retry failed', [
+                'delivery_id' => $delivery->id,
+                'message' => $exception->getMessage(),
+            ]);
+        }
 
         return $delivery->refresh();
     }

@@ -7,8 +7,17 @@ namespace App\Modules\Plugins\Services;
 use App\Modules\Plugins\Contracts\PluginContract;
 use App\Modules\Plugins\Enums\PluginStatus;
 use App\Modules\Plugins\Models\Plugin;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
+use Throwable;
 
+/**
+ * Loads trusted server-side PHP plugin entrypoints.
+ *
+ * Luma plugins are not sandboxed PHP. Only install plugins from trusted sources.
+ * Entrypoint paths are validated with realpath() and must stay inside the plugin directory.
+ */
 final class PluginRuntimeService
 {
     /** @var array<string, PluginContract> */
@@ -21,6 +30,7 @@ final class PluginRuntimeService
         private readonly BlockTypeRegistry $blockTypes,
         private readonly PluginRouteRegistry $pluginRoutes,
         private readonly CapabilityGate $capabilityGate,
+        private readonly AuditLogService $auditLog,
     ) {
     }
 
@@ -30,7 +40,11 @@ final class PluginRuntimeService
             ->where('status', PluginStatus::Enabled)
             ->orderBy('plugin_id')
             ->each(function (Plugin $plugin): void {
-                $this->registerPlugin($plugin);
+                try {
+                    $this->registerPlugin($plugin);
+                } catch (Throwable $exception) {
+                    $this->markPluginBootFailed($plugin, $exception);
+                }
             });
 
         $this->dispatcher->dispatch('system.booted');
@@ -74,6 +88,32 @@ final class PluginRuntimeService
         $this->loaded = [];
     }
 
+    private function markPluginBootFailed(Plugin $plugin, Throwable $exception): void
+    {
+        $message = substr($exception->getMessage(), 0, 1000);
+
+        $this->unregisterPlugin($plugin);
+
+        $plugin->update([
+            'status' => PluginStatus::Failed,
+            'last_error' => $message,
+            'enabled_at' => null,
+        ]);
+
+        $this->auditLog->record(
+            'plugin.boot_failed',
+            'plugin',
+            $plugin->plugin_id,
+            null,
+            ['message' => $message],
+        );
+
+        Log::warning('Plugin boot failed', [
+            'plugin_id' => $plugin->plugin_id,
+            'message' => $message,
+        ]);
+    }
+
     private function instantiate(Plugin $plugin): PluginContract
     {
         $backendEntry = $plugin->manifest['entrypoints']['backend'] ?? null;
@@ -82,16 +122,23 @@ final class PluginRuntimeService
             throw new RuntimeException('Plugin backend entrypoint is missing.');
         }
 
-        $absolutePath = $this->registry->absolutePluginPath($plugin->path)
-            .DIRECTORY_SEPARATOR.ltrim($backendEntry, DIRECTORY_SEPARATOR);
+        $pluginRoot = realpath($this->registry->absolutePluginPath($plugin->path));
 
-        if (! is_file($absolutePath)) {
-            throw new RuntimeException('Plugin backend entrypoint file not found.');
+        if ($pluginRoot === false) {
+            throw new RuntimeException('Plugin directory not found.');
         }
 
-        require_once $absolutePath;
+        $absolutePath = $pluginRoot.DIRECTORY_SEPARATOR.ltrim($backendEntry, DIRECTORY_SEPARATOR);
+        $entry = realpath($absolutePath);
 
-        $className = $this->resolvePluginClass($absolutePath);
+        if ($entry === false || ! is_file($entry) || ! str_starts_with($entry, $pluginRoot)) {
+            throw new RuntimeException('Plugin entrypoint escapes plugin directory.');
+        }
+
+        // Plugins are trusted PHP extensions loaded via require_once after path validation.
+        require_once $entry;
+
+        $className = $this->resolvePluginClass($entry);
 
         if ($className === null) {
             throw new RuntimeException('Plugin backend class not found.');
@@ -108,11 +155,7 @@ final class PluginRuntimeService
 
     private function resolvePluginClass(string $absolutePath): ?string
     {
-        $contents = file_get_contents($absolutePath);
-
-        if ($contents === false) {
-            return null;
-        }
+        $contents = File::get($absolutePath);
 
         $namespace = null;
         $class = null;

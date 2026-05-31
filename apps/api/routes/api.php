@@ -36,9 +36,12 @@ Route::prefix('v1')->group(function (): void {
 
     Route::get('/setup/status', [SetupController::class, 'status']);
 
-    Route::prefix('setup')->middleware('luma.not_installed')->group(function (): void {
+    Route::prefix('setup')->middleware(['luma.not_installed', 'luma.setup_token', 'throttle:setup'])->group(function (): void {
         Route::get('/requirements', [SetupController::class, 'requirements']);
         Route::get('/logs', [SetupController::class, 'logs']);
+    });
+
+    Route::prefix('setup')->middleware(['luma.not_installed', 'luma.setup_token', 'throttle:setup-write'])->group(function (): void {
         Route::post('/database/test', [SetupController::class, 'testDatabase']);
         Route::post('/database', [SetupController::class, 'saveDatabase']);
         Route::post('/finish', [SetupController::class, 'finish']);

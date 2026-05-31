@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Core\Install\ProductionPasswordGuard;
 use App\Core\Install\InstallService;
 use App\Core\Requirements\EnvironmentRequirementChecker;
+use App\Core\System\Models\SystemUpdate;
+use App\Core\System\Policies\SystemUpdatePolicy;
 use App\Core\Update\SystemVersionService;
 use App\Core\Update\UpdateService;
 use App\Modules\Content\Models\Collection;
@@ -38,8 +41,13 @@ use App\Modules\Seo\Models\Redirect;
 use App\Modules\Seo\Policies\RedirectPolicy;
 use App\Modules\Settings\Models\Setting;
 use App\Modules\Settings\Policies\SettingPolicy;
+use App\Modules\Setup\Models\SetupLog;
+use App\Modules\Setup\Policies\SetupLogPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -48,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(EnvironmentRequirementChecker::class, static fn (): EnvironmentRequirementChecker => EnvironmentRequirementChecker::default());
         $this->app->singleton(InstallService::class);
+        $this->app->singleton(ProductionPasswordGuard::class);
         $this->app->singleton(UpdateService::class);
         $this->app->singleton(SystemVersionService::class);
         $this->app->singleton(ExtensionPointDispatcher::class);
@@ -58,6 +67,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        RateLimiter::for('setup', static fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
+        RateLimiter::for('setup-write', static fn (Request $request) => Limit::perMinute(6)->by($request->ip()));
+
         Gate::policy(Collection::class, CollectionPolicy::class);
         Gate::policy(Field::class, FieldPolicy::class);
         Gate::policy(Entry::class, EntryPolicy::class);
@@ -71,8 +83,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Plugin::class, PluginPolicy::class);
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
         Gate::policy(Setting::class, SettingPolicy::class);
+        Gate::policy(SystemUpdate::class, SystemUpdatePolicy::class);
+        Gate::policy(SetupLog::class, SetupLogPolicy::class);
 
-        if (Schema::hasTable('plugins')) {
+        if ($this->shouldBootPlugins()) {
             $this->app->booted(function (): void {
                 $this->app->make(PluginRuntimeService::class)->bootEnabledPlugins();
             });
@@ -81,5 +95,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->booted(function (): void {
             $this->app->make(PluginRouteRegistrar::class)->registerRoutes();
         });
+    }
+
+    private function shouldBootPlugins(): bool
+    {
+        try {
+            return Schema::hasTable('plugins');
+        } catch (\Throwable) {
+            // Database may be unavailable during composer scripts or pre-install bootstrap.
+            return false;
+        }
     }
 }
