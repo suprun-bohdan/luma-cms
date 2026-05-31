@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.19] - 2026-05-30
+
+### Added
+
+- Plugin block type registration via `PluginContext::registerBlockType()` and `render.block` extension point
+- `BlockTypeRegistry`, `BlockTypeService`, and `GET /api/v1/editor/block-types` for Studio palette merge
+- Dynamic plugin blocks in `PageContentValidator` and `BlockRendererRegistry`
+- Plugin HTTP routes via `PluginContext::registerRoute()` guarded by `routes.register` capability
+- `PluginRouteRegistry`, `EnsurePluginRouteCapability` middleware, and catch-all plugin route dispatcher
+- Demo plugin v0.3.0 — `quote` block type
+- Tests: `BlockTypeRegistryTest`, `PluginBlockTypeTest`, `PluginRouteTest`
+
 ## [0.0.18] - 2026-05-30
 
 ### Added

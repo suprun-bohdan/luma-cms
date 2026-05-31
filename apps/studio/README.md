@@ -63,7 +63,7 @@ apps/studio/src/
 | `/media` | Media library (upload, alt text, delete) |
 | `/pages` | Pages list |
 | `/pages/new` | Create page (section templates, blocks, live preview before save) |
-| `/pages/:slug/edit` | Visual page editor (drag-and-drop blocks, preview, inspector) |
+| `/pages/:slug/edit` | Visual page editor (drag-and-drop blocks, preview, inspector, plugin blocks from API) |
 | `/menus` | Navigation hub (header + footer) |
 | `/menus/footer` | Footer menu editor |
 | `/forms` | Forms list |
@@ -112,7 +112,7 @@ npm run lint
 6. Edit header menu at `/menus/header` — link to your page slug
 7. Optional: run demo seeder and open `/p/home` (includes contact form)
 8. Check `/forms/contact/submissions` after a form submit
-9. At `/plugins` — discover and install `luma.demo`, approve any pending capabilities, enable; check sidebar **Demo insights** and `/plugins/audit-logs`
+9. At `/plugins` — discover and install `luma.demo`, enable; edit a page and add the **Quote** plugin block from the Plugins palette group
 10. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling

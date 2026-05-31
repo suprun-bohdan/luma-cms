@@ -28,6 +28,29 @@ final class Plugin implements PluginContract
         });
 
         $context->registerAdminNavigation('Demo insights', '/plugins', 90);
+
+        $context->registerBlockType(
+            'quote',
+            'Quote',
+            'Pull quote with optional author attribution',
+            'content',
+            [
+                'quote' => 'Great products are built by teams who care about structured content.',
+                'author' => 'Luma CMS',
+            ],
+            [
+                ['name' => 'quote', 'label' => 'Quote', 'type' => 'textarea'],
+                ['name' => 'author', 'label' => 'Author', 'type' => 'text'],
+            ],
+            static function (array $props): string {
+                $quote = e(is_string($props['quote'] ?? null) ? $props['quote'] : '');
+                $author = e(is_string($props['author'] ?? null) ? $props['author'] : '');
+
+                $footer = $author !== '' ? '<footer>&mdash; '.$author.'</footer>' : '';
+
+                return '<blockquote class="luma-block-quote"><p>'.$quote.'</p>'.$footer.'</blockquote>';
+            },
+        );
     }
 
     public function boot(PluginContext $context): void

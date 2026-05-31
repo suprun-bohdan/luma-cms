@@ -93,7 +93,9 @@ POST   /api/v1/plugins/{plugin_id}/disable    requires plugins.manage
 POST   /api/v1/plugins/{plugin_id}/capabilities/approve  requires plugins.manage
 DELETE /api/v1/plugins/{plugin_id}            requires plugins.manage
 GET    /api/v1/audit-logs                     requires plugins.audit
+GET    /api/v1/editor/block-types               requires pages.view
 GET    /api/v1/admin/navigation-items           requires pages.view (Studio admin access)
+GET|POST|PUT|DELETE /api/v1/plugins/{plugin_id}/{path}  requires routes.register (plugin-registered routes only)
 POST   /api/v1/pages/preview-html               requires pages.view (unsaved page preview)
 GET    /api/v1/pages/{slug}/preview-html       requires pages.view
 POST   /api/v1/pages/{slug}/preview-html       requires pages.view (live preview body)
@@ -157,10 +159,13 @@ Dangerous capabilities require explicit admin approval before enable. Lifecycle 
 | `content.afterUpdate` | `content.update` |
 | `content.afterPublish` | `content.publish` |
 | `admin.navigation` | `admin.extend` |
+| `render.block` | `editor.extend` |
+
+Plugin block types use namespaced ids: `{plugin_id}/{local_type}`. Plugin routes are registered under `/api/v1/plugins/{plugin_id}/{path}` and require the `routes.register` capability (dangerous — approve before enable).
 
 Hook listeners run only when the plugin is enabled, the capability is granted, and the point is declared in the manifest snapshot. Listener failures are logged and do not roll back the core action.
 
-Demo plugin: `plugins/luma.demo/` v0.2.0 — `system.booted`, `content.afterPublish`, `admin.navigation`. After upgrading manifest on disk, uninstall and reinstall the plugin to refresh the DB snapshot (no auto-upgrade path yet).
+Demo plugin: `plugins/luma.demo/` v0.3.0 — quote block, content hooks, admin navigation. After upgrading manifest on disk, uninstall and reinstall the plugin to refresh the DB snapshot (no auto-upgrade path yet).
 
 ### Media
 

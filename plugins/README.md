@@ -15,7 +15,7 @@ plugins/
 
 Each plugin requires `luma.plugin.json`. Minimum fields match the governance template (schemaVersion, id, name, version, capabilities, entrypoints, …).
 
-## Extension points (Phase 5.1)
+## Extension points (Phase 5.1–5.2)
 
 | Extension point | Required capability | Purpose |
 |-----------------|-------------------|---------|
@@ -24,24 +24,50 @@ Each plugin requires `luma.plugin.json`. Minimum fields match the governance tem
 | `content.afterUpdate` | `content.update` | React to entry updates |
 | `content.afterPublish` | `content.publish` | React to entry/page publish |
 | `admin.navigation` | `admin.extend` | Add Studio sidebar links |
+| `render.block` | `editor.extend` | Register page block types |
 
-Declare points in `extensionPoints[]` and implement listeners via `PluginContext::listen()`. Use `PluginContext::registerAdminNavigation($label, $to, $sortOrder)` for sidebar items.
+Declare points in `extensionPoints[]`. Use `PluginContext::listen()`, `registerAdminNavigation()`, and `registerBlockType()`.
 
-## Demo plugin (v0.2.0)
+### Block types
+
+Block ids are namespaced: `{plugin_id}/{local_type}` (e.g. `luma.demo/quote`).
+
+```php
+$context->registerBlockType(
+    'quote',
+    'Quote',
+    'Pull quote with author',
+    'content',
+    ['quote' => '...', 'author' => '...'],
+    [
+        ['name' => 'quote', 'label' => 'Quote', 'type' => 'textarea'],
+        ['name' => 'author', 'label' => 'Author', 'type' => 'text'],
+    ],
+    static fn (array $props): string => '<blockquote>...</blockquote>',
+);
+```
+
+Escape all output in renderers (`e()` in Laravel).
+
+### Plugin routes
+
+Requires dangerous capability `routes.register` (approve in Studio before enable):
+
+```php
+$context->registerRoute('GET', 'ping', static fn () => ['ok' => true]);
+```
+
+Dispatched at `GET /api/v1/plugins/{plugin_id}/ping`.
+
+## Demo plugin (v0.3.0)
 
 `luma.demo`:
 
 - Logs on `system.booted` and `content.afterPublish`
-- Registers sidebar link **Demo insights** → `/plugins`
+- Sidebar link **Demo insights** → `/plugins`
+- **Quote** block type for the visual editor
 
-Install via Studio **Plugins → Discover → Install → Enable**, or API:
-
-```bash
-curl -X POST http://localhost:8080/api/v1/plugins/install \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"plugin_id":"luma.demo"}'
-```
+Install via Studio **Plugins → Discover → Install → Enable**, or API.
 
 **Manifest upgrades:** uninstall and reinstall to refresh the DB snapshot (auto-upgrade is not implemented yet).
 

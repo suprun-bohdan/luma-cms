@@ -1,16 +1,25 @@
 import { Button } from '../../../shared/components/Button'
-import { blockPaletteGroups, getBlocksByCategory } from '../data/blockDefinitions'
-import type { BlockDefinition } from '../data/blockDefinitions'
+import { getBlocksByCategory, type BlockDefinition } from '../data/blockDefinitions'
+import { useBlockPaletteGroups } from '../hooks/useBlockTypes'
 
 type BlockPaletteProps = {
+  definitions: BlockDefinition[]
   onAdd: (type: BlockDefinition['type']) => void
 }
 
-export function BlockPalette({ onAdd }: BlockPaletteProps) {
+export function BlockPalette({ definitions, onAdd }: BlockPaletteProps) {
+  const groups = useBlockPaletteGroups(definitions)
+
   return (
     <div className="space-y-4">
-      {blockPaletteGroups.map((group) => {
-        const blocks = getBlocksByCategory(group.id)
+      {groups.map((group) => {
+        const blocks = getBlocksByCategory(group.id).length
+          ? getBlocksByCategory(group.id)
+          : definitions.filter((definition) => definition.category === group.id)
+
+        if (blocks.length === 0) {
+          return null
+        }
 
         return (
           <div key={group.id}>
@@ -26,6 +35,7 @@ export function BlockPalette({ onAdd }: BlockPaletteProps) {
                   onClick={() => onAdd(definition.type)}
                 >
                   + {definition.label}
+                  {definition.category === 'plugins' ? ' (Plugin)' : ''}
                 </Button>
               ))}
             </div>

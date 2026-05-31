@@ -10,6 +10,7 @@ use App\Modules\Media\Http\Controllers\Api\V1\MediaController;
 use App\Modules\Media\Http\Controllers\Api\V1\PublicMediaController;
 use App\Modules\Navigation\Http\Controllers\Api\V1\MenuController;
 use App\Modules\Navigation\Http\Controllers\Api\V1\PublicMenuController;
+use App\Modules\Pages\Http\Controllers\Api\V1\EditorBlockTypesController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PagePreviewController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
@@ -67,6 +68,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/pages/preview-html', [PagePreviewController::class, 'draft']);
         Route::get('/pages/{page:slug}/preview-html', [PagePreviewController::class, 'show']);
         Route::post('/pages/{page:slug}/preview-html', [PagePreviewController::class, 'store']);
+
+        Route::get('/editor/block-types', [EditorBlockTypesController::class, 'index']);
 
         Route::get('/menus', [MenuController::class, 'index']);
         Route::post('/menus', [MenuController::class, 'store']);

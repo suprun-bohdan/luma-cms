@@ -2,12 +2,13 @@ import { Button } from '../../../shared/components/Button'
 import { Input } from '../../../shared/components/Input'
 import { Textarea } from '../../../shared/components/Textarea'
 import { SettingsPanel } from '../../../shared/layout/SplitPane'
-import { getBlockDefinition, type BlockItemFieldDefinition } from '../data/blockDefinitions'
+import type { BlockDefinition, BlockItemFieldDefinition } from '../data/blockDefinitions'
 import type { PageContent } from '../schemas/page'
 
 type BlockInspectorProps = {
   block: PageContent['blocks'][number] | null
   onChange: (blockId: string, props: Record<string, unknown>) => void
+  getBlockDefinition: (type: string) => BlockDefinition | undefined
 }
 
 type ItemRecord = Record<string, string>
@@ -100,7 +101,7 @@ function ItemListEditor({
   )
 }
 
-export function BlockInspector({ block, onChange }: BlockInspectorProps) {
+export function BlockInspector({ block, onChange, getBlockDefinition }: BlockInspectorProps) {
   if (!block) {
     return (
       <SettingsPanel title="Block settings">

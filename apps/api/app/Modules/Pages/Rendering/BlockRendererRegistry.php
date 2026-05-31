@@ -7,12 +7,16 @@ namespace App\Modules\Pages\Rendering;
 use App\Modules\Forms\Models\Form;
 use App\Modules\Media\Models\Media;
 use App\Modules\Media\Services\MediaStorageService;
+use App\Modules\Plugins\Services\BlockTypeRegistry;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
+use Throwable;
 
 final class BlockRendererRegistry
 {
     public function __construct(
         private readonly MediaStorageService $mediaStorage,
+        private readonly BlockTypeRegistry $blockTypes,
     ) {
     }
 
@@ -31,8 +35,31 @@ final class BlockRendererRegistry
             'contact_form' => $this->renderContactForm($props),
             'feature_grid' => $this->renderFeatureGrid($props),
             'faq' => $this->renderFaq($props),
-            default => '',
+            default => $this->renderPluginBlock($type, $props),
         };
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     */
+    private function renderPluginBlock(string $type, array $props): string
+    {
+        $entry = $this->blockTypes->find($type);
+
+        if ($entry === null) {
+            return '';
+        }
+
+        try {
+            return (string) ($entry['renderer'])($props);
+        } catch (Throwable $exception) {
+            Log::warning('Plugin block renderer failed', [
+                'type' => $type,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return '';
+        }
     }
 
     /**

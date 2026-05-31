@@ -33,6 +33,7 @@ final class ManifestValidator
         'content.afterUpdate',
         'content.afterPublish',
         'admin.navigation',
+        'render.block',
     ];
 
     /**

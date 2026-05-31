@@ -21,7 +21,10 @@ use App\Modules\Plugins\Models\Plugin;
 use App\Modules\Plugins\Policies\AuditLogPolicy;
 use App\Modules\Plugins\Policies\PluginPolicy;
 use App\Modules\Plugins\Services\AdminNavigationRegistry;
+use App\Modules\Plugins\Services\BlockTypeRegistry;
 use App\Modules\Plugins\Services\ExtensionPointDispatcher;
+use App\Modules\Plugins\Services\PluginRouteRegistry;
+use App\Modules\Plugins\Services\PluginRouteRegistrar;
 use App\Modules\Plugins\Services\PluginRuntimeService;
 use App\Modules\Seo\Models\Redirect;
 use App\Modules\Seo\Policies\RedirectPolicy;
@@ -35,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ExtensionPointDispatcher::class);
         $this->app->singleton(AdminNavigationRegistry::class);
+        $this->app->singleton(BlockTypeRegistry::class);
+        $this->app->singleton(PluginRouteRegistry::class);
     }
 
     public function boot(): void
@@ -55,5 +60,9 @@ class AppServiceProvider extends ServiceProvider
                 $this->app->make(PluginRuntimeService::class)->bootEnabledPlugins();
             });
         }
+
+        $this->app->booted(function (): void {
+            $this->app->make(PluginRouteRegistrar::class)->registerRoutes();
+        });
     }
 }

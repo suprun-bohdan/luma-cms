@@ -12,7 +12,8 @@ import { PagePreviewPane } from './PagePreviewPane'
 import { SectionTemplatePicker } from './SectionTemplatePicker'
 import { SeoPreviewPane } from './SeoPreviewPane'
 import { VisualBlockList } from './VisualBlockList'
-import { createUniqueBlockId, getBlockDefinition } from '../data/blockDefinitions'
+import { createUniqueBlockId } from '../data/blockDefinitions'
+import { useBlockTypes } from '../hooks/useBlockTypes'
 import {
   defaultContentJson,
   pageContentSchema,
@@ -78,6 +79,8 @@ export function PageForm({
   const [seoOgImage, setSeoOgImage] = useState(initialValues?.seoOgImage ?? '')
   const [formError, setFormError] = useState<string | null>(null)
   const [contentError, setContentError] = useState<string | null>(null)
+  const blockTypesQuery = useBlockTypes()
+  const { getBlockDefinition, definitions: blockDefinitionsList } = blockTypesQuery
 
   const selectedBlock = useMemo(
     () => content.blocks.find((block) => block.id === selectedBlockId) ?? null,
@@ -218,7 +221,7 @@ export function PageForm({
           }}
         />
         <div className="mt-4">
-          <BlockPalette onAdd={handleAddBlock} />
+          <BlockPalette definitions={blockDefinitionsList} onAdd={handleAddBlock} />
         </div>
         <div className="mt-4">
           <VisualBlockList
@@ -280,7 +283,11 @@ export function PageForm({
 
   const rightColumn = (
     <div className="space-y-4">
-      <BlockInspector block={selectedBlock} onChange={handleBlockPropsChange} />
+      <BlockInspector
+        block={selectedBlock}
+        onChange={handleBlockPropsChange}
+        getBlockDefinition={getBlockDefinition}
+      />
       <PreviewPane title="SEO preview">
         <SeoPreviewPane
           pageTitle={title}

@@ -16,13 +16,13 @@ export type BlockFieldDefinition = {
   itemFields?: BlockItemFieldDefinition[]
 }
 
-export type BlockType = PageContent['blocks'][number]['type']
+export type BlockType = string
 
 export type BlockDefinition = {
   type: BlockType
   label: string
   description: string
-  category: 'content' | 'actions' | 'forms'
+  category: 'content' | 'actions' | 'forms' | 'plugins'
   defaultProps: Record<string, unknown>
   fields: BlockFieldDefinition[]
 }
@@ -186,12 +186,13 @@ export function createBlock(type: BlockType, index: number): PageContent['blocks
 }
 
 export function createUniqueBlockId(type: BlockType, existingIds: Set<string>): string {
+  const base = type.replace(/\//g, '-')
   let index = 1
-  let id = `${type}-${index}`
+  let id = `${base}-${index}`
 
   while (existingIds.has(id)) {
     index += 1
-    id = `${type}-${index}`
+    id = `${base}-${index}`
   }
 
   return id

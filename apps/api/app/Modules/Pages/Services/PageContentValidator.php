@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace App\Modules\Pages\Services;
 
+use App\Modules\Pages\Support\CoreBlockDefinitions;
+use App\Modules\Plugins\Services\BlockTypeService;
+use App\Modules\Plugins\Support\BlockTypeDefinition;
 use Illuminate\Validation\ValidationException;
 
 final class PageContentValidator
 {
-    private const ALLOWED_TYPES = ['hero', 'rich_text', 'cta', 'contact_form', 'feature_grid', 'faq'];
+    public function __construct(
+        private readonly BlockTypeService $blockTypes,
+    ) {
+    }
 
     /**
      * @param  array<string, mixed>|null  $content
@@ -26,6 +32,7 @@ final class PageContentValidator
             ]);
         }
 
+        $allowedTypes = $this->blockTypes->allowedTypeIds();
         $blocks = [];
 
         foreach ($content['blocks'] as $index => $block) {
@@ -38,9 +45,9 @@ final class PageContentValidator
             $type = $block['type'] ?? null;
             $id = $block['id'] ?? null;
 
-            if (! is_string($type) || ! in_array($type, self::ALLOWED_TYPES, true)) {
+            if (! is_string($type) || ! in_array($type, $allowedTypes, true)) {
                 throw ValidationException::withMessages([
-                    "content.blocks.{$index}.type" => ['Block type must be one of: '.implode(', ', self::ALLOWED_TYPES).'.'],
+                    "content.blocks.{$index}.type" => ['Block type must be one of: '.implode(', ', $allowedTypes).'.'],
                 ]);
             }
 
@@ -67,23 +74,66 @@ final class PageContentValidator
                 $normalized['variant'] = $block['variant'];
             }
 
-            if ($type === 'contact_form') {
-                $formSlug = $props['form_slug'] ?? null;
-                if (! is_string($formSlug) || $formSlug === '') {
-                    throw ValidationException::withMessages([
-                        "content.blocks.{$index}.props.form_slug" => ['Contact form block requires a form_slug prop.'],
-                    ]);
+            if (in_array($type, CoreBlockDefinitions::ALLOWED_TYPES, true)) {
+                $normalized['props'] = $this->validateCoreBlockProps($type, $props, $index);
+            } else {
+                $definition = $this->blockTypes->findDefinition($type);
+                if ($definition !== null) {
+                    $normalized['props'] = $this->validatePluginBlockProps($definition, $props, $index);
                 }
-            }
-
-            if (in_array($type, ['feature_grid', 'faq'], true)) {
-                $normalized['props'] = $this->validateListBlockProps($type, $props, $index);
             }
 
             $blocks[] = $normalized;
         }
 
         return ['blocks' => $blocks];
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     * @return array<string, mixed>
+     */
+    private function validateCoreBlockProps(string $type, array $props, int $index): array
+    {
+        if ($type === 'contact_form') {
+            $formSlug = $props['form_slug'] ?? null;
+            if (! is_string($formSlug) || $formSlug === '') {
+                throw ValidationException::withMessages([
+                    "content.blocks.{$index}.props.form_slug" => ['Contact form block requires a form_slug prop.'],
+                ]);
+            }
+        }
+
+        if (in_array($type, ['feature_grid', 'faq'], true)) {
+            return $this->validateListBlockProps($type, $props, $index);
+        }
+
+        return $props;
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     * @return array<string, mixed>
+     */
+    private function validatePluginBlockProps(BlockTypeDefinition $definition, array $props, int $index): array
+    {
+        $normalized = $props;
+
+        foreach ($definition->fields as $field) {
+            if ($field->type === 'item_list') {
+                continue;
+            }
+
+            $value = $props[$field->name] ?? null;
+
+            if ($value !== null && ! is_string($value)) {
+                throw ValidationException::withMessages([
+                    "content.blocks.{$index}.props.{$field->name}" => ["{$field->label} must be a string."],
+                ]);
+            }
+        }
+
+        return $normalized;
     }
 
     /**

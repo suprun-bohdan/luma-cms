@@ -18,6 +18,9 @@ final class PluginRuntimeService
         private readonly PluginRegistryService $registry,
         private readonly ExtensionPointDispatcher $dispatcher,
         private readonly AdminNavigationRegistry $adminNavigation,
+        private readonly BlockTypeRegistry $blockTypes,
+        private readonly PluginRouteRegistry $pluginRoutes,
+        private readonly CapabilityGate $capabilityGate,
     ) {
     }
 
@@ -39,8 +42,17 @@ final class PluginRuntimeService
             return;
         }
 
+        $plugin->loadMissing('capabilities');
+
         $instance = $this->instantiate($plugin);
-        $context = new DefaultPluginContext($plugin, $this->dispatcher, $this->adminNavigation);
+        $context = new DefaultPluginContext(
+            $plugin,
+            $this->dispatcher,
+            $this->adminNavigation,
+            $this->blockTypes,
+            $this->pluginRoutes,
+            $this->capabilityGate,
+        );
 
         $instance->register($context);
         $instance->boot($context);
@@ -53,6 +65,13 @@ final class PluginRuntimeService
         unset($this->loaded[$plugin->plugin_id]);
         $this->dispatcher->forgetPlugin($plugin->plugin_id);
         $this->adminNavigation->forgetPlugin($plugin->plugin_id);
+        $this->blockTypes->forgetPlugin($plugin->plugin_id);
+        $this->pluginRoutes->forgetPlugin($plugin->plugin_id);
+    }
+
+    public function resetRuntimeState(): void
+    {
+        $this->loaded = [];
     }
 
     private function instantiate(Plugin $plugin): PluginContract

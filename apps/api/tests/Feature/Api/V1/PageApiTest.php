@@ -338,4 +338,31 @@ final class PageApiTest extends TestCase
             ->assertJsonPath('slug', 'services')
             ->assertJsonCount(2, 'content.blocks');
     }
+
+    public function test_rejects_plugin_block_type_when_plugin_not_enabled(): void
+    {
+        config([
+            'plugins.path' => base_path('tests/fixtures/plugins'),
+        ]);
+
+        $response = $this->postJson(
+            '/api/v1/pages',
+            [
+                'title' => 'Invalid plugin block',
+                'slug' => 'invalid-plugin-block',
+                'content' => [
+                    'blocks' => [
+                        [
+                            'id' => 'banner-1',
+                            'type' => 'luma.test-blocks/banner',
+                            'props' => ['text' => 'Nope'],
+                        ],
+                    ],
+                ],
+            ],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response->assertStatus(422);
+    }
 }
