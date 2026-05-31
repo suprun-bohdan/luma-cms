@@ -2,18 +2,19 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Not scaffolded yet. Directory reserved for Phase 1C (React Studio scaffold).
+> **Status:** Pre-alpha scaffold (Phase 1C). Content workflows not implemented yet.
 
-## Planned stack
+## Stack
 
-- React
+- React 19
 - TypeScript
 - Vite
 - TanStack Query
 - Zod
 - Tailwind CSS
+- React Router
 
-## Planned structure
+## Structure
 
 ```text
 apps/studio/
@@ -22,13 +23,39 @@ apps/studio/
     hooks/          # TanStack Query hooks
     components/     # UI components
     pages/          # Route pages
-    schemas/        # Zod form schemas
+    schemas/        # Zod validation schemas
+```
+
+## Local development
+
+Requires the Laravel API running (outer Docker workspace on port 8080):
+
+```bash
+cd apps/studio
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 — the dev server proxies `/api` to the backend.
+
+Optional env:
+
+```bash
+# .env.local
+VITE_API_BASE_URL=
+```
+
+Leave empty to use the Vite proxy (recommended for local dev).
+
+## Build
+
+```bash
+npm run build
 ```
 
 ## Rules
 
-- Strict TypeScript; no `any` without documented reason
-- Server state via TanStack Query, not global state
-- Small, focused components
-
-See [../../docs/architecture.md](../../docs/architecture.md).
+- Strict TypeScript
+- Server state via TanStack Query
+- Zod for API response validation
+- No decorative dashboard widgets before core content workflows exist

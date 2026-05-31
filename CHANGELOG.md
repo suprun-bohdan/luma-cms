@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.3] - 2026-05-30
+
+### Added
+
+- React Studio scaffold in `apps/studio/` (Vite, TypeScript, Tailwind, TanStack Query, Zod)
+- Typed API client and health check page
+- Vite dev proxy for `/api` → Laravel backend
+
 ## [0.0.2] - 2026-05-30
 
 ### Added

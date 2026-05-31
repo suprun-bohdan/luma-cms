@@ -55,7 +55,7 @@ luma-cms/
 
 ## Development status
 
-Early development. Laravel API scaffold is available at `apps/api/`. React Studio is not yet created.
+Early development. Laravel API at `apps/api/`, React Studio at `apps/studio/`. Content Core not implemented yet.
 
 Installation instructions will be added once the first runnable development version is available.
 
