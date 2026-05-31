@@ -2,7 +2,7 @@
 
 Open-source CMS for developers, agencies, and SMB — structured content, clean Laravel architecture, and a modern admin studio (in progress).
 
-> **Status: Pre-alpha.** Phase 1 Content Core API is implemented; Studio UI and extensions are not ready for production.
+> **Status: Pre-alpha.** Phase 1 Content Core API and Phase 2 Studio Core MVP are implemented; extensions and media backend are not ready for production.
 
 [![PHP](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml)
 
@@ -30,8 +30,8 @@ Luma CMS is a modular content platform — **not** a WordPress clone. Small core
 | Collections / Fields / Entries API | Done |
 | Draft / publish + public read API | Done |
 | CI (GitHub Actions + GitLab CI) | Done |
-| React Studio (`apps/studio/`) | Scaffold + health check only |
-| Studio content UI (Phase 2) | Planned |
+| React Studio (`apps/studio/`) | Phase 2 Core MVP (auth, collections, fields, entries, preview) |
+| Studio content UI (Phase 2) | Done (media UI stub only) |
 | Plugin system | Planned |
 
 Details: [CHANGELOG.md](CHANGELOG.md) · [apps/api/README.md](apps/api/README.md)

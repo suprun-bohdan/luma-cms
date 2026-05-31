@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.9] - 2026-05-30
+
+### Added
+
+- Studio Phase 2 Core: Bearer token auth, protected routes, app shell
+- Collections, fields, and entries management UI with RBAC-aware actions
+- Entry publish/unpublish, admin + public preview page
+- Media placeholder page (stub until Media Core backend)
+- Dashboard with API health and collection count
+- GitHub Actions workflow: Studio build and lint (`apps/studio`)
+
+### Changed
+
+- Refactored Studio to feature-based folder structure
+- Updated Studio README with routes, auth flow, and smoke test checklist
+
 ## [0.0.8] - 2026-05-31
 
 ### Added

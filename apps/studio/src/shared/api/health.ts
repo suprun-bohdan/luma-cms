@@ -1,4 +1,4 @@
-import { apiGet } from './client'
+import { apiGet } from '../api/client'
 import { healthResponseSchema, type HealthResponse } from '../schemas/health'
 
 export function fetchHealth(): Promise<HealthResponse> {

@@ -1,0 +1,51 @@
+# Build and lint Luma Studio (React / Vite)
+# https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Studio
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/studio/**'
+      - '.github/workflows/studio.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'apps/studio/**'
+      - '.github/workflows/studio.yml'
+
+concurrency:
+  group: studio-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: apps/studio
+
+jobs:
+  build-and-lint:
+    name: Build and lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/studio/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

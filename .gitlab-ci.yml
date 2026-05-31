@@ -10,10 +10,12 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - apps/api/**/*
+        - apps/studio/**/*
         - .gitlab-ci.yml
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
         - apps/api/**/*
+        - apps/studio/**/*
         - .gitlab-ci.yml
 
 variables:
@@ -63,3 +65,26 @@ test:
     - cp .env.example .env
     - php artisan key:generate --force --no-interaction
     - php artisan test --colors=never
+
+studio:build:
+  stage: build
+  image: node:22-bookworm
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - apps/studio/**/*
+        - .gitlab-ci.yml
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - apps/studio/**/*
+        - .gitlab-ci.yml
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}-studio-npm"
+    paths:
+      - apps/studio/node_modules/
+    policy: pull-push
+  script:
+    - cd apps/studio
+    - npm ci
+    - npm run lint
+    - npm run build

@@ -1,0 +1,38 @@
+import type { AuthUser } from '../../features/auth/schemas/auth'
+
+export function hasRole(user: AuthUser | null | undefined, role: string): boolean {
+  return user?.roles.includes(role) ?? false
+}
+
+export function canDeleteContent(user: AuthUser | null | undefined): boolean {
+  return hasRole(user, 'admin')
+}
+
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function formatDate(value: string | null | undefined): string {
+  if (!value) {
+    return '—'
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
+
+export function formatFieldErrors(
+  errors?: Record<string, string[]>,
+): string {
+  if (!errors) {
+    return 'Something went wrong.'
+  }
+
+  return Object.values(errors).flat().join(' ')
+}
