@@ -2,7 +2,7 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Pre-alpha. Content Core + Media Core API with auth/RBAC.
+> **Status:** Pre-alpha `[0.0.23]`. Content Core through Integrations, installer (`luma:install` / web setup), settings, onboarding, and release updater (`luma:update`).
 
 ## Stack
 
@@ -26,7 +26,9 @@ apps/api/
       Seo/
       Plugins/
       Integrations/   # Webhooks, integration tokens
-      Settings/
+      Settings/      # Global site settings
+      Setup/         # Web installer API + setup logs
+      Onboarding/    # First-run wizard progress API
     Support/
     Http/Controllers/
   routes/
@@ -371,10 +373,14 @@ Note: single-entry JSON responses return fields at the root (no outer `data` wra
 
 ## CI
 
-On push/PR to `main`, PHP 8.4 build and tests run automatically:
+On push/PR to `main`, when `apps/api/**` changes:
 
-- **GitHub Actions:** `.github/workflows/php.yml`
-- **GitLab CI:** `.gitlab-ci.yml`
+| Platform | Workflow | Steps |
+|----------|----------|--------|
+| GitHub Actions | [`.github/workflows/php.yml`](../../.github/workflows/php.yml) | PHP 8.4, `composer validate`, `composer install`, `php artisan test` |
+| GitLab CI | [`.gitlab-ci.yml`](../../.gitlab-ci.yml) | `build` + `test` jobs |
+
+Studio lint/build runs separately when `apps/studio/**` changes — see [apps/studio/README.md](../studio/README.md).
 
 Steps: `composer validate` → `composer install` → Laravel `.env` bootstrap → `php artisan test` (SQLite in-memory).
 

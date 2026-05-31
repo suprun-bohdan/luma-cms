@@ -2,7 +2,9 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Business Website Kit + Forms + Visual Editing (4.3) + Plugin admin.
+> **Status:** Pre-alpha `[0.0.23]`. Content admin, visual pages, plugins, integrations, web setup wizard, first-run onboarding, site settings, and release updater UI.
+
+[![Studio CI](https://github.com/suprun-bohdan/luma-cms/actions/workflows/studio.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/studio.yml)
 
 ## Design system
 
@@ -32,9 +34,9 @@ styles/
 
 ```text
 apps/studio/src/
-  app/              # App shell, router, query client
+  app/              # Router, auth layout, onboarding gate
   shared/           # API client, auth, layout, UI primitives, hooks
-  features/         # auth, collections, fields, entries, preview, media, pages, navigation, forms, plugins
+  features/         # auth, collections, pages, media, forms, plugins, setup, onboarding, settings, updates, …
   pages/            # Dashboard, NotFound
   styles/           # SCSS entry, tokens (extend for themes)
 ```
@@ -44,14 +46,17 @@ apps/studio/src/
 - Bearer token auth against `POST /api/v1/auth/login`
 - Session stored in `sessionStorage` (token + user)
 - Protected routes redirect to `/login` when unauthenticated
+- First login may redirect to `/onboarding` until completed (skip locally with `LUMA_SKIP_ONBOARDING=true` on the API)
 - Dev credentials: `admin@luma.test` / `password` (see `apps/api/README.md`)
 
 ## Routes
 
 | Route | Description |
 |-------|-------------|
+| `/setup` | Web installer (before app is installed) |
 | `/login` | Sign in |
-| `/dashboard` | Overview + API health |
+| `/onboarding` | First-run wizard (site profile, starter preset, optional integrations) |
+| `/dashboard` | Overview, API health, setup history |
 | `/collections` | List collections |
 | `/collections/new` | Create collection |
 | `/collections/:slug/edit` | Edit collection |
@@ -65,14 +70,19 @@ apps/studio/src/
 | `/pages/new` | Create page (section templates, blocks, live preview before save) |
 | `/pages/:slug/edit` | Visual page editor (drag-and-drop blocks, preview, inspector, plugin blocks from API) |
 | `/menus` | Navigation hub (header + footer) |
-| `/menus/footer` | Footer menu editor |
 | `/forms` | Forms list |
 | `/forms/:slug/edit` | Edit form fields |
 | `/forms/:slug/submissions` | Form submissions inbox |
+| `/integrations/webhooks` | Outbound webhooks |
+| `/integrations/tokens` | Integration API tokens |
+| `/settings` | Global site title and tagline |
+| `/settings/updates` | Release version + run database update after FTP deploy |
 | `/plugins` | Discover, install, enable/disable plugins; approve capabilities |
 | `/plugins/audit-logs` | Plugin lifecycle audit log (requires `plugins.audit`) |
 | `/seo/redirects` | URL redirects list |
 | `/seo/redirects/new` | Create redirect |
+
+Production builds are served under `/studio/` (Vite `base` / router basename from `VITE_BASE_PATH`).
 
 ## Local development
 
@@ -95,25 +105,34 @@ VITE_API_BASE_URL=
 
 Leave empty to use the Vite proxy (recommended for local dev). For non-proxy deployments, set the full API origin.
 
-## Build
+## Build & CI
 
 ```bash
-npm run build
 npm run lint
+npm run build
 ```
+
+Production bundle (same as CI and release packaging):
+
+```bash
+VITE_BASE_PATH=/studio/ npm run build
+```
+
+GitHub Actions [`.github/workflows/studio.yml`](../../.github/workflows/studio.yml) runs on changes to `apps/studio/**`: Node 22, `npm ci`, lint, build. GitLab CI: `studio:build` job in [`.gitlab-ci.yml`](../../.gitlab-ci.yml).
 
 ## Manual smoke test
 
-1. Sign in at `/login` with dev credentials
-2. Upload an image at `/media`
-3. Create a page at `/pages/new` — pick a section template, add `feature_grid` or `faq` blocks, confirm live preview before save
-4. Save draft, then continue editing at `/pages/{slug}/edit` with drag-and-drop reorder and inspector
-5. Publish and open public URL `/p/{slug}`
-6. Edit header menu at `/menus/header` — link to your page slug
-7. Optional: run demo seeder and open `/p/home` (includes contact form)
+1. Fresh install: open `/setup`, complete database + admin steps (or use `php artisan luma:install`)
+2. Sign in at `/login` with dev credentials
+3. Complete `/onboarding` or skip via API env `LUMA_SKIP_ONBOARDING=true`
+4. Upload an image at `/media`
+5. Create a page at `/pages/new` — pick a section template, add blocks, confirm live preview
+6. Publish and open public URL `/p/{slug}`
+7. Edit header menu at `/menus` — link to your page slug
 8. Check `/forms/contact/submissions` after a form submit
-9. At `/plugins` — discover and install `luma.demo`, enable; edit a page and add the **Quote** plugin block from the Plugins palette group
-10. Sign out — protected routes redirect to login; API returns 401 without token
+9. At `/plugins` — discover and install `luma.demo`, enable; add the **Quote** plugin block on a page
+10. At `/settings/updates` — confirm version and run database update after a release file replace
+11. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling
 

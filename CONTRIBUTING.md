@@ -15,10 +15,10 @@ Thank you for your interest in Luma CMS. This project is in **pre-alpha** — AP
 
    - [README.md](README.md) — project status and layout
    - [CHANGELOG.md](CHANGELOG.md) — what shipped recently
-   - [apps/api/README.md](apps/api/README.md) — API, auth, local setup, tests
-   - [apps/studio/README.md](apps/studio/README.md) — frontend scaffold
+   - [apps/api/README.md](apps/api/README.md) — API, auth, install, tests
+   - [apps/studio/README.md](apps/studio/README.md) — Studio routes, lint, build
 
-3. Stay in scope. Phase 1 (Content Core API) backend is done; next focus is **Studio Core** (login, collections, fields, entries UI). Do not build marketplace, full visual builder, or e-commerce engine before core workflows are stable.
+3. Stay in scope. Core CMS, Studio, installer, and plugin foundation are in place. Prefer fixes and incremental features over marketplace, SaaS billing, or full e-commerce before the first stable release.
 
 ## How to contribute
 
@@ -37,18 +37,31 @@ Thank you for your interest in Luma CMS. This project is in **pre-alpha** — AP
 
 ### CI
 
-Pull requests and pushes to `main` run **PHP build & test** (Composer + `php artisan test`) via:
+Pull requests and pushes to `main` run **path-filtered** pipelines:
 
-- GitHub Actions: [`.github/workflows/php.yml`](.github/workflows/php.yml)
-- GitLab CI: [`.gitlab-ci.yml`](.gitlab-ci.yml)
+| Stack | GitHub Actions | GitLab CI | Local check |
+|-------|----------------|-----------|-------------|
+| Laravel API | [`.github/workflows/php.yml`](.github/workflows/php.yml) | `build` + `test` jobs | `cd apps/api && composer install && php artisan test` |
+| Luma Studio | [`.github/workflows/studio.yml`](.github/workflows/studio.yml) | `studio:build` job | `cd apps/studio && npm ci && npm run lint && npm run build` |
 
-Ensure tests pass locally before pushing:
+Ensure the relevant jobs pass locally before pushing. API-only changes do not run Studio CI (and vice versa) until both areas are touched.
+
+**API (PHP 8.4, SQLite in-memory tests):**
 
 ```bash
 cd apps/api
 composer install
 cp .env.example .env && php artisan key:generate
 php artisan test
+```
+
+**Studio (Node 22):**
+
+```bash
+cd apps/studio
+npm ci
+npm run lint
+npm run build
 ```
 
 ### Code style
