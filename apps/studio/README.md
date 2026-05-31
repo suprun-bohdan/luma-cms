@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Pre-alpha `[0.0.25-rc.2]`. Content admin, visual pages, plugins, integrations, web setup wizard, first-run onboarding, site settings, and release updater UI.
+> **Status:** Pre-alpha `[0.0.25-rc.3]`. Content admin, visual pages, plugins, integrations, web setup wizard, first-run onboarding, site settings, and release updater UI.
 
 [![Studio CI](https://github.com/suprun-bohdan/luma-cms/actions/workflows/studio.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/studio.yml)
 

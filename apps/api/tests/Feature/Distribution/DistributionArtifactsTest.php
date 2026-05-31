@@ -18,6 +18,7 @@ final class DistributionArtifactsTest extends TestCase
         $this->assertFileExists($root.'/deploy/nginx/luma-root.conf.example');
         $this->assertFileExists($root.'/deploy/apache/luma.htaccess');
         $this->assertFileExists($root.'/deploy/shared-hosting-root/index.php');
+        $this->assertFileExists($root.'/deploy/shared-hosting-root/install.php');
         $this->assertFileExists($root.'/deploy/shared-hosting-root/.htaccess');
         $this->assertFileExists($root.'/deploy/shared-hosting-root/luma-requirements.php');
         $this->assertFileExists($root.'/docs/installation-validation.md');
@@ -46,6 +47,23 @@ final class DistributionArtifactsTest extends TestCase
         $this->assertStringContainsString('browser', strtolower($install));
         $this->assertStringContainsString('extract', strtolower($install));
         $this->assertStringContainsString('index.php', $install);
+        $this->assertStringContainsString('install.php', $install);
+    }
+
+    public function test_release_script_packages_flat_zip_from_staging_root(): void
+    {
+        $root = dirname(base_path(), 2);
+        $scriptPath = dirname($root).'/scripts/release-shared.sh';
+
+        if (! is_file($scriptPath)) {
+            $this->markTestSkipped('Outer workspace release script not available in this checkout.');
+        }
+
+        $script = (string) file_get_contents($scriptPath);
+
+        $this->assertStringContainsString('rsync -a "$LUMA/deploy/shared-hosting-root/" "$STAGING/"', $script);
+        $this->assertStringContainsString('cd "$STAGING"', $script);
+        $this->assertStringContainsString('zip -rq "$ARCHIVE" .', $script);
     }
 
     public function test_nginx_deploy_sample_serves_admin_and_redirects_studio(): void

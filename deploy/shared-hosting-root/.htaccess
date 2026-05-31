@@ -40,8 +40,8 @@
     RewriteCond %{DOCUMENT_ROOT}/apps/api/public%{REQUEST_URI} -f
     RewriteRule ^ apps/api/public%{REQUEST_URI} [L]
 
-    # Root requirements gate (wrapper file in archive root)
-    RewriteRule ^luma-requirements\.php$ - [L]
+    # Root PHP entrypoints (wrapper files in archive root)
+    RewriteRule ^(luma-requirements|install)\.php$ - [L]
 
     # Front controller
     RewriteCond %{REQUEST_FILENAME} !-d

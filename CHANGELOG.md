@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.3] - 2026-05-31
+
+### Added
+
+- Root `install.php` shortcut → `/admin/setup` (visible in file managers alongside `index.php`)
+
+### Fixed
+
+- Shared release zip now extracts **flat** at archive root (no nested `staging-shared/` folder that hid entry files after unzip)
+- `release-shared.sh` prints root entry file list after build for packaging verification
+
 ## [0.0.25-rc.2] - 2026-05-31
 
 ### Added

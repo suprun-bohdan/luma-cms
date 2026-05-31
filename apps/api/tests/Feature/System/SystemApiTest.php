@@ -29,7 +29,7 @@ final class SystemApiTest extends TestCase
         $this->getJson('/api/v1/system/version')
             ->assertOk()
             ->assertJsonStructure(['data' => ['version', 'installed']])
-            ->assertJsonPath('data.version', '0.0.25-rc.2')
+            ->assertJsonPath('data.version', '0.0.25-rc.3')
             ->assertJsonPath('data.installed', false);
     }
 

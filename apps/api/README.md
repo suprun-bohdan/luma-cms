@@ -2,7 +2,7 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Pre-alpha `[0.0.25-rc.2]`. Content Core through Integrations, installer (`luma:install` / web setup), settings, onboarding, and release updater (`luma:update`).
+> **Status:** Pre-alpha `[0.0.25-rc.3]`. Content Core through Integrations, installer (`luma:install` / web setup), settings, onboarding, and release updater (`luma:update`).
 
 ## Stack
 

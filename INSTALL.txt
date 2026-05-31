@@ -18,10 +18,14 @@ Primary install path
 3. Point the domain document root at the folder where you extracted the archive.
    You do NOT need to change it to apps/api/public — root index.php handles that.
 
-   The archive includes:
-   - index.php          (front controller)
-   - .htaccess          (Apache rewrite + security on typical shared hosting)
+   The archive includes at the **top level** (same folder as apps/):
+   - index.php
+   - install.php       (shortcut → setup wizard)
    - luma-requirements.php
+   - .htaccess         (may be hidden in file manager — enable "show hidden files")
+
+   When extracting the zip, put files directly in your site folder.
+   Do NOT leave them inside a nested staging-shared/ subfolder.
 
 4. Open your site in a browser:
 
@@ -29,6 +33,8 @@ Primary install path
 
    If CMS is not installed yet, you are redirected to the setup wizard at
    /admin/setup automatically.
+
+   https://your-domain.example/install.php
 
    Optional first check:
 

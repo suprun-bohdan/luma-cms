@@ -12,11 +12,11 @@ Public summary of Luma CMS direction. Detailed agent planning lives in the outer
 - Onboarding wizard and site settings
 - System updates: CLI and Studio (owner)
 
-**Current release track:** `0.0.25-rc.2` — shared-hosting root entry point (extract folder = document root).
+**Current release track:** `0.0.25-rc.3` — flat zip + root `index.php` / `install.php`.
 
 ## Near term
 
-- Tag `v0.0.25-rc.2` on GitHub after CI verification
+- Tag `v0.0.25-rc.3` on GitHub; attach shared zip asset
 - Plugin upgrade path and registry hardening (symlink/depth limits)
 - Optional Redis queue / S3 media for larger deployments
 
