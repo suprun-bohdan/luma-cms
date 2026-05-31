@@ -13,6 +13,8 @@ type NavItem = {
 const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/collections', label: 'Collections' },
+  { to: '/pages', label: 'Pages' },
+  { to: '/menus/header', label: 'Navigation' },
   { to: '/media', label: 'Media' },
 ]
 
