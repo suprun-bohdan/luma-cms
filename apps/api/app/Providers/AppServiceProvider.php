@@ -16,6 +16,10 @@ use App\Modules\Pages\Models\Page;
 use App\Modules\Pages\Policies\PagePolicy;
 use App\Modules\Forms\Models\Form;
 use App\Modules\Forms\Policies\FormPolicy;
+use App\Modules\Integrations\Models\IntegrationToken;
+use App\Modules\Integrations\Models\Webhook;
+use App\Modules\Integrations\Policies\IntegrationTokenPolicy;
+use App\Modules\Integrations\Policies\WebhookPolicy;
 use App\Modules\Plugins\Models\AuditLog;
 use App\Modules\Plugins\Models\Plugin;
 use App\Modules\Plugins\Policies\AuditLogPolicy;
@@ -52,6 +56,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Menu::class, MenuPolicy::class);
         Gate::policy(Redirect::class, RedirectPolicy::class);
         Gate::policy(Form::class, FormPolicy::class);
+        Gate::policy(Webhook::class, WebhookPolicy::class);
+        Gate::policy(IntegrationToken::class, IntegrationTokenPolicy::class);
         Gate::policy(Plugin::class, PluginPolicy::class);
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
 

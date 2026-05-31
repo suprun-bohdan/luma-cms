@@ -24,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return null;
         });
+
+        $middleware->alias([
+            'integration.token' => \App\Modules\Integrations\Http\Middleware\AuthenticateIntegrationToken::class,
+            'integration.scope' => \App\Modules\Integrations\Http\Middleware\EnsureIntegrationTokenScope::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

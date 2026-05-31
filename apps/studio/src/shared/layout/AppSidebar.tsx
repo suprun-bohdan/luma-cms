@@ -20,6 +20,7 @@ const navItems: NavItem[] = [
   { to: '/menus', label: 'Navigation' },
   { to: '/seo/redirects', label: 'SEO' },
   { to: '/forms', label: 'Forms' },
+  { to: '/integrations/webhooks', label: 'Integrations' },
   { to: '/plugins', label: 'Plugins' },
   { to: '/media', label: 'Media' },
 ]

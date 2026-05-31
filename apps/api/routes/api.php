@@ -15,6 +15,10 @@ use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PagePreviewController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
 use App\Modules\Forms\Http\Controllers\Api\V1\FormController;
+use App\Modules\Integrations\Http\Controllers\Api\V1\IntegrationAccessController;
+use App\Modules\Integrations\Http\Controllers\Api\V1\IntegrationTokenController;
+use App\Modules\Integrations\Http\Controllers\Api\V1\WebhookController;
+use App\Modules\Integrations\Http\Controllers\Api\V1\WebhookDeliveryController;
 use App\Modules\Plugins\Http\Controllers\Api\V1\AdminNavigationController;
 use App\Modules\Plugins\Http\Controllers\Api\V1\PluginController;
 use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
@@ -100,5 +104,35 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/audit-logs', [PluginController::class, 'auditLogs']);
 
         Route::get('/admin/navigation-items', [AdminNavigationController::class, 'index']);
+
+        Route::get('/integrations/webhooks/events', [WebhookController::class, 'events']);
+        Route::get('/integrations/webhooks', [WebhookController::class, 'index']);
+        Route::post('/integrations/webhooks', [WebhookController::class, 'store']);
+        Route::get('/integrations/webhooks/{webhook}', [WebhookController::class, 'show']);
+        Route::put('/integrations/webhooks/{webhook}', [WebhookController::class, 'update']);
+        Route::delete('/integrations/webhooks/{webhook}', [WebhookController::class, 'destroy']);
+        Route::get('/integrations/webhooks/{webhook}/deliveries', [WebhookDeliveryController::class, 'index']);
+        Route::post('/integrations/webhooks/{webhook}/deliveries/{delivery}/retry', [WebhookDeliveryController::class, 'retry']);
+
+        Route::get('/integrations/tokens/scopes', [IntegrationTokenController::class, 'scopes']);
+        Route::get('/integrations/tokens', [IntegrationTokenController::class, 'index']);
+        Route::post('/integrations/tokens', [IntegrationTokenController::class, 'store']);
+        Route::delete('/integrations/tokens/{integrationToken}', [IntegrationTokenController::class, 'destroy']);
+    });
+
+    Route::prefix('integration')->middleware(['integration.token'])->group(function (): void {
+        Route::middleware('integration.scope:content_read')->group(function (): void {
+            Route::get('/pages/{page:slug}', [IntegrationAccessController::class, 'showPage']);
+            Route::get('/collections/{collection:slug}/entries', [IntegrationAccessController::class, 'listEntries']);
+            Route::get('/entries/{entry}', [IntegrationAccessController::class, 'showEntry']);
+        });
+
+        Route::middleware('integration.scope:media_read')->group(function (): void {
+            Route::get('/media/{media:uuid}', [IntegrationAccessController::class, 'showMedia']);
+        });
+
+        Route::middleware('integration.scope:forms_read_submissions')->group(function (): void {
+            Route::get('/forms/{form:slug}/submissions', [IntegrationAccessController::class, 'formSubmissions']);
+        });
     });
 });

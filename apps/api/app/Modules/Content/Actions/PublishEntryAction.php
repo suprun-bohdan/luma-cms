@@ -10,12 +10,14 @@ use App\Modules\Content\Models\Entry;
 use App\Modules\Content\Models\EntryVersion;
 use App\Modules\Content\Services\EntryDataValidator;
 use App\Modules\Plugins\Services\PluginHookService;
+use App\Modules\Integrations\Services\IntegrationEventEmitter;
 
 final class PublishEntryAction
 {
     public function __construct(
         private readonly EntryDataValidator $validator,
         private readonly PluginHookService $pluginHooks,
+        private readonly IntegrationEventEmitter $integrationEvents,
     ) {
     }
 
@@ -40,6 +42,7 @@ final class PublishEntryAction
 
         $entry = $entry->refresh();
         $this->pluginHooks->afterEntryPublished($entry, $user);
+        $this->integrationEvents->entryPublished($entry);
 
         return $entry;
     }

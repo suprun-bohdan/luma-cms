@@ -6,11 +6,17 @@ namespace App\Modules\Forms\Actions;
 
 use App\Modules\Forms\Models\Form;
 use App\Modules\Forms\Models\FormSubmission;
+use App\Modules\Integrations\Services\IntegrationEventEmitter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 final class SubmitFormAction
 {
+    public function __construct(
+        private readonly IntegrationEventEmitter $integrationEvents,
+    ) {
+    }
+
     /**
      * @param  array<string, mixed>  $input
      */
@@ -60,11 +66,15 @@ final class SubmitFormAction
 
         $validated = $validator->validated();
 
-        return FormSubmission::query()->create([
+        $submission = FormSubmission::query()->create([
             'form_id' => $form->id,
             'data' => $validated,
             'ip' => $ip,
             'user_agent' => $userAgent,
         ]);
+
+        $this->integrationEvents->formSubmissionCreated($form, $submission);
+
+        return $submission;
     }
 }

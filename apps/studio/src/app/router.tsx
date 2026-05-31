@@ -17,6 +17,10 @@ import { RedirectsListPage } from '../features/seo/pages/RedirectsListPage'
 import { FormEditPage } from '../features/forms/pages/FormEditPage'
 import { FormsListPage } from '../features/forms/pages/FormsListPage'
 import { SubmissionsListPage } from '../features/forms/pages/SubmissionsListPage'
+import { IntegrationTokensPage } from '../features/integrations/pages/IntegrationTokensPage'
+import { WebhookDeliveriesPage } from '../features/integrations/pages/WebhookDeliveriesPage'
+import { WebhookEditPage } from '../features/integrations/pages/WebhookEditPage'
+import { WebhooksListPage } from '../features/integrations/pages/WebhooksListPage'
 import { PluginsListPage } from '../features/plugins/pages/PluginsListPage'
 import { AuditLogsListPage } from '../features/plugins/pages/AuditLogsListPage'
 import { DashboardPage } from '../pages/DashboardPage'
@@ -55,6 +59,11 @@ export const router = createBrowserRouter([
       { path: 'forms/:slug/submissions', element: <SubmissionsListPage /> },
       { path: 'plugins', element: <PluginsListPage /> },
       { path: 'plugins/audit-logs', element: <AuditLogsListPage /> },
+      { path: 'integrations/webhooks', element: <WebhooksListPage /> },
+      { path: 'integrations/webhooks/new', element: <WebhookEditPage /> },
+      { path: 'integrations/webhooks/:id/edit', element: <WebhookEditPage /> },
+      { path: 'integrations/webhooks/:id/deliveries', element: <WebhookDeliveriesPage /> },
+      { path: 'integrations/tokens', element: <IntegrationTokensPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

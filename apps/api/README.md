@@ -25,6 +25,7 @@ apps/api/
       Forms/        # Forms, fields, submissions
       Seo/
       Plugins/
+      Integrations/   # Webhooks, integration tokens
       Settings/
     Support/
     Http/Controllers/
@@ -93,12 +94,34 @@ POST   /api/v1/plugins/{plugin_id}/disable    requires plugins.manage
 POST   /api/v1/plugins/{plugin_id}/capabilities/approve  requires plugins.manage
 DELETE /api/v1/plugins/{plugin_id}            requires plugins.manage
 GET    /api/v1/audit-logs                     requires plugins.audit
+GET    /api/v1/integrations/webhooks/events   requires integrations.manage
+GET    /api/v1/integrations/webhooks           requires integrations.manage
+POST   /api/v1/integrations/webhooks           requires integrations.manage
+GET    /api/v1/integrations/webhooks/{id}      requires integrations.manage
+PUT    /api/v1/integrations/webhooks/{id}      requires integrations.manage
+DELETE /api/v1/integrations/webhooks/{id}      requires integrations.manage
+GET    /api/v1/integrations/webhooks/{id}/deliveries  requires integrations.deliveries.read
+POST   /api/v1/integrations/webhooks/{id}/deliveries/{delivery}/retry  requires integrations.manage
+GET    /api/v1/integrations/tokens/scopes      requires integrations.tokens.manage
+GET    /api/v1/integrations/tokens             requires integrations.tokens.manage
+POST   /api/v1/integrations/tokens             requires integrations.tokens.manage
+DELETE /api/v1/integrations/tokens/{id}        requires integrations.tokens.manage
 GET    /api/v1/editor/block-types               requires pages.view
 GET    /api/v1/admin/navigation-items           requires pages.view (Studio admin access)
 GET|POST|PUT|DELETE /api/v1/plugins/{plugin_id}/{path}  requires routes.register (plugin-registered routes only)
 POST   /api/v1/pages/preview-html               requires pages.view (unsaved page preview)
 GET    /api/v1/pages/{slug}/preview-html       requires pages.view
 POST   /api/v1/pages/{slug}/preview-html       requires pages.view (live preview body)
+```
+
+Integration token routes (`Authorization: Bearer {integration_token}` — not admin Sanctum session):
+
+```
+GET /api/v1/integration/pages/{slug}                         requires content:read
+GET /api/v1/integration/collections/{slug}/entries         requires content:read
+GET /api/v1/integration/entries/{id}                       requires content:read
+GET /api/v1/integration/media/{uuid}                       requires media:read
+GET /api/v1/integration/forms/{slug}/submissions           requires forms:read_submissions
 ```
 
 Laravel health check:
@@ -134,7 +157,7 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
 
 | Role | Permissions |
 |------|-------------|
-| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage, forms.*, plugins.manage, plugins.audit |
+| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage, forms.*, plugins.manage, plugins.audit, integrations.* |
 | `editor` | content.view/create/update; media.read/upload/update; pages.view/create/update/publish; menus.view/update (no delete) |
 
 ### Plugins
@@ -166,6 +189,14 @@ Plugin block types use namespaced ids: `{plugin_id}/{local_type}`. Plugin routes
 Hook listeners run only when the plugin is enabled, the capability is granted, and the point is declared in the manifest snapshot. Listener failures are logged and do not roll back the core action.
 
 Demo plugin: `plugins/luma.demo/` v0.3.0 — quote block, content hooks, admin navigation. After upgrading manifest on disk, uninstall and reinstall the plugin to refresh the DB snapshot (no auto-upgrade path yet).
+
+### Integrations
+
+Outbound webhooks fire asynchronously on `page.published`, `entry.published`, and `form.submission.created`. Payloads are signed with HMAC-SHA256 (`X-Luma-Signature: t={unix},v1={hex}`).
+
+Integration tokens are separate from admin login tokens. Scopes gate read-only `/api/v1/integration/*` routes. Token plaintext is returned once on create.
+
+See `docs/integrations/webhooks.md` for verification examples.
 
 ### Media
 

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.20] - 2026-05-31
+
+### Added
+
+- Integrations module: outbound webhooks with HMAC signatures (`X-Luma-Signature`), delivery log, and manual retry
+- Integration API tokens with scoped machine access (`content:read`, `forms:read_submissions`, `media:read`)
+- Events: `page.published`, `entry.published`, `form.submission.created`
+- Admin API: `/api/v1/integrations/webhooks`, `/integrations/tokens`, scoped `/api/v1/integration/*` routes
+- Studio: `/integrations/webhooks`, `/integrations/tokens`
+- RBAC: `integrations.manage`, `integrations.tokens.manage`, `integrations.deliveries.read`
+- Tests: `WebhookSignatureServiceTest`, `IntegrationWebhookTest`, `IntegrationTokenTest`
+
 ## [0.0.19] - 2026-05-30
 
 ### Added
