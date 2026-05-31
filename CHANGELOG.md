@@ -16,6 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `UpdateService` is no longer `final` to allow failure-path testing via container mock
+- `apps/api/.env.production.example` admin password placeholder avoids production guard blocked value
+
+### Fixed
+
+- Manual clean-room validation (2026-05-31): documented `make prod-setup` fixes for root-owned `.env` and production install password (outer `Makefile`)
 
 ## [0.0.24] - 2026-05-30
 

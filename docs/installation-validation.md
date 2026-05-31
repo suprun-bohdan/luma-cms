@@ -83,10 +83,20 @@ This path uses **CLI install** (`luma:install`), not the web Setup wizard. Use S
 - Production install rejects weak/default passwords when enforcement is active.
 - After update, restart queue workers if your host runs them outside PHP.
 
-## Validation log
+## Manual clean-room validation log
 
-Record date, release version, environment (shared zip / Docker prod), and any failures when running this checklist.
+| Date | Environment | Command / Flow | Result | Notes |
+|------|-------------|----------------|--------|-------|
+| 2026-05-31 | Shared release package | `make release-shared VERSION=0.0.24` + zip inspection | **Pass** | `dist/luma-cms-0.0.24-shared.zip` (31M): `vendor/`, `studio/dist/`, `INSTALL.txt`, `.env.shared.example`, `deploy/` present; no `.env`, `node_modules`, or `apps/api/tests`; `INSTALL.txt` links `/admin/setup` |
+| 2026-05-31 | Docker production profile | `make prod-setup` (after fixes below) | **Pass** | PostgreSQL (`DB_CONNECTION=pgsql`), prod containers up, `luma:install --force` OK, `/admin/` HTTP 200, `/studio/` → 301 `/admin/`, `/api/v1/health` OK, `/luma-requirements.php` → `/admin/setup`, `/admin/login` OK when installed |
+| 2026-05-31 | Setup token | `LUMA_SETUP_TOKEN` + `VITE_LUMA_SETUP_TOKEN` end-to-end | **Not run** | Optional production hardening; covered by automated `SetupApiTest` |
+| 2026-05-31 | Post-install smoke | Owner login → media → page → publish → form → update RBAC | **Pass** | API smoke: owner update 200, admin update 403, owner journal 200 / admin journal 403, media 201, page publish + public `/p/` 200, form submit 302 (with CSRF); plugin/update Studio copy verified via `DistributionStudioCopyTest` |
 
-| Date | Version | Path | Result | Notes |
-|------|---------|------|--------|-------|
-| | | | | |
+### Issues found and resolved during this run
+
+1. **`make prod-setup` host `cp .env` permission denied** when `.env` was root-owned from Docker. Fixed outer [`Makefile`](../Makefile) to copy via `docker compose exec -u root php`.
+2. **`luma:install` rejected default production password** (`change-me-in-production`). Fixed Makefile to pass `--admin-password` (12+ chars); updated [`apps/api/.env.production.example`](apps/api/.env.production.example) placeholder.
+3. **Nginx routing stale until reload** after config changes — run `docker compose exec nginx nginx -s reload` if `/admin/` or `/studio/` redirect misbehaves.
+
+No open blockers remain for Phase 8.3 planning.
+
