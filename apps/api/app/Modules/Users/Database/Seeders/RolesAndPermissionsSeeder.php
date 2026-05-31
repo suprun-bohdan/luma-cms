@@ -23,6 +23,11 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Upload media', 'slug' => 'media.upload'],
             ['name' => 'Update media', 'slug' => 'media.update'],
             ['name' => 'Delete media', 'slug' => 'media.delete'],
+            ['name' => 'View pages', 'slug' => 'pages.view'],
+            ['name' => 'Create pages', 'slug' => 'pages.create'],
+            ['name' => 'Update pages', 'slug' => 'pages.update'],
+            ['name' => 'Delete pages', 'slug' => 'pages.delete'],
+            ['name' => 'Publish pages', 'slug' => 'pages.publish'],
         ];
 
         foreach ($permissions as $permission) {
@@ -55,6 +60,10 @@ class RolesAndPermissionsSeeder extends Seeder
                     'media.read',
                     'media.upload',
                     'media.update',
+                    'pages.view',
+                    'pages.create',
+                    'pages.update',
+                    'pages.publish',
                 ])
                 ->pluck('id'),
         );
