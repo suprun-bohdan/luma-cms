@@ -75,8 +75,25 @@ This is optional — the default archive-root entry works on most shared panels.
 Pure nginx without Apache (.htaccess)
 -------------------------------------
 
-If your host does not process .htaccess, paste deploy/nginx/luma-root.conf.example
-into your panel (adjust root path and PHP socket).
+BrainyCP and similar panels often use **nginx only** — `.htaccess` is ignored.
+Use `deploy/nginx/brainycp-luma-snippet.conf` or `deploy/nginx/luma-root.conf.example`.
+
+Replace WordPress-style rules like:
+
+   rewrite ^(.+)$ /index.php?q=$1 last;
+
+with:
+
+   try_files $uri $uri/ /index.php?$query_string;
+
+Add a `/admin/` location that serves `apps/studio/dist/`.
+
+Important URLs (install.php is in site root, NOT under /admin/):
+
+   https://your-domain.example/install.php
+   https://your-domain.example/admin/setup
+
+Wrong: /admin/install.php  (this path does not exist)
 
 Optional security (recommended before exposing setup to the internet)
 ---------------------------------------------------------------------

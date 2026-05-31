@@ -31,7 +31,7 @@ final class DistributionArtifactsTest extends TestCase
         $index = (string) file_get_contents($root.'/index.php');
         $install = (string) file_get_contents($root.'/install.php');
 
-        $this->assertStringContainsString('install.php', $index);
+        $this->assertStringContainsString('/install.php', $index);
         $this->assertStringContainsString('public/index.php', $index);
         $this->assertStringContainsString('/admin/setup', $install);
         $this->assertStringContainsString('^apps/', $htaccess);

@@ -13,7 +13,7 @@ $installScript = $projectRoot.'/install.php';
 
 if (! is_file($installedMarker)) {
     if (is_file($installScript)) {
-        header('Location: install.php', true, 302);
+        header('Location: /install.php', true, 302);
         exit;
     }
 
