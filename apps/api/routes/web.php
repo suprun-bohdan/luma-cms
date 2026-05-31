@@ -16,5 +16,6 @@ Route::get('/', function () {
 
 Route::get('/sitemap.xml', SitemapController::class);
 Route::get('/robots.txt', RobotsController::class);
-Route::post('/public/forms/{form:slug}/submit', PublicFormSubmitController::class);
+Route::post('/public/forms/{form:slug}/submit', PublicFormSubmitController::class)
+    ->middleware('throttle:10,1');
 Route::get('/p/{page:slug}', [PublicPageViewController::class, 'show']);

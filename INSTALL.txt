@@ -1,0 +1,21 @@
+Luma CMS — Shared hosting install (no Composer required)
+=======================================================
+
+1. Upload and extract `luma-cms-{version}-shared.zip` outside public_html (e.g. ~/luma/).
+
+2. In hosting panel select PHP 8.3 or 8.4 for your domain.
+
+3. Set document root to: `~/luma/apps/api/public`
+
+4. Copy environment file:
+   `cp apps/api/.env.shared.example apps/api/.env`
+   Edit DB credentials in File Manager if using MySQL.
+
+5. Open in browser:
+   `/luma-requirements.php`  — PHP version check
+   `/studio/setup`           — guided installer
+
+6. Optional cron (webhooks / queue):
+   `* * * * * php ~/luma/apps/api/artisan schedule:run`
+
+See `deploy/nginx/luma.conf` or `deploy/apache/luma-vhost.conf.example` for web server samples.

@@ -21,6 +21,8 @@ const navItems: NavItem[] = [
   { to: '/seo/redirects', label: 'SEO' },
   { to: '/forms', label: 'Forms' },
   { to: '/integrations/webhooks', label: 'Integrations' },
+  { to: '/integrations/tokens', label: 'API Tokens' },
+  { to: '/settings', label: 'Settings' },
   { to: '/plugins', label: 'Plugins' },
   { to: '/media', label: 'Media' },
 ]

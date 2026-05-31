@@ -9,7 +9,7 @@ Laravel backend for Luma CMS.
 - PHP 8.3+
 - Laravel 13
 - Laravel Sanctum (API tokens)
-- SQLite (local dev default); PostgreSQL planned for production
+- SQLite (local dev default); PostgreSQL for production Docker profile
 
 ## Structure
 
@@ -152,6 +152,40 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@luma.test","password":"password"}'
 ```
+
+### Production install
+
+Copy `.env.production.example` to `.env`, then from the outer Docker workspace:
+
+```bash
+make prod-setup
+```
+
+Or inside the PHP container:
+
+```bash
+php artisan luma:install --force \
+  --admin-email=admin@example.com \
+  --admin-password='your-secure-password'
+```
+
+Idempotent steps: prerequisites check, `key:generate`, `migrate`, RBAC seed, admin user, `storage:link`, cache clear.
+
+**PHP requirements (shared hosting):**
+
+| PHP | Status |
+|-----|--------|
+| 7.x, 8.0–8.2 | Not supported (Laravel 13) |
+| 8.3.x | Supported legacy branch |
+| 8.4.x | Supported (recommended) |
+
+Single source of truth: `bootstrap/luma-requirements.php` (also loaded by `config/luma.php`).
+
+- Pre-bootstrap gate (no Composer): `GET /luma-requirements.php` or `?format=json`
+- API report: `GET /api/v1/system/requirements`
+- Install CLI runs the same checks via `EnvironmentRequirementChecker`
+
+Production docs: `docs/production/` (storage, backup-restore, hardening).
 
 ### RBAC
 

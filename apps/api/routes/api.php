@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\SystemController;
+use App\Http\Controllers\Api\V1\SystemRequirementsController;
+use App\Modules\Setup\Http\Controllers\Api\V1\SetupController;
 use App\Modules\Auth\Http\Controllers\Api\V1\AuthController;
 use App\Modules\Content\Http\Controllers\Api\V1\CollectionController;
 use App\Modules\Content\Http\Controllers\Api\V1\EntryController;
@@ -22,10 +25,24 @@ use App\Modules\Integrations\Http\Controllers\Api\V1\WebhookDeliveryController;
 use App\Modules\Plugins\Http\Controllers\Api\V1\AdminNavigationController;
 use App\Modules\Plugins\Http\Controllers\Api\V1\PluginController;
 use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
+use App\Modules\Settings\Http\Controllers\Api\V1\SettingsController;
+use App\Modules\Onboarding\Http\Controllers\Api\V1\OnboardingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('/health', HealthController::class);
+    Route::get('/system/requirements', SystemRequirementsController::class);
+    Route::get('/system/version', [SystemController::class, 'version']);
+
+    Route::get('/setup/status', [SetupController::class, 'status']);
+
+    Route::prefix('setup')->middleware('luma.not_installed')->group(function (): void {
+        Route::get('/requirements', [SetupController::class, 'requirements']);
+        Route::get('/logs', [SetupController::class, 'logs']);
+        Route::post('/database/test', [SetupController::class, 'testDatabase']);
+        Route::post('/database', [SetupController::class, 'saveDatabase']);
+        Route::post('/finish', [SetupController::class, 'finish']);
+    });
 
     Route::post('/auth/login', [AuthController::class, 'login']);
 
@@ -86,6 +103,20 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/redirects/{redirect}', [RedirectController::class, 'show']);
         Route::put('/redirects/{redirect}', [RedirectController::class, 'update']);
         Route::delete('/redirects/{redirect}', [RedirectController::class, 'destroy']);
+
+        Route::get('/settings', [SettingsController::class, 'show']);
+        Route::patch('/settings', [SettingsController::class, 'update']);
+
+        Route::get('/system/update/check', [SystemController::class, 'updateCheck']);
+        Route::post('/system/update/run', [SystemController::class, 'updateRun']);
+
+        Route::get('/onboarding/progress', [OnboardingController::class, 'progress']);
+        Route::get('/onboarding/journal', [OnboardingController::class, 'journal']);
+        Route::post('/onboarding/welcome', [OnboardingController::class, 'welcome']);
+        Route::post('/onboarding/site-type', [OnboardingController::class, 'siteType']);
+        Route::post('/onboarding/starter', [OnboardingController::class, 'starter']);
+        Route::post('/onboarding/integrations', [OnboardingController::class, 'integrations']);
+        Route::post('/onboarding/finish', [OnboardingController::class, 'finish']);
 
         Route::get('/forms', [FormController::class, 'index']);
         Route::post('/forms', [FormController::class, 'store']);

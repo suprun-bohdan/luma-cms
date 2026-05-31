@@ -19,7 +19,7 @@ export class ApiError extends Error {
   }
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 type ApiRequestOptions<T> = {
   method?: HttpMethod

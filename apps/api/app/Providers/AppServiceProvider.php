@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Core\Install\InstallService;
+use App\Core\Requirements\EnvironmentRequirementChecker;
+use App\Core\Update\SystemVersionService;
+use App\Core\Update\UpdateService;
 use App\Modules\Content\Models\Collection;
 use App\Modules\Content\Models\Entry;
 use App\Modules\Content\Models\Field;
@@ -32,6 +36,8 @@ use App\Modules\Plugins\Services\PluginRouteRegistrar;
 use App\Modules\Plugins\Services\PluginRuntimeService;
 use App\Modules\Seo\Models\Redirect;
 use App\Modules\Seo\Policies\RedirectPolicy;
+use App\Modules\Settings\Models\Setting;
+use App\Modules\Settings\Policies\SettingPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -40,6 +46,10 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->singleton(EnvironmentRequirementChecker::class, static fn (): EnvironmentRequirementChecker => EnvironmentRequirementChecker::default());
+        $this->app->singleton(InstallService::class);
+        $this->app->singleton(UpdateService::class);
+        $this->app->singleton(SystemVersionService::class);
         $this->app->singleton(ExtensionPointDispatcher::class);
         $this->app->singleton(AdminNavigationRegistry::class);
         $this->app->singleton(BlockTypeRegistry::class);
@@ -60,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(IntegrationToken::class, IntegrationTokenPolicy::class);
         Gate::policy(Plugin::class, PluginPolicy::class);
         Gate::policy(AuditLog::class, AuditLogPolicy::class);
+        Gate::policy(Setting::class, SettingPolicy::class);
 
         if (Schema::hasTable('plugins')) {
             $this->app->booted(function (): void {

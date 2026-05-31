@@ -1,5 +1,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
+import { AuthenticatedLayout } from './AuthenticatedLayout'
 import { ProtectedLayout } from './ProtectedLayout'
+import { OnboardingGate } from './OnboardingGate'
 import { LoginPage } from '../features/auth/pages/LoginPage'
 import { CollectionsListPage } from '../features/collections/pages/CollectionsListPage'
 import { CollectionEditPage } from '../features/collections/pages/CollectionEditPage'
@@ -23,48 +25,82 @@ import { WebhookEditPage } from '../features/integrations/pages/WebhookEditPage'
 import { WebhooksListPage } from '../features/integrations/pages/WebhooksListPage'
 import { PluginsListPage } from '../features/plugins/pages/PluginsListPage'
 import { AuditLogsListPage } from '../features/plugins/pages/AuditLogsListPage'
+import { UpdatesPage } from '../features/updates/pages/UpdatesPage'
+import { SettingsPage } from '../features/settings/pages/SettingsPage'
+import { SetupWizardPage } from '../features/setup/pages/SetupWizardPage'
+import { OnboardingWizardPage } from '../features/onboarding/pages/OnboardingWizardPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
+function routerBasename(): string | undefined {
+  const base = import.meta.env.BASE_URL
+
+  if (!base || base === '/') {
+    return undefined
+  }
+
+  return base.replace(/\/$/, '')
+}
+
 export const router = createBrowserRouter([
+  {
+    path: '/setup',
+    element: <SetupWizardPage />,
+  },
   {
     path: '/login',
     element: <LoginPage />,
   },
   {
-    element: <ProtectedLayout />,
+    element: <AuthenticatedLayout />,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'collections', element: <CollectionsListPage /> },
-      { path: 'collections/new', element: <CollectionEditPage /> },
-      { path: 'collections/:slug/edit', element: <CollectionEditPage /> },
-      { path: 'collections/:slug/fields', element: <CollectionFieldsPage /> },
-      { path: 'collections/:slug/entries', element: <CollectionEntriesPage /> },
-      { path: 'collections/:slug/entries/new', element: <EntryEditPage /> },
-      { path: 'entries/:id/edit', element: <EntryEditPage /> },
-      { path: 'entries/:id/preview', element: <EntryPreviewPage /> },
-      { path: 'media', element: <MediaLibraryPage /> },
-      { path: 'pages', element: <PagesListPage /> },
-      { path: 'pages/new', element: <PageEditPage /> },
-      { path: 'pages/:slug/edit', element: <PageEditPage /> },
-      { path: 'menus', element: <NavigationHubPage /> },
-      { path: 'menus/:menuSlug', element: <MenuEditorPage /> },
-      { path: 'seo/redirects', element: <RedirectsListPage /> },
-      { path: 'seo/redirects/new', element: <RedirectEditPage /> },
-      { path: 'seo/redirects/:id/edit', element: <RedirectEditPage /> },
-      { path: 'forms', element: <FormsListPage /> },
-      { path: 'forms/new', element: <FormEditPage /> },
-      { path: 'forms/:slug/edit', element: <FormEditPage /> },
-      { path: 'forms/:slug/submissions', element: <SubmissionsListPage /> },
-      { path: 'plugins', element: <PluginsListPage /> },
-      { path: 'plugins/audit-logs', element: <AuditLogsListPage /> },
-      { path: 'integrations/webhooks', element: <WebhooksListPage /> },
-      { path: 'integrations/webhooks/new', element: <WebhookEditPage /> },
-      { path: 'integrations/webhooks/:id/edit', element: <WebhookEditPage /> },
-      { path: 'integrations/webhooks/:id/deliveries', element: <WebhookDeliveriesPage /> },
-      { path: 'integrations/tokens', element: <IntegrationTokensPage /> },
-      { path: '*', element: <NotFoundPage /> },
+      {
+        path: '/onboarding',
+        element: <OnboardingWizardPage />,
+      },
+      {
+        element: <OnboardingGate />,
+        children: [
+          {
+            element: <ProtectedLayout />,
+            children: [
+              { index: true, element: <Navigate to="/dashboard" replace /> },
+              { path: 'dashboard', element: <DashboardPage /> },
+              { path: 'collections', element: <CollectionsListPage /> },
+              { path: 'collections/new', element: <CollectionEditPage /> },
+              { path: 'collections/:slug/edit', element: <CollectionEditPage /> },
+              { path: 'collections/:slug/fields', element: <CollectionFieldsPage /> },
+              { path: 'collections/:slug/entries', element: <CollectionEntriesPage /> },
+              { path: 'collections/:slug/entries/new', element: <EntryEditPage /> },
+              { path: 'entries/:id/edit', element: <EntryEditPage /> },
+              { path: 'entries/:id/preview', element: <EntryPreviewPage /> },
+              { path: 'media', element: <MediaLibraryPage /> },
+              { path: 'pages', element: <PagesListPage /> },
+              { path: 'pages/new', element: <PageEditPage /> },
+              { path: 'pages/:slug/edit', element: <PageEditPage /> },
+              { path: 'menus', element: <NavigationHubPage /> },
+              { path: 'menus/:menuSlug', element: <MenuEditorPage /> },
+              { path: 'seo/redirects', element: <RedirectsListPage /> },
+              { path: 'seo/redirects/new', element: <RedirectEditPage /> },
+              { path: 'seo/redirects/:id/edit', element: <RedirectEditPage /> },
+              { path: 'forms', element: <FormsListPage /> },
+              { path: 'forms/new', element: <FormEditPage /> },
+              { path: 'forms/:slug/edit', element: <FormEditPage /> },
+              { path: 'forms/:slug/submissions', element: <SubmissionsListPage /> },
+              { path: 'plugins', element: <PluginsListPage /> },
+              { path: 'plugins/audit-logs', element: <AuditLogsListPage /> },
+              { path: 'integrations/webhooks', element: <WebhooksListPage /> },
+              { path: 'integrations/webhooks/new', element: <WebhookEditPage /> },
+              { path: 'integrations/webhooks/:id/edit', element: <WebhookEditPage /> },
+              { path: 'integrations/webhooks/:id/deliveries', element: <WebhookDeliveriesPage /> },
+              { path: 'integrations/tokens', element: <IntegrationTokensPage /> },
+              { path: 'settings', element: <SettingsPage /> },
+              { path: 'settings/updates', element: <UpdatesPage /> },
+              { path: '*', element: <NotFoundPage /> },
+            ],
+          },
+        ],
+      },
     ],
   },
-])
+], { basename: routerBasename() })

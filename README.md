@@ -110,6 +110,14 @@ cd apps/studio && npm install && npm run dev
 
 Open http://localhost:5173 (proxies `/api` when the backend is running).
 
+**Production (outer Docker workspace):**
+
+```bash
+make prod-setup   # PostgreSQL + luma:install + Studio at /studio/
+```
+
+See `docs/production/` for storage, backup, and hardening guides.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

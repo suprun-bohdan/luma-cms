@@ -14,7 +14,7 @@ final class HealthController extends Controller
         return response()->json([
             'status' => 'ok',
             'service' => 'luma-api',
-            'version' => '0.1.0-dev',
+            'version' => config('luma.version', '0.0.0-dev'),
         ]);
     }
 }

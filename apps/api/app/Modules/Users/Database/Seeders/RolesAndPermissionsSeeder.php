@@ -40,6 +40,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Manage integrations', 'slug' => 'integrations.manage'],
             ['name' => 'Manage integration tokens', 'slug' => 'integrations.tokens.manage'],
             ['name' => 'Read webhook deliveries', 'slug' => 'integrations.deliveries.read'],
+            ['name' => 'Manage site settings', 'slug' => 'settings.manage'],
         ];
 
         foreach ($permissions as $permission) {

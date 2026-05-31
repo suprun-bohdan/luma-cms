@@ -1,0 +1,18 @@
+<VirtualHost *:80>
+    ServerName example.com
+    DocumentRoot /var/www/luma/apps/api/public
+
+    <Directory /var/www/luma/apps/api/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    Alias /studio /var/www/luma/apps/studio/dist
+    <Directory /var/www/luma/apps/studio/dist>
+        Require all granted
+        FallbackResource /studio/index.html
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/luma-error.log
+    CustomLog ${APACHE_LOG_DIR}/luma-access.log combined
+</VirtualHost>

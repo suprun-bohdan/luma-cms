@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'integration.token' => \App\Modules\Integrations\Http\Middleware\AuthenticateIntegrationToken::class,
             'integration.scope' => \App\Modules\Integrations\Http\Middleware\EnsureIntegrationTokenScope::class,
+            'luma.not_installed' => \App\Modules\Setup\Http\Middleware\EnsureNotInstalled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

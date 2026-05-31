@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Unit\Setup;
+
+use App\Modules\Setup\Services\EnvFileWriter;
+use Tests\TestCase;
+
+final class EnvFileWriterTest extends TestCase
+{
+    public function test_merge_updates_and_appends_env_values(): void
+    {
+        $path = storage_path('framework/testing-env-writer.env');
+        file_put_contents($path, "APP_NAME=Laravel\nDB_CONNECTION=sqlite\n");
+
+        $writer = new EnvFileWriter();
+        $writer->merge($path, [
+            'DB_CONNECTION' => 'mysql',
+            'DB_HOST' => '127.0.0.1',
+            'APP_URL' => 'http://localhost',
+        ]);
+
+        $contents = file_get_contents($path);
+
+        $this->assertStringContainsString('DB_CONNECTION=mysql', $contents);
+        $this->assertStringContainsString('DB_HOST=127.0.0.1', $contents);
+        $this->assertStringContainsString('APP_URL=http://localhost', $contents);
+        $this->assertStringContainsString('APP_NAME=Laravel', $contents);
+        $this->assertFileExists($path.'.bak');
+
+        @unlink($path);
+        @unlink($path.'.bak');
+    }
+}

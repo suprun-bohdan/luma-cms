@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.23] - 2026-05-31
+
+### Added
+
+- Settings module: `settings` table, `GET/PATCH /api/v1/settings`, Studio `/settings` page
+- Onboarding wizard: `GET/POST /api/v1/onboarding/*`, Studio `/onboarding` with progress bar and setup journal
+- `OnboardingService` with welcome, site type, starter content, integrations skip, and finish steps
+- Starter presets: `blog` and `portfolio` in `StarterSiteService` (in addition to `business`)
+- Dashboard setup history panel (last 10 onboarding/setup log entries)
+
+### Fixed
+
+- Settings PATCH with dotted keys (`site.title`) now persists correctly when sent as flat JSON keys
+
+### Added
+
+- System update API: `GET /api/v1/system/version`, `GET /api/v1/system/update/check`, `POST /api/v1/system/update/run`
+- Shared `UpdateService` for CLI `luma:update` and web update flow
+- Studio `/settings/updates` page for post-FTP migration step on shared hosting
+- `make update` Makefile target
+- `LUMA_SKIP_ONBOARDING` config flag for local development
+- Distribution artifact smoke test and system/update PHPUnit coverage
+
+### Changed
+
+- `GET /api/v1/health` version now reads `config('luma.version')`
+
+## [0.0.22] - 2026-05-31
+
+### Added
+
+- PHP requirement system: `bootstrap/luma-requirements.php`, `EnvironmentRequirementChecker`, `GET /api/v1/system/requirements`, `public/luma-requirements.php`
+- Web installer: `GET/POST /api/v1/setup/*`, Studio wizard at `/studio/setup`, `setup_logs` + `luma_installation` tables
+- `InstallService` shared by CLI and web setup; `StarterSiteService` with business preset
+- `php artisan luma:update` for post-release migrate/cache clear
+- Release packaging: `make release-shared`, `make release-docker`, `luma-manifest.json`, `INSTALL.txt`
+- Deploy samples: `deploy/nginx/luma.conf`, `deploy/apache/*`, `.env.shared.example`
+
+### Changed
+
+- `luma:install` uses `InstallService`; optional `--with-starter-site`
+- `make restore` runs `luma:update --force` instead of raw migrate
+
+## [0.0.21] - 2026-05-31
+
+### Added
+
+- Production Docker profile: PostgreSQL, queue worker, scheduler (`docker compose --profile prod`)
+- CLI installer: `php artisan luma:install` with `--force`, `--admin-email`, `--admin-password`
+- Studio production build served at `/studio/` via nginx (same-origin API)
+- Outer Makefile targets: `prod-setup`, `build-studio`, `backup`, `restore`, `logs-queue`
+- Production docs: `docs/production/storage.md`, `backup-restore.md`, `hardening-checklist.md`
+- `.env.production.example` for API and outer compose
+
+### Changed
+
+- Dev compose includes dedicated `queue` service for webhooks and media jobs
+- Studio router uses Vite `BASE_URL` basename for `/studio/` deployments
+- Sidebar link to Integration API tokens
+- Rate limit on public form submit (`10/min` per IP)
+
 ## [0.0.20] - 2026-05-31
 
 ### Added

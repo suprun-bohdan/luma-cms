@@ -1,0 +1,13 @@
+# Optional Apache rules for Luma CMS on shared hosting.
+# Place in apps/api/public/.htaccess or include from vhost.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Studio static (when dist is deployed under apps/studio/dist)
+    RewriteRule ^studio/(.*)$ ../studio/dist/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

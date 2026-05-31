@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useOnboardingJournal } from '../features/onboarding/hooks/useOnboarding'
 import { Badge } from '../shared/components/Badge'
 import { Button } from '../shared/components/Button'
 import { Card } from '../shared/components/Card'
@@ -11,6 +12,7 @@ import { useCollections } from '../features/collections/hooks/useCollections'
 export function DashboardPage() {
   const healthQuery = useHealth()
   const collectionsQuery = useCollections()
+  const journalQuery = useOnboardingJournal()
 
   return (
     <>
@@ -59,6 +61,24 @@ export function DashboardPage() {
           </div>
         </Card>
       </div>
+
+      <Card className="mt-6">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Setup history</p>
+        <div className="space-y-2 text-sm">
+          {(journalQuery.data ?? []).length === 0 && (
+            <p className="text-slate-500">Recent setup and onboarding events appear here.</p>
+          )}
+          {(journalQuery.data ?? []).map((entry) => (
+            <div key={entry.id} className="rounded border border-slate-200 px-3 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{entry.step}</span>
+                <Badge tone="muted">{entry.status}</Badge>
+              </div>
+              <p className="text-slate-600">{entry.message}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
     </>
   )
 }
