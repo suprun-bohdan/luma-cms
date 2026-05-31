@@ -1,0 +1,50 @@
+# Luma CMS — shared hosting root entry (Apache / BrainyCP / HestiaCP)
+# Document root = extracted archive folder (e.g. subdomain site directory).
+
+<IfModule mod_negotiation.c>
+    Options -MultiViews -Indexes
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Block dotfiles (.env, .git, etc.)
+    RewriteRule (^|/)\. - [F,L]
+
+    # Block direct HTTP access to application internals
+    RewriteRule ^apps/ - [F,L]
+    RewriteRule ^(deploy|docs|packages|plugins)/ - [F,L]
+    RewriteRule ^(CHANGELOG|CONTRIBUTING|CODE_OF_CONDUCT|SECURITY|README)\.md$ - [F,L,NC]
+
+    # Legacy Studio path → canonical admin UI
+    RewriteRule ^studio/?(.*)$ admin/$1 [R=301,L]
+
+    # Luma Studio static assets
+    RewriteCond %{REQUEST_URI} ^/admin/(.*)$
+    RewriteCond %{DOCUMENT_ROOT}/apps/studio/dist/%1 -f
+    RewriteRule ^admin/(.*)$ apps/studio/dist/$1 [L]
+
+    # Luma Studio SPA fallback
+    RewriteRule ^admin(/.*)?$ apps/studio/dist/index.html [L]
+
+    # Laravel public assets (favicon, etc.)
+    RewriteCond %{REQUEST_URI} !^/admin
+    RewriteCond %{DOCUMENT_ROOT}/apps/api/public%{REQUEST_URI} -f
+    RewriteRule ^ apps/api/public%{REQUEST_URI} [L]
+
+    # Root requirements gate (wrapper file in archive root)
+    RewriteRule ^luma-requirements\.php$ - [L]
+
+    # Front controller
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>

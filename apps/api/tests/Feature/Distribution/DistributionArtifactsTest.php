@@ -15,8 +15,25 @@ final class DistributionArtifactsTest extends TestCase
         $this->assertFileExists($root.'/INSTALL.txt');
         $this->assertFileExists($root.'/apps/api/.env.shared.example');
         $this->assertFileExists($root.'/deploy/nginx/luma.conf');
+        $this->assertFileExists($root.'/deploy/nginx/luma-root.conf.example');
         $this->assertFileExists($root.'/deploy/apache/luma.htaccess');
+        $this->assertFileExists($root.'/deploy/shared-hosting-root/index.php');
+        $this->assertFileExists($root.'/deploy/shared-hosting-root/.htaccess');
+        $this->assertFileExists($root.'/deploy/shared-hosting-root/luma-requirements.php');
         $this->assertFileExists($root.'/docs/installation-validation.md');
+    }
+
+    public function test_shared_hosting_root_entry_routes_admin_and_blocks_apps(): void
+    {
+        $root = dirname(base_path(), 2);
+        $htaccess = (string) file_get_contents($root.'/deploy/shared-hosting-root/.htaccess');
+        $index = (string) file_get_contents($root.'/deploy/shared-hosting-root/index.php');
+
+        $this->assertStringContainsString('apps/api/public/index.php', $index);
+        $this->assertStringContainsString('^apps/', $htaccess);
+        $this->assertStringContainsString('^admin/', $htaccess);
+        $this->assertStringContainsString('index.php', $htaccess);
+        $this->assertStringContainsString('studio', $htaccess);
     }
 
     public function test_install_guide_uses_admin_setup_url(): void
@@ -27,7 +44,8 @@ final class DistributionArtifactsTest extends TestCase
         $this->assertStringContainsString('/admin/setup', $install);
         $this->assertStringContainsString('LUMA_SETUP_TOKEN', $install);
         $this->assertStringContainsString('browser', strtolower($install));
-        $this->assertStringContainsString('apps/api/public', $install);
+        $this->assertStringContainsString('extract', strtolower($install));
+        $this->assertStringContainsString('index.php', $install);
     }
 
     public function test_nginx_deploy_sample_serves_admin_and_redirects_studio(): void

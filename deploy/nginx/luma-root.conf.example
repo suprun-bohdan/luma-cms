@@ -1,0 +1,49 @@
+# Luma CMS — nginx sample when document root is the extracted archive folder.
+# Use when the panel runs nginx only (no Apache .htaccess). Adjust paths and PHP socket.
+
+server {
+    listen 80;
+    server_name stage.example.com;
+    client_max_body_size 64M;
+
+    root /var/www/stage;
+    index index.php index.html;
+
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~ ^/(apps|deploy|docs|packages|plugins)/ {
+        deny all;
+    }
+
+    location = /studio {
+        return 301 /admin/;
+    }
+
+    location ^~ /studio/ {
+        return 301 /admin/;
+    }
+
+    location ^~ /admin/ {
+        alias /var/www/stage/apps/studio/dist/;
+        try_files $uri $uri/ /admin/index.html;
+    }
+
+    location = /luma-requirements.php {
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root/luma-requirements.php;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        include fastcgi_params;
+        fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}

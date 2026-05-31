@@ -2,9 +2,17 @@
 
 ## Document root
 
-Point the web server at `apps/api/public`. Nginx/Apache samples live in `deploy/nginx/` and `deploy/apache/`.
+### Default (shared hosting)
 
-Studio static assets must be available under `/admin/` (built with `VITE_BASE_PATH=/admin/`). Legacy `/studio/` URLs should redirect to `/admin/`.
+Point the panel document root at the **extracted archive folder**. Root `index.php` and `.htaccess` route requests to Laravel and Luma Studio. No symlink or subfolder change required.
+
+Samples: `deploy/shared-hosting-root/`, `deploy/nginx/luma-root.conf.example`.
+
+### Advanced (VPS / custom vhost)
+
+Point the web server at `apps/api/public` and serve Studio under `/admin/` per `deploy/nginx/luma.conf` or `deploy/apache/luma-vhost.conf.example`.
+
+Legacy `/studio/` URLs should redirect to `/admin/`.
 
 ## Environment
 
@@ -18,7 +26,7 @@ Studio static assets must be available under `/admin/` (built with `VITE_BASE_PA
 
 - `storage/` and `bootstrap/cache/` writable by PHP
 - `.env` not world-readable
-- Do not expose `vendor/`, `apps/studio/src/`, or git metadata
+- Do not expose `vendor/`, `apps/studio/src/`, or git metadata (root `.htaccess` blocks direct `/apps/` access)
 
 ## Updates
 

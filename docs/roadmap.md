@@ -12,11 +12,11 @@ Public summary of Luma CMS direction. Detailed agent planning lives in the outer
 - Onboarding wizard and site settings
 - System updates: CLI and Studio (owner)
 
-**Current release track:** `0.0.25-rc.1` — Phase 8.5 release candidate finalization complete.
+**Current release track:** `0.0.25-rc.2` — shared-hosting root entry point (extract folder = document root).
 
 ## Near term
 
-- Tag `v0.0.25-rc.1` on GitHub after CI verification
+- Tag `v0.0.25-rc.2` on GitHub after CI verification
 - Plugin upgrade path and registry hardening (symlink/depth limits)
 - Optional Redis queue / S3 media for larger deployments
 

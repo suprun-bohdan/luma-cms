@@ -23,6 +23,7 @@ After building the zip, extract to a clean directory and confirm:
 
 | Check | Expected |
 |-------|----------|
+| `index.php`, `.htaccess`, `luma-requirements.php` at archive root | Root entry for shared hosting |
 | `apps/api/vendor/` present | Composer deps bundled (no Composer on host required) |
 | `apps/studio/dist/` present | Built with `VITE_BASE_PATH=/admin/` |
 | `deploy/` present | nginx/apache samples |
@@ -34,10 +35,11 @@ After building the zip, extract to a clean directory and confirm:
 
 ### Shared hosting checklist
 
-**Prerequisites:** PHP 8.3+, web root = `apps/api/public`, MySQL/MariaDB or SQLite.
+**Prerequisites:** PHP 8.3+, document root = **extracted archive folder** (default) or `apps/api/public` (advanced), MySQL/MariaDB or SQLite.
 
 | Step | Action | Expected |
 |------|--------|----------|
+| A0 | Point panel document root at extract folder **without** changing to `apps/api/public` | `/` redirects to `/admin/setup` when not installed |
 | A1 | Extract `luma-cms-*-shared.zip` to a clean directory | Packaging checks above pass |
 | A2 | `cp apps/api/.env.shared.example apps/api/.env`, set `APP_KEY`, DB credentials | `.env` not world-readable |
 | A3 | (Recommended) Set `LUMA_SETUP_TOKEN`; rebuild Studio with matching `VITE_LUMA_SETUP_TOKEN` | Setup API rejects requests without `X-Luma-Setup-Token` |
@@ -163,4 +165,20 @@ Automated smoke (same HTTP/API steps as manual R1–R7): outer [`scripts/rehears
 | GitHub Actions post-push | **Manual** | Verify in GitHub UI after push |
 
 **RC polish gate:** **Pass** — browser-first flow documented and wired; tag when ready.
+
+---
+
+## v0.0.25-rc.2 — Shared-hosting root entry point
+
+| Item | Result | Notes |
+|------|--------|-------|
+| Root `index.php` + `.htaccess` in release zip | **Pass** | `deploy/shared-hosting-root/` copied by `release-shared.sh` |
+| Document root = extract folder (no `apps/api/public` change) | **Pass** | `INSTALL.txt` primary path; advanced option documented |
+| Security deny rules in root `.htaccess` | **Pass** | Blocks `/apps/`, dotfiles, repo markdown at web root |
+| nginx pure-hosting sample | **Pass** | `deploy/nginx/luma-root.conf.example` |
+| PHPUnit artifact tests | **Pass** | `DistributionArtifactsTest` extended |
+| Live subdomain E2E (stage.bsc.cv.ua) | **Not run** | User manual validation pending |
+| GitHub Release with zip asset | **Pending** | Tag `v0.0.25-rc.2` after push |
+
+**RC2 gate:** **Pass** (automation) — ready for tag and live hosting test.
 

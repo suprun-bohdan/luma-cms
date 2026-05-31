@@ -7,9 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.2] - 2026-05-31
+
+### Added
+
+- Shared-hosting root entry package: `deploy/shared-hosting-root/` (`index.php`, `.htaccess`, `luma-requirements.php`) copied into release zip root
+- `deploy/nginx/luma-root.conf.example` for pure-nginx panels without Apache `.htaccess`
+
 ### Changed
 
-- Browser-first install polish: expanded `/admin/setup` wizard (welcome, site/owner steps, MySQL default), login/setup redirects when not installed, `INSTALL.txt` user guide, install marker for `/luma-requirements.php`
+- Browser-first install polish: expanded `/admin/setup` wizard, login/setup redirects, install marker for requirements page
+- `INSTALL.txt` and installation docs: document root = **extract folder** by default; `apps/api/public` is advanced/optional
+- `release-shared.sh` bundles root entry files into shared zip
 
 ## [0.0.25-rc.1] - 2026-05-31
 
