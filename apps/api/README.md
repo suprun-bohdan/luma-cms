@@ -2,7 +2,7 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Pre-alpha (Phase 1D). Collections CRUD API with Sanctum auth and RBAC.
+> **Status:** Pre-alpha (Phase 1D). Collections and Fields CRUD API with Sanctum auth and RBAC.
 
 ## Stack
 
@@ -52,6 +52,11 @@ POST   /api/v1/collections
 GET    /api/v1/collections/{slug}
 PUT    /api/v1/collections/{slug}
 DELETE /api/v1/collections/{slug}
+GET    /api/v1/collections/{slug}/fields
+POST   /api/v1/collections/{slug}/fields
+GET    /api/v1/collections/{slug}/fields/{field}
+PUT    /api/v1/collections/{slug}/fields/{field}
+DELETE /api/v1/collections/{slug}/fields/{field}
 ```
 
 Laravel health check:
@@ -89,6 +94,21 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
 |------|-------------|
 | `admin` | content.view, content.create, content.update, content.delete |
 | `editor` | content.view, content.create, content.update |
+
+### Fields
+
+Supported field types: `text`, `textarea`, `number`, `boolean`, `datetime`, `json`.
+
+Create field example:
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/collections/pages/fields \
+  -H 'Authorization: Bearer {token}' \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"Title","type":"text","required":true}'
+```
+
+Adding, updating (schema-affecting attrs), or deleting a field increments the parent collection `schema_version`.
 
 ## Local development
 

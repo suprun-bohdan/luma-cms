@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.6] - 2026-05-31
+
+### Added
+
+- Nested Fields CRUD API under collections (`/api/v1/collections/{slug}/fields`)
+- `FieldType` enum: text, textarea, number, boolean, datetime, json
+- Field actions with automatic `schema_version` bump on create/update/delete
+- `FieldPolicy` with RBAC permission checks
+- Feature tests for fields API (401/403/404/422, schema versioning)
+
 ## [0.0.5] - 2026-05-31
 
 ### Added
