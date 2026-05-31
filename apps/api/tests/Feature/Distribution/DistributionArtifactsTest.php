@@ -16,6 +16,6 @@ final class DistributionArtifactsTest extends TestCase
         $this->assertFileExists($root.'/apps/api/.env.shared.example');
         $this->assertFileExists($root.'/deploy/nginx/luma.conf');
         $this->assertFileExists($root.'/deploy/apache/luma.htaccess');
-        $this->assertFileExists($root.'/docs/deployment/shared-hosting.md');
+        // docs/ is gitignored; deployment guides live in the outer workspace only.
     }
 }
