@@ -100,3 +100,35 @@ This path uses **CLI install** (`luma:install`), not the web Setup wizard. Use S
 
 No open blockers remain for Phase 8.3 planning.
 
+---
+
+## Phase 8.4 — Real user install rehearsal
+
+Simulates a shared-hosting user path: extract `luma-cms-0.0.25-shared.zip` to an isolated directory (not the git workspace), configure `.env` from `.env.shared.example`, web document root = `apps/api/public`, then Setup → login → onboarding → first published page.
+
+Automated smoke (same HTTP/API steps as manual R1–R7): outer [`scripts/rehearsal-8.4-smoke.sh`](../../scripts/rehearsal-8.4-smoke.sh) with [`docker-compose.rehearsal.yml`](../../docker-compose.rehearsal.yml) on port `8081`.
+
+| Step | Action | Result | Notes |
+|------|--------|--------|-------|
+| R0 | `make release-shared VERSION=0.0.25` + packaging checks | **Pass** | 31M zip; `vendor/`, `studio/dist/`, no `.env`/tests |
+| R1 | `/luma-requirements.php` | **Pass** | Links to `/admin/setup` |
+| R2 | Web Setup (API: requirements → database → finish) | **Pass** | SQLite DB path; owner account created |
+| R3 | Owner login | **Pass** | `owner` role |
+| R4 | Onboarding wizard (welcome → site-type → starter → integrations → finish) | **Pass** | Business preset + starter content |
+| R5 | Studio `/admin/dashboard` | **Pass** | `Luma Studio` shell loads |
+| R6 | Create page `hello` | **Pass** | Hero block |
+| R7 | Publish + public `/p/hello` | **Pass** | HTTP 200, headline visible |
+| R8 | Friction review | **Pass** | See items below; one blocker fixed in product |
+
+**Environment:** PHP 8.4 (Docker), SQLite (minimal shared-hosting simulation), `LUMA_SETUP_TOKEN` not set, zip `0.0.25`, date 2026-05-31.
+
+### Friction and fixes (Phase 8.4)
+
+| Item | Severity | Resolution |
+|------|----------|------------|
+| Default `.env.shared.example` used `CACHE_STORE=database` before migrations exist | **Blocker** | Changed to `CACHE_STORE=file` and `SESSION_DRIVER=file`; note added to `INSTALL.txt` |
+| Rehearsal Docker overlay replaced `storage/` with empty volume | Infra only | Removed separate storage volume from `docker-compose.rehearsal.yml` — real zip includes full `storage/` skeleton |
+| MySQL shared-hosting path not re-run in this session | Nice-to-have | SQLite path validates Setup/onboarding; MySQL remains covered by Section A checklist + prior API tests |
+
+**Phase 8.4 gate:** **Pass** (with blocker fix committed). Next: tag release candidate or plan Phase 9 — not started here.
+

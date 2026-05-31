@@ -10,6 +10,7 @@ Luma CMS — Shared hosting install (no Composer required)
 4. Copy environment file:
    `cp apps/api/.env.shared.example apps/api/.env`
    Edit DB credentials in File Manager if using MySQL.
+   Leave `CACHE_STORE=file` until setup finishes (database cache needs migrated tables).
 
 5. Open in browser:
    `/luma-requirements.php`  — PHP version check

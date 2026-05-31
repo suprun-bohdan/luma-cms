@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Manual clean-room validation (2026-05-31): documented `make prod-setup` fixes for root-owned `.env` and production install password (outer `Makefile`)
+- Phase 8.4 rehearsal: `.env.shared.example` now uses file cache/session until Setup migrations complete; `INSTALL.txt` note added
 
 ## [0.0.24] - 2026-05-30
 
