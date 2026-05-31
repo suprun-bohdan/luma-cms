@@ -85,17 +85,18 @@ function luma_serve_studio(string $studioDist, string $path): bool
     return true;
 }
 
-if (! is_file($installedMarker)) {
-    $path = luma_request_path();
+$path = luma_request_path();
 
+// Studio admin UI (/admin/*) is static SPA — serve before Laravel on every request.
+// Required when nginx has no location ^~ /admin/ block (common on BrainyCP panels).
+if (str_starts_with($path, '/admin') && luma_serve_studio($studioDist, $path)) {
+    exit;
+}
+
+if (! is_file($installedMarker)) {
     // Setup API and health checks must reach Laravel before install completes.
     if (str_starts_with($path, '/api/') || $path === '/up') {
         luma_bootstrap_api($apiRoot);
-        exit;
-    }
-
-    // Nginx without /admin/ alias falls through here — serve Studio, never redirect to install.php relatively.
-    if (str_starts_with($path, '/admin') && luma_serve_studio($studioDist, $path)) {
         exit;
     }
 

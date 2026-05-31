@@ -25,9 +25,13 @@ server {
         return 301 /admin/;
     }
 
+    location = /admin {
+        return 301 /admin/;
+    }
+
     location ^~ /admin/ {
         alias /var/www/stage/apps/studio/dist/;
-        try_files $uri $uri/ /admin/index.html;
+        try_files $uri $uri/ /apps/studio/dist/index.html;
     }
 
     location ^~ /api/ {

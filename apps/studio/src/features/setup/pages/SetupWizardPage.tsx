@@ -44,25 +44,25 @@ function SetupWizardContent() {
   const navigate = useNavigate()
   const { t, locale, setLocale, suggestedLocale, regionHint, languages } = useSetupI18n()
   const statusQuery = useSetupStatus()
-  const savedState = loadSetupWizardState()
-  const [stepIndex, setStepIndex] = useState(savedState?.stepIndex ?? 0)
+  const [persistedState] = useState(() => loadSetupWizardState())
+  const [stepIndex, setStepIndex] = useState(persistedState?.stepIndex ?? 0)
   const requirementsQuery = useSetupRequirements(stepIndex === 1)
   const logsQuery = useSetupLogs(stepIndex >= 5)
   const { testMutation, saveMutation, finishMutation } = useSetupDatabaseActions()
 
-  const [driver, setDriver] = useState(savedState?.driver ?? 'mysql')
-  const [host, setHost] = useState(savedState?.host ?? '127.0.0.1')
-  const [port, setPort] = useState(savedState?.port ?? '3306')
-  const [database, setDatabase] = useState(savedState?.database ?? '')
-  const [username, setUsername] = useState(savedState?.username ?? '')
+  const [driver, setDriver] = useState(persistedState?.driver ?? 'mysql')
+  const [host, setHost] = useState(persistedState?.host ?? '127.0.0.1')
+  const [port, setPort] = useState(persistedState?.port ?? '3306')
+  const [database, setDatabase] = useState(persistedState?.database ?? '')
+  const [username, setUsername] = useState(persistedState?.username ?? '')
   const [password, setPassword] = useState('')
-  const [siteTitle, setSiteTitle] = useState(savedState?.siteTitle ?? '')
-  const [ownerName, setOwnerName] = useState(savedState?.ownerName ?? '')
-  const [adminEmail, setAdminEmail] = useState(savedState?.adminEmail ?? '')
+  const [siteTitle, setSiteTitle] = useState(persistedState?.siteTitle ?? '')
+  const [ownerName, setOwnerName] = useState(persistedState?.ownerName ?? '')
+  const [adminEmail, setAdminEmail] = useState(persistedState?.adminEmail ?? '')
   const [adminPassword, setAdminPassword] = useState('')
   const [adminPasswordConfirm, setAdminPasswordConfirm] = useState('')
-  const [withStarterSite, setWithStarterSite] = useState(savedState?.withStarterSite ?? true)
-  const [allowWeakPassword, setAllowWeakPassword] = useState(savedState?.allowWeakPassword ?? false)
+  const [withStarterSite, setWithStarterSite] = useState(persistedState?.withStarterSite ?? true)
+  const [allowWeakPassword, setAllowWeakPassword] = useState(persistedState?.allowWeakPassword ?? false)
   const [error, setError] = useState<string | null>(null)
 
   const steps = useMemo(() => stepKeys.map((key) => t(key)), [t])
@@ -535,7 +535,11 @@ function SetupWizardContent() {
 }
 
 export function SetupWizardPage() {
-  const savedState = loadSetupWizardState()
+  const initialLocale = useMemo(() => loadSetupWizardState()?.locale, [])
 
-  return <SetupI18nProvider initialLocale={savedState?.locale}><SetupWizardContent /></SetupI18nProvider>
+  return (
+    <SetupI18nProvider initialLocale={initialLocale}>
+      <SetupWizardContent />
+    </SetupI18nProvider>
+  )
 }

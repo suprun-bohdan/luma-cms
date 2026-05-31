@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.13] - 2026-05-31
+
+### Fixed
+
+- Root `index.php` serves `/admin/*` Studio SPA after install (fixes 404 on `/admin/login` when nginx has no `/admin/` alias)
+- Setup wizard locale picker no longer resets saved step via `initialLocale` sync effect
+- BrainyCP nginx snippet: `/admin` → `/admin/` redirect and SPA fallback via `/apps/studio/dist/index.html`
+
 ## [0.0.25-rc.12] - 2026-05-31
 
 ### Added

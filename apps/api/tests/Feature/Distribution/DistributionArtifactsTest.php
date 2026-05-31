@@ -34,6 +34,7 @@ final class DistributionArtifactsTest extends TestCase
 
         $this->assertStringContainsString("header('Location: /install.php'", $index);
         $this->assertStringContainsString('luma_serve_studio', $index);
+        $this->assertStringContainsString('str_starts_with($path, \'/admin\') && luma_serve_studio', $index);
         $this->assertStringContainsString('luma_bootstrap_api', $index);
         $this->assertStringNotContainsString("header('Location: install.php'", $index);
         $this->assertStringContainsString('/admin/setup', $install);

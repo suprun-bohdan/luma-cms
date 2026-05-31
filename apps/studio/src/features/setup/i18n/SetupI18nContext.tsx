@@ -56,12 +56,6 @@ export function SetupI18nProvider({
     document.documentElement.dir = localeDirection(locale)
   }, [locale])
 
-  useEffect(() => {
-    if (initialLocale && initialLocale !== locale) {
-      setLocale(initialLocale)
-    }
-  }, [initialLocale, locale, setLocale])
-
   const t = useCallback(
     (key: string, params?: Record<string, string | number>) => {
       const template = messages[key] ?? loadMessages('en_US')[key] ?? key
