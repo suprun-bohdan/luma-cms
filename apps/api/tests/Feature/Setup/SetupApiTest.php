@@ -20,7 +20,56 @@ final class SetupApiTest extends TestCase
         $this->getJson('/api/v1/setup/status')
             ->assertOk()
             ->assertJsonPath('installed', false)
-            ->assertJsonPath('version', '0.0.25-rc.9');
+            ->assertJsonPath('version', '0.0.25-rc.10');
+    }
+
+    public function test_sqlite_database_test_uses_default_path_when_empty(): void
+    {
+        config(['luma.setup_token' => '']);
+
+        $path = database_path('database.sqlite');
+        if (is_file($path)) {
+            unlink($path);
+        }
+
+        $this->postJson('/api/v1/setup/database/test', [
+            'driver' => 'sqlite',
+        ])
+            ->assertOk()
+            ->assertJsonPath('ok', true);
+
+        $this->assertFileExists($path);
+    }
+
+    public function test_save_database_writes_sqlite_settings_to_env(): void
+    {
+        config(['luma.setup_token' => '']);
+
+        $envPath = base_path('.env');
+        $backup = is_file($envPath) ? file_get_contents($envPath) : null;
+
+        try {
+            file_put_contents($envPath, "APP_NAME=Luma\nDB_CONNECTION=mysql\n");
+
+            $this->postJson('/api/v1/setup/database', [
+                'driver' => 'sqlite',
+                'database' => database_path('database.sqlite'),
+            ])
+                ->assertOk()
+                ->assertJsonPath('ok', true);
+
+            $contents = (string) file_get_contents($envPath);
+            $this->assertStringContainsString('DB_CONNECTION=sqlite', $contents);
+            $this->assertStringContainsString('database.sqlite', $contents);
+        } finally {
+            if ($backup === null) {
+                @unlink($envPath);
+                @unlink($envPath.'.bak');
+                @unlink($envPath.'.lock');
+            } else {
+                file_put_contents($envPath, $backup);
+            }
+        }
     }
 
     public function test_setup_status_and_logs_work_when_database_is_unreachable(): void
@@ -110,6 +159,8 @@ final class SetupApiTest extends TestCase
 
     public function test_setup_write_routes_are_rate_limited(): void
     {
+        config(['luma.setup_token' => '']);
+
         for ($i = 0; $i < 6; $i++) {
             $this->postJson('/api/v1/setup/database/test', [
                 'driver' => 'sqlite',

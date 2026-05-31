@@ -83,6 +83,16 @@ final class SetupController extends Controller
         }
 
         $driver = $config['driver'];
+        $envPath = base_path('.env');
+        $envExample = base_path('.env.shared.example');
+
+        if (! is_file($envPath) && is_file($envExample)) {
+            if (! @copy($envExample, $envPath)) {
+                return response()->json([
+                    'message' => 'Unable to create apps/api/.env. Make the apps/api folder writable by the web server.',
+                ], 422);
+            }
+        }
 
         $envValues = [
             'DB_CONNECTION' => $driver,
@@ -98,8 +108,16 @@ final class SetupController extends Controller
             $envValues['DB_PASSWORD'] = $config['password'] ?? '';
         }
 
-        $envFileWriter->merge(base_path('.env'), $envValues);
-        Artisan::call('config:clear');
+        try {
+            $envFileWriter->merge($envPath, $envValues);
+            Artisan::call('config:clear');
+        } catch (Throwable $exception) {
+            $setupLog->write('database.save', 'error', $exception->getMessage());
+
+            return response()->json([
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
 
         $setupLog->write('database.save', 'success', 'Database settings saved to .env');
 

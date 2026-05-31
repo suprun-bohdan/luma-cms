@@ -12,6 +12,7 @@ if [[ ! -d "$API" ]]; then
 fi
 
 mkdir -p \
+  "$API/database" \
   "$API/storage/app/public" \
   "$API/storage/app/private" \
   "$API/storage/framework/cache/data" \
@@ -26,8 +27,17 @@ find "$API/storage/framework/views" -type f -name '*.php' -delete 2>/dev/null ||
 find "$API/storage/logs" -type f -name '*.log' -delete 2>/dev/null || true
 rm -rf "$API/storage/app/public/media/"* 2>/dev/null || true
 mkdir -p "$API/storage/app/public/media"
+rm -f "$API/database/"*.sqlite 2>/dev/null || true
+
+if [[ -f "$API/.env.shared.example" && ! -f "$API/.env" ]]; then
+  cp "$API/.env.shared.example" "$API/.env"
+fi
 
 # 0777 survives unzip on most Linux hosts; PHP-FPM user often differs from FTP owner.
-chmod -R 0777 "$API/storage" "$API/bootstrap/cache"
+chmod -R 0777 "$API/storage" "$API/bootstrap/cache" "$API/database"
 
-echo "Writable paths prepared under $API (storage, bootstrap/cache → mode 0777)"
+if [[ -f "$API/.env" ]]; then
+  chmod 0666 "$API/.env"
+fi
+
+echo "Writable paths prepared under $API (storage, bootstrap/cache, database → mode 0777)"

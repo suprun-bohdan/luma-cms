@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use PDO;
 use RuntimeException;
+use Throwable;
 
 final class InstallService
 {
@@ -45,14 +47,7 @@ final class InstallService
         $driver = $database['driver'] ?? 'sqlite';
 
         if ($driver === 'sqlite') {
-            $path = $database['database'] ?? database_path('database.sqlite');
-            File::ensureDirectoryExists(dirname($path));
-
-            if (! File::exists($path)) {
-                File::put($path, '');
-            }
-
-            return File::isWritable($path);
+            return $this->testSqliteConnection($database);
         }
 
         // Raw PDO is intentional: setup may test credentials before Laravel reloads database config from .env.
@@ -72,14 +67,69 @@ final class InstallService
             default => throw new RuntimeException("Unsupported database driver: {$driver}"),
         };
 
-        new \PDO(
-            $dsn,
-            (string) ($database['username'] ?? ''),
-            (string) ($database['password'] ?? ''),
-            [\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION],
-        );
+        try {
+            new PDO(
+                $dsn,
+                (string) ($database['username'] ?? ''),
+                (string) ($database['password'] ?? ''),
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
+            );
+        } catch (Throwable $exception) {
+            throw new RuntimeException($this->connectionErrorMessage($driver, $exception), 0, $exception);
+        }
 
         return true;
+    }
+
+    /**
+     * @param  array{driver?: string, database?: string}  $database
+     */
+    private function testSqliteConnection(array $database): bool
+    {
+        $path = $database['database'] ?? database_path('database.sqlite');
+        $directory = dirname($path);
+
+        if (! is_dir($directory) && ! File::ensureDirectoryExists($directory)) {
+            throw new RuntimeException("Unable to create SQLite directory: {$directory}. Check permissions on apps/api/database.");
+        }
+
+        if (! is_writable($directory)) {
+            throw new RuntimeException("SQLite directory is not writable: {$directory}.");
+        }
+
+        if (! File::exists($path)) {
+            if (File::put($path, '') === false) {
+                throw new RuntimeException("Unable to create SQLite database file: {$path}.");
+            }
+        }
+
+        if (! is_writable($path)) {
+            throw new RuntimeException("SQLite database file is not writable: {$path}.");
+        }
+
+        try {
+            new PDO(
+                'sqlite:'.$path,
+                null,
+                null,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
+            );
+        } catch (Throwable $exception) {
+            throw new RuntimeException('SQLite connection failed: '.$exception->getMessage(), 0, $exception);
+        }
+
+        return true;
+    }
+
+    private function connectionErrorMessage(string $driver, Throwable $exception): string
+    {
+        $label = match ($driver) {
+            'pgsql' => 'PostgreSQL',
+            'mysql', 'mariadb' => 'MySQL/MariaDB',
+            default => ucfirst($driver),
+        };
+
+        return $label.' connection failed: '.$exception->getMessage();
     }
 
     public function install(InstallOptions $options): void

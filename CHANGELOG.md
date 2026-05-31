@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.10] - 2026-05-31
+
+### Added
+
+- Setup wizard progress persists in browser localStorage across page reloads
+
+### Fixed
+
+- Database setup no longer returns HTTP 500 when saving `.env` fails (clear 422 errors)
+- SQLite setup tests real PDO connection and creates default `database/database.sqlite`
+- Release zip prepares writable `apps/api/database` and seeds `.env` from example
+
 ## [0.0.25-rc.9] - 2026-05-31
 
 ### Added

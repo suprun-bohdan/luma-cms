@@ -34,8 +34,9 @@ return [
         'writable' => [
             'storage',
             'bootstrap/cache',
+            'database',
         ],
     ],
 
-    'version' => '0.0.25-rc.9',
+    'version' => '0.0.25-rc.10',
 ];

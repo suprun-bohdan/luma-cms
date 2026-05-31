@@ -40,7 +40,7 @@ final class WritablePathEvaluator implements RequirementEvaluator
             id: 'paths.writable',
             label: 'Writable directories',
             status: RequirementStatus::Passed,
-            message: 'Storage and bootstrap cache are writable.',
+            message: 'Storage, bootstrap cache, and database directory are writable.',
         );
     }
 }

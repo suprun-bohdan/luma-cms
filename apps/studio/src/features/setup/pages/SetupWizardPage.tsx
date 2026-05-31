@@ -19,6 +19,11 @@ import {
   useSetupRequirements,
   useSetupStatus,
 } from '../hooks/useSetup'
+import {
+  clearSetupWizardState,
+  loadSetupWizardState,
+  saveSetupWizardState,
+} from '../setupWizardStorage'
 
 const steps = [
   'Welcome',
@@ -62,30 +67,63 @@ function requirementsErrorMessage(error: unknown): string {
 export function SetupWizardPage() {
   const navigate = useNavigate()
   const statusQuery = useSetupStatus()
-  const [stepIndex, setStepIndex] = useState(0)
+  const savedState = loadSetupWizardState()
+  const [stepIndex, setStepIndex] = useState(savedState?.stepIndex ?? 0)
   const requirementsQuery = useSetupRequirements(stepIndex === 1)
   const logsQuery = useSetupLogs(stepIndex >= 5)
   const { testMutation, saveMutation, finishMutation } = useSetupDatabaseActions()
 
-  const [driver, setDriver] = useState('mysql')
-  const [host, setHost] = useState('127.0.0.1')
-  const [port, setPort] = useState('3306')
-  const [database, setDatabase] = useState('')
-  const [username, setUsername] = useState('')
+  const [driver, setDriver] = useState(savedState?.driver ?? 'mysql')
+  const [host, setHost] = useState(savedState?.host ?? '127.0.0.1')
+  const [port, setPort] = useState(savedState?.port ?? '3306')
+  const [database, setDatabase] = useState(savedState?.database ?? '')
+  const [username, setUsername] = useState(savedState?.username ?? '')
   const [password, setPassword] = useState('')
-  const [siteTitle, setSiteTitle] = useState('')
-  const [ownerName, setOwnerName] = useState('')
-  const [adminEmail, setAdminEmail] = useState('')
+  const [siteTitle, setSiteTitle] = useState(savedState?.siteTitle ?? '')
+  const [ownerName, setOwnerName] = useState(savedState?.ownerName ?? '')
+  const [adminEmail, setAdminEmail] = useState(savedState?.adminEmail ?? '')
   const [adminPassword, setAdminPassword] = useState('')
   const [adminPasswordConfirm, setAdminPasswordConfirm] = useState('')
-  const [withStarterSite, setWithStarterSite] = useState(true)
+  const [withStarterSite, setWithStarterSite] = useState(savedState?.withStarterSite ?? true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (statusQuery.data?.installed) {
+      clearSetupWizardState()
       navigate('/login', { replace: true })
     }
   }, [navigate, statusQuery.data?.installed])
+
+  useEffect(() => {
+    if (statusQuery.data?.installed) {
+      return
+    }
+
+    saveSetupWizardState({
+      stepIndex,
+      driver,
+      host,
+      port,
+      database,
+      username,
+      siteTitle,
+      ownerName,
+      adminEmail,
+      withStarterSite,
+    })
+  }, [
+    stepIndex,
+    driver,
+    host,
+    port,
+    database,
+    username,
+    siteTitle,
+    ownerName,
+    adminEmail,
+    withStarterSite,
+    statusQuery.data?.installed,
+  ])
 
   const progress = useMemo(() => Math.round(((stepIndex + 1) / steps.length) * 100), [stepIndex])
 
@@ -105,7 +143,13 @@ export function SetupWizardPage() {
       await saveMutation.mutateAsync(databasePayload)
       setStepIndex(3)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Database setup failed')
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : err instanceof Error
+            ? err.message
+            : 'Database setup failed',
+      )
     }
   }
 
@@ -135,6 +179,7 @@ export function SetupWizardPage() {
         admin_password: adminPassword,
         with_starter_site: withStarterSite,
       })
+      clearSetupWizardState()
       navigate(result.redirect.replace(/^\/(?:studio|admin)/, '') || '/login', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Installation failed')
@@ -255,7 +300,8 @@ export function SetupWizardPage() {
             value={driver}
             onChange={(event) => setDriver(event.target.value)}
           >
-            <option value="mysql">MySQL / MariaDB (shared hosting)</option>
+            <option value="mysql">MySQL (shared hosting)</option>
+            <option value="mariadb">MariaDB</option>
             <option value="pgsql">PostgreSQL</option>
             <option value="sqlite">SQLite (simple / local)</option>
           </Select>
@@ -279,7 +325,11 @@ export function SetupWizardPage() {
           <div className="flex justify-between gap-2">
             <Button variant="secondary" onClick={() => setStepIndex(1)}>Back</Button>
             <Button onClick={() => void handleDatabaseNext()} disabled={testMutation.isPending || saveMutation.isPending}>
-              {testMutation.isPending ? 'Testing…' : 'Test connection & continue'}
+              {testMutation.isPending
+                ? 'Testing…'
+                : saveMutation.isPending
+                  ? 'Saving…'
+                  : 'Test connection & continue'}
             </Button>
           </div>
         </Card>
