@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.8] - 2026-05-31
+
+### Changed
+
+- Shared release zip sets `apps/api/storage` and `apps/api/bootstrap/cache` to mode `0777` before packaging (`scripts/ensure-writable-paths.sh`)
+
+## [0.0.25-rc.7] - 2026-05-31
+
+### Fixed
+
+- Setup API no longer 500 when database is not configured yet (`InstallationStateService`, `SetupLogService`)
+- Installer reads version from `/api/v1/health` if `/api/v1/setup/status` fails
+- Setup log polling starts only on final install step (no 500 spam on Welcome)
+
+## [0.0.25-rc.6] - 2026-05-31
+
+### Added
+
+- Installer light/dark theme with toggle (`ThemeProvider`, CSS `--luma-*` tokens)
+- `InstallerShell` layout for setup and login pages
+
+### Fixed
+
+- Setup wizard requirements step uses public `/api/v1/system/requirements` (no setup token)
+- Requirements step shows error + retry when API fails
+- Setup status includes `version` for Welcome step
+- Root `index.php` serves Studio/API correctly before install on nginx
+
+## [0.0.25-rc.5] - 2026-05-31
+
+### Fixed
+
+- Root `index.php` uses absolute redirect to `/install.php` (prevents `/admin/install.php` on nginx without `/admin/` alias)
+- Before install: `/admin/*` serves Studio SPA from `index.php`; `/api/*` boots Laravel for setup wizard
+
 ## [0.0.25-rc.4] - 2026-05-31
 
 ### Added

@@ -19,7 +19,46 @@ final class SetupApiTest extends TestCase
     {
         $this->getJson('/api/v1/setup/status')
             ->assertOk()
-            ->assertJsonPath('installed', false);
+            ->assertJsonPath('installed', false)
+            ->assertJsonPath('version', '0.0.25-rc.8');
+    }
+
+    public function test_setup_status_and_logs_work_when_database_is_unreachable(): void
+    {
+        $state = app(InstallationStateService::class);
+        $marker = $state->installedMarkerPath();
+        $hadMarker = is_file($marker);
+        if ($hadMarker) {
+            unlink($marker);
+        }
+
+        $originalMysql = config('database.connections.mysql');
+
+        config([
+            'database.default' => 'mysql',
+            'database.connections.mysql.host' => '127.0.0.1',
+            'database.connections.mysql.port' => 1,
+            'database.connections.mysql.database' => 'missing',
+            'database.connections.mysql.username' => 'missing',
+            'database.connections.mysql.password' => 'missing',
+        ]);
+
+        try {
+            $this->getJson('/api/v1/setup/status')
+                ->assertOk()
+                ->assertJsonPath('installed', false);
+
+            $this->getJson('/api/v1/setup/logs')
+                ->assertOk()
+                ->assertJsonPath('logs', []);
+        } finally {
+            config(['database.connections.mysql' => $originalMysql]);
+            config(['database.default' => 'sqlite']);
+
+            if ($hadMarker) {
+                file_put_contents($marker, '{"version":"test-restore"}');
+            }
+        }
     }
 
     public function test_setup_finish_installs_application_and_assigns_owner_role(): void

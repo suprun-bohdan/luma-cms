@@ -9,11 +9,11 @@ export function Checkbox({ label, error, id, className = '', ...props }: Checkbo
   const inputId = id ?? props.name
 
   return (
-    <label className="flex items-start gap-2">
+    <label className="flex cursor-pointer items-start gap-2">
       <input
         id={inputId}
         type="checkbox"
-        className={`mt-1 h-4 w-4 rounded border-[var(--luma-color-border)] text-[var(--luma-color-primary)] focus:ring-2 focus:ring-slate-200 ${className}`}
+        className={`mt-1 h-4 w-4 rounded border-[var(--luma-color-border)] text-[var(--luma-color-primary)] focus:ring-2 focus:ring-[var(--luma-color-focus-ring)] ${className}`}
         {...props}
       />
       <span className="space-y-1">

@@ -11,7 +11,7 @@ export function Select({ label, error, className = '', children, ...props }: Sel
   return (
     <label className="block space-y-1.5">
       <span className={labelClassName()}>{label}</span>
-      <select className={inputClassName(error, className)} {...props}>
+      <select className={`${inputClassName(error, className)} cursor-pointer`} {...props}>
         {children}
       </select>
       {error && <span className={fieldErrorClassName()}>{error}</span>}

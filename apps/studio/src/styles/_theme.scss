@@ -1,15 +1,35 @@
 @use 'tokens' as *;
 
-:root {
-  --luma-color-bg: #{$color-bg};
-  --luma-color-surface: #{$color-surface};
-  --luma-color-surface-muted: #{$color-surface-muted};
-  --luma-color-text: #{$color-text};
-  --luma-color-text-muted: #{$color-text-muted};
-  --luma-color-border: #{$color-border};
-  --luma-color-primary: #{$color-primary};
-  --luma-color-primary-hover: #{$color-primary-hover};
-  --luma-color-danger: #{$color-danger};
+:root,
+[data-luma-theme='light'] {
+  color-scheme: light;
+
+  @include luma-theme-vars(
+    $color-bg,
+    $color-surface,
+    $color-surface-muted,
+    $color-text,
+    $color-text-muted,
+    $color-border,
+    $color-primary,
+    $color-primary-hover,
+    $color-primary-contrast,
+    $color-danger,
+    $color-danger-surface,
+    $color-danger-border,
+    $color-success-surface,
+    $color-success-text,
+    $color-warning-surface,
+    $color-warning-text,
+    $color-muted-surface,
+    $color-muted-text,
+    $color-progress-track,
+    $color-progress-fill,
+    $color-code-bg,
+    $color-focus-ring,
+    $shadow-sm
+  );
+
   --luma-color-success: #{$color-success};
   --luma-color-warning: #{$color-warning};
 
@@ -41,4 +61,45 @@
   --luma-z-dropdown: #{$z-dropdown};
   --luma-z-modal: #{$z-modal};
   --luma-z-toast: #{$z-toast};
+}
+
+[data-luma-theme='dark'] {
+  color-scheme: dark;
+
+  @include luma-theme-vars(
+    $color-bg-dark,
+    $color-surface-dark,
+    $color-surface-muted-dark,
+    $color-text-dark,
+    $color-text-muted-dark,
+    $color-border-dark,
+    $color-primary-dark,
+    $color-primary-hover-dark,
+    $color-primary-contrast-dark,
+    $color-danger-dark,
+    $color-danger-surface-dark,
+    $color-danger-border-dark,
+    $color-success-surface-dark,
+    $color-success-text-dark,
+    $color-warning-surface-dark,
+    $color-warning-text-dark,
+    $color-muted-surface-dark,
+    $color-muted-text-dark,
+    $color-progress-track-dark,
+    $color-progress-fill-dark,
+    $color-code-bg-dark,
+    $color-focus-ring-dark,
+    $shadow-sm-dark
+  );
+
+  --luma-color-success: #{$color-success-text-dark};
+  --luma-color-warning: #{$color-warning-text-dark};
+}
+
+code {
+  border-radius: var(--luma-radius-sm);
+  background-color: var(--luma-color-code-bg);
+  padding: 0.125rem 0.375rem;
+  font-family: var(--luma-font-mono);
+  font-size: 0.875em;
 }

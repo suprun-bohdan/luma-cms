@@ -20,6 +20,7 @@ export function useSetupRequirements(enabled: boolean) {
     queryKey: ['setup', 'requirements'],
     queryFn: fetchSetupRequirements,
     enabled,
+    retry: 1,
   })
 }
 

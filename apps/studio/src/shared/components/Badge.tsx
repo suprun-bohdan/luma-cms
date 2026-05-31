@@ -7,10 +7,10 @@ type BadgeProps = {
 
 export function Badge({ children, tone = 'default' }: BadgeProps) {
   const tones = {
-    default: 'bg-slate-100 text-slate-700',
-    success: 'bg-emerald-100 text-emerald-800',
-    warning: 'bg-amber-100 text-amber-800',
-    muted: 'bg-slate-50 text-slate-500',
+    default: 'bg-[var(--luma-color-muted-surface)] text-[var(--luma-color-text)]',
+    success: 'bg-[var(--luma-color-success-surface)] text-[var(--luma-color-success-text)]',
+    warning: 'bg-[var(--luma-color-warning-surface)] text-[var(--luma-color-warning-text)]',
+    muted: 'bg-[var(--luma-color-muted-surface)] text-[var(--luma-color-muted-text)]',
   }
 
   return (

@@ -6,6 +6,7 @@ import { ErrorAlert } from '../../../shared/components/ErrorAlert'
 import { HelpText } from '../../../shared/components/HelpText'
 import { Input } from '../../../shared/components/Input'
 import { LoadingState } from '../../../shared/components/LoadingState'
+import { InstallerShell } from '../../../shared/layout/InstallerShell'
 import { ApiError } from '../../../shared/api/client'
 import { formatFieldErrors } from '../../../shared/utils/format'
 import { useAuth } from '../../../shared/auth/useAuth'
@@ -20,7 +21,13 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
 
   if (statusQuery.isLoading) {
-    return <LoadingState message="Checking installation status…" />
+    return (
+      <InstallerShell centered>
+        <Card className="w-full max-w-md">
+          <LoadingState message="Checking installation status…" />
+        </Card>
+      </InstallerShell>
+    )
   }
 
   if (!statusQuery.data?.installed) {
@@ -39,10 +46,14 @@ export function LoginPage() {
         : null
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-10">
+    <InstallerShell centered>
       <Card className="w-full max-w-md">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Luma CMS</p>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Sign in to Luma Studio</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-[var(--luma-color-muted-text)]">
+          Luma CMS
+        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-[var(--luma-color-text)]">
+          Sign in to Luma Studio
+        </h1>
         <HelpText className="mt-2">
           Use the owner account you created during setup. If you have not installed Luma CMS yet,
           open <code>/admin/setup</code> in your browser.
@@ -81,6 +92,6 @@ export function LoginPage() {
           </Button>
         </form>
       </Card>
-    </div>
+    </InstallerShell>
   )
 }

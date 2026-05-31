@@ -5,6 +5,19 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Luma Studio</title>
+    <script>
+      (function () {
+        var key = 'luma-theme';
+        var stored = localStorage.getItem(key);
+        var mode =
+          stored === 'dark' || stored === 'light'
+            ? stored
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        document.documentElement.setAttribute('data-luma-theme', mode);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

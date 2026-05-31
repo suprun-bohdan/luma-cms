@@ -23,6 +23,7 @@ final class SetupController extends Controller
     {
         return response()->json([
             'installed' => $installationState->isInstalled(),
+            'version' => (string) config('luma.version', '0.0.0-dev'),
         ]);
     }
 

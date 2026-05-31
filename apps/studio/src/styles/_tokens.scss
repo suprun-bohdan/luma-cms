@@ -1,6 +1,6 @@
 // Luma Studio design tokens — source of truth for SCSS and CSS custom properties.
 
-// Colors
+// Colors — light
 $color-bg: #f8fafc;
 $color-surface: #ffffff;
 $color-surface-muted: #f1f5f9;
@@ -9,9 +9,48 @@ $color-text-muted: #64748b;
 $color-border: #e2e8f0;
 $color-primary: #0f172a;
 $color-primary-hover: #1e293b;
+$color-primary-contrast: #ffffff;
 $color-danger: #dc2626;
+$color-danger-surface: #fef2f2;
+$color-danger-border: #fecaca;
 $color-success: #16a34a;
+$color-success-surface: #ecfdf5;
+$color-success-text: #065f46;
 $color-warning: #d97706;
+$color-warning-surface: #fffbeb;
+$color-warning-text: #92400e;
+$color-muted-surface: #f8fafc;
+$color-muted-text: #64748b;
+$color-progress-track: #e2e8f0;
+$color-progress-fill: #0f172a;
+$color-code-bg: #f1f5f9;
+$color-focus-ring: rgb(226 232 240 / 0.9);
+$shadow-sm: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+
+// Colors — dark
+$color-bg-dark: #0f172a;
+$color-surface-dark: #1e293b;
+$color-surface-muted-dark: #334155;
+$color-text-dark: #f8fafc;
+$color-text-muted-dark: #94a3b8;
+$color-border-dark: #475569;
+$color-primary-dark: #f8fafc;
+$color-primary-hover-dark: #e2e8f0;
+$color-primary-contrast-dark: #0f172a;
+$color-danger-dark: #f87171;
+$color-danger-surface-dark: rgb(127 29 29 / 0.35);
+$color-danger-border-dark: rgb(248 113 113 / 0.35);
+$color-success-surface-dark: rgb(6 78 59 / 0.45);
+$color-success-text-dark: #6ee7b7;
+$color-warning-surface-dark: rgb(120 53 15 / 0.45);
+$color-warning-text-dark: #fcd34d;
+$color-muted-surface-dark: #334155;
+$color-muted-text-dark: #cbd5e1;
+$color-progress-track-dark: #334155;
+$color-progress-fill-dark: #f8fafc;
+$color-code-bg-dark: #334155;
+$color-focus-ring-dark: rgb(71 85 105 / 0.9);
+$shadow-sm-dark: 0 1px 2px 0 rgb(0 0 0 / 0.35);
 
 // Typography
 $font-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
@@ -46,3 +85,53 @@ $content-max-width: 72rem;
 $z-dropdown: 1000;
 $z-modal: 1100;
 $z-toast: 1200;
+
+@mixin luma-theme-vars(
+  $bg,
+  $surface,
+  $surface-muted,
+  $text,
+  $text-muted,
+  $border,
+  $primary,
+  $primary-hover,
+  $primary-contrast,
+  $danger,
+  $danger-surface,
+  $danger-border,
+  $success-surface,
+  $success-text,
+  $warning-surface,
+  $warning-text,
+  $muted-surface,
+  $muted-text,
+  $progress-track,
+  $progress-fill,
+  $code-bg,
+  $focus-ring,
+  $shadow-sm-value
+) {
+  --luma-color-bg: #{$bg};
+  --luma-color-surface: #{$surface};
+  --luma-color-surface-muted: #{$surface-muted};
+  --luma-color-text: #{$text};
+  --luma-color-text-muted: #{$text-muted};
+  --luma-color-border: #{$border};
+  --luma-color-primary: #{$primary};
+  --luma-color-primary-hover: #{$primary-hover};
+  --luma-color-primary-contrast: #{$primary-contrast};
+  --luma-color-danger: #{$danger};
+  --luma-color-danger-surface: #{$danger-surface};
+  --luma-color-danger-border: #{$danger-border};
+  --luma-color-success-surface: #{$success-surface};
+  --luma-color-success-text: #{$success-text};
+  --luma-color-warning-surface: #{$warning-surface};
+  --luma-color-warning-text: #{$warning-text};
+  --luma-color-muted-surface: #{$muted-surface};
+  --luma-color-muted-text: #{$muted-text};
+  --luma-color-progress-track: #{$progress-track};
+  --luma-color-progress-fill: #{$progress-fill};
+  --luma-color-code-bg: #{$code-bg};
+  --luma-color-focus-ring: #{$focus-ring};
+  --luma-shadow-sm: #{$shadow-sm-value};
+}

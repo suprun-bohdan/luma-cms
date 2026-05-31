@@ -1,5 +1,6 @@
 export { AdminShell } from './AdminShell'
 export { AppSidebar, SidebarNav } from './AppSidebar'
+export { InstallerShell } from './InstallerShell'
 export { TopBar } from './TopBar'
 export { PageBody } from './PageBody'
 export { PageSection } from './PageSection'

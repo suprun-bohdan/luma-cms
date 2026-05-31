@@ -6,6 +6,7 @@ namespace App\Modules\Setup\Services;
 
 use App\Modules\Setup\Models\LumaInstallation;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 final class InstallationStateService
 {
@@ -26,13 +27,21 @@ final class InstallationStateService
 
     public function isInstalled(): bool
     {
-        if (! Schema::hasTable('luma_installation')) {
-            return false;
+        if (is_file($this->installedMarkerPath())) {
+            return true;
         }
 
-        return LumaInstallation::query()
-            ->whereNotNull('completed_at')
-            ->exists();
+        try {
+            if (! Schema::hasTable('luma_installation')) {
+                return false;
+            }
+
+            return LumaInstallation::query()
+                ->whereNotNull('completed_at')
+                ->exists();
+        } catch (Throwable) {
+            return false;
+        }
     }
 
     public function markInstalled(string $version): void

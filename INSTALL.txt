@@ -54,10 +54,15 @@ Primary install path
    - DB_* credentials if you use MySQL before the wizard
    - Leave SESSION_DRIVER=file and CACHE_STORE=file until setup finishes
 
-6. Make these directories writable by the web server user:
+6. Writable directories (storage, bootstrap/cache):
 
-   apps/api/storage/
-   apps/api/bootstrap/cache/
+   The release zip already sets apps/api/storage/ and apps/api/bootstrap/cache/
+   to mode 0777 during packaging. After extract, the Requirements step should
+   show "Writable directories: passed".
+
+   If your host still reports failed, set permissions in File Manager or SSH:
+
+   chmod -R 777 apps/api/storage apps/api/bootstrap/cache
 
 7. Complete the visual installer at /admin/setup, then sign in at /admin/login.
 

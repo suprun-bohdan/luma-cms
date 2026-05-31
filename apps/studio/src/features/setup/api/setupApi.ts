@@ -15,6 +15,7 @@ function setupHeaders(): Record<string, string> {
 
 const setupStatusSchema = z.object({
   installed: z.boolean(),
+  version: z.string(),
 })
 
 const requirementCheckSchema = z.object({
@@ -50,18 +51,34 @@ const finishSchema = z.object({
   redirect: z.string(),
 })
 
+const healthSchema = z.object({
+  status: z.string(),
+  service: z.string(),
+  version: z.string(),
+})
+
 export type SetupRequirementCheck = z.infer<typeof requirementCheckSchema>
 export type SetupLogEntry = z.infer<typeof setupLogSchema>
 
-export async function fetchSetupStatus(): Promise<{ installed: boolean }> {
-  return apiGet('/api/v1/setup/status', setupStatusSchema)
+export async function fetchSetupStatus(): Promise<{ installed: boolean; version: string }> {
+  try {
+    return await apiGet('/api/v1/setup/status', setupStatusSchema)
+  } catch {
+    const health = await apiGet('/api/v1/health', healthSchema)
+
+    return {
+      installed: false,
+      version: health.version,
+    }
+  }
 }
 
 export async function fetchSetupRequirements(): Promise<{
   passed: boolean
   checks: SetupRequirementCheck[]
 }> {
-  return apiGet('/api/v1/setup/requirements', setupRequirementsSchema, { headers: setupHeaders() })
+  // Public endpoint — readable before install without LUMA_SETUP_TOKEN / VITE_LUMA_SETUP_TOKEN.
+  return apiGet('/api/v1/system/requirements', setupRequirementsSchema)
 }
 
 export async function fetchSetupLogs(): Promise<{ logs: SetupLogEntry[] }> {

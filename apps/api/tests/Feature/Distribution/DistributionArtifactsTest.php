@@ -31,8 +31,10 @@ final class DistributionArtifactsTest extends TestCase
         $index = (string) file_get_contents($root.'/index.php');
         $install = (string) file_get_contents($root.'/install.php');
 
-        $this->assertStringContainsString('/install.php', $index);
-        $this->assertStringContainsString('public/index.php', $index);
+        $this->assertStringContainsString("header('Location: /install.php'", $index);
+        $this->assertStringContainsString('luma_serve_studio', $index);
+        $this->assertStringContainsString('luma_bootstrap_api', $index);
+        $this->assertStringNotContainsString("header('Location: install.php'", $index);
         $this->assertStringContainsString('/admin/setup', $install);
         $this->assertStringContainsString('^apps/', $htaccess);
         $this->assertStringContainsString('^admin/', $htaccess);
@@ -65,6 +67,7 @@ final class DistributionArtifactsTest extends TestCase
 
         $this->assertStringContainsString('cd "$STAGING"', $script);
         $this->assertStringContainsString('zip -rq "$ARCHIVE" .', $script);
+        $this->assertStringContainsString('ensure-writable-paths.sh', $script);
         $this->assertStringNotContainsString('deploy/shared-hosting-root', $script);
     }
 

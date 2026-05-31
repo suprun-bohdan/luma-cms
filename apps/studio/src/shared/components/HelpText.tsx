@@ -4,5 +4,7 @@ type HelpTextProps = {
 }
 
 export function HelpText({ children, className = '' }: HelpTextProps) {
-  return <p className={`text-sm text-slate-600 ${className}`.trim()}>{children}</p>
+  return (
+    <p className={`text-sm text-[var(--luma-color-text-muted)] ${className}`.trim()}>{children}</p>
+  )
 }
