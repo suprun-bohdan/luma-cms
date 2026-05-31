@@ -1,79 +1,103 @@
 # Luma CMS
 
-Open-source AI-native CMS with visual editing, structured content, and clean modular architecture.
+Open-source, AI-native CMS with structured content, visual editing (planned), and a clean modular architecture.
 
-> **Status: Pre-alpha.** Not production-ready. No runnable release is available yet.
+> **Status: Pre-alpha.** Not production-ready.
 
 ## What is Luma CMS?
 
-Luma CMS is a modular content platform for developers, editors, agencies, and content teams. It focuses on structured content, secure extensibility, developer-first APIs, and AI-assisted workflows — without copying legacy CMS patterns or plugin chaos.
+Luma CMS is a modular content platform for developers, editors, agencies, and content teams.
 
-Luma CMS is **not** a WordPress clone.
+It is **not** a WordPress clone. The goal is a small core, strong module boundaries, secure extensions, and developer-first APIs — not plugin chaos.
 
 ## Core principles
 
-- **Small core** — minimal kernel, official features as modules
+- **Small core** — official features live in modules
 - **Structured content** — collections, fields, and entries; not raw HTML as source of truth
-- **Clean module boundaries** — thin controllers, business logic in Actions/Services/Policies
+- **Modular monolith** — clear boundaries between Core, modules, API, and Studio
 - **Secure extensions** — plugins declare capabilities; default deny
-- **Typed APIs** — versioned REST from the start
-- **Developer-first** — Laravel backend, React TypeScript admin studio
+- **Versioned API** — public REST under `/api/v1/`
+- **Engineering discipline** — thin controllers, Actions, Policies, Form Requests, API Resources
 
-## MVP roadmap
+## Current progress
 
-The first milestone is **Content Core (MVP 0.1)**: authentication, users, roles, collections, fields, entries, draft/published status, basic SEO metadata, REST API v1, and a basic admin studio.
+| Area | Status |
+|------|--------|
+| Monorepo layout (`apps/`, `packages/`) | Done |
+| Laravel API (`apps/api/`) | Scaffold + Content module started |
+| Collections API | Done |
+| Fields / Entries API | Planned |
+| Auth (Sanctum) | Planned |
+| React Studio (`apps/studio/`) | Scaffold + API health check |
+| Plugin system | Planned |
 
-See [docs/roadmap.md](docs/roadmap.md) for the full phased plan.
+### Available API (pre-alpha)
 
-## Planned architecture
-
+```http
+GET  /api/v1/health
+GET  /api/v1/collections
+POST /api/v1/collections
+GET  /api/v1/collections/{slug}
+PUT  /api/v1/collections/{slug}
+DELETE /api/v1/collections/{slug}
 ```
-Core Kernel → Modules (Auth, Content, Media, SEO, Plugins, Settings)
-           → Plugin Runtime (capabilities + extension points)
-           → Admin Studio (React/TypeScript)
-           → Public API (/api/v1/)
-           → Future: AI Gateway, Render Engine
+
+## Architecture (target)
+
+```text
+Core Kernel
+  → Modules (Auth, Content, Media, SEO, Plugins, Settings, …)
+  → Plugin runtime (capabilities + extension points)
+  → Luma Studio (React / TypeScript)
+  → Public API (/api/v1/)
+  → Future: AI Gateway, Render Engine
 ```
 
-Details: [docs/architecture.md](docs/architecture.md)
-
-## Repository structure
-
-This repository is the clean open-source product. Planned layout:
+## Repository layout
 
 ```text
 luma-cms/
   apps/
-    api/          # Laravel backend
-    studio/       # React TypeScript admin
+    api/          # Laravel 13 backend
+    studio/       # React + TypeScript admin
   packages/
-    sdk/          # Public TypeScript SDK
-    plugin-sdk/   # Plugin development kit
-    ui/           # Shared UI components
-  docs/           # Public documentation
+    sdk/          # Public TypeScript SDK (planned)
+    plugin-sdk/   # Plugin development kit (planned)
+    ui/           # Shared UI components (planned)
 ```
 
-## Development status
+## Local development
 
-Early development. Laravel API at `apps/api/`, React Studio at `apps/studio/`. Content Core not implemented yet.
+This repository is the product source. Some contributors use an optional outer workspace with Docker, Nginx, and Makefile for local orchestration — that layer is not required to work on the CMS code.
 
-Installation instructions will be added once the first runnable development version is available.
+**API** (with outer Docker stack on port 8080):
 
-Contributors: see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/development.md](docs/development.md).
+```bash
+curl http://localhost:8080/api/v1/health
+curl http://localhost:8080/api/v1/collections
+```
 
-## Documentation
+**API tests:**
 
-| Document | Description |
-|----------|-------------|
-| [docs/vision.md](docs/vision.md) | Product vision and goals |
-| [docs/architecture.md](docs/architecture.md) | System architecture |
-| [docs/roadmap.md](docs/roadmap.md) | Phased development plan |
-| [docs/content-model.md](docs/content-model.md) | Collections, fields, entries |
-| [docs/permissions.md](docs/permissions.md) | Permission model |
-| [docs/extensions.md](docs/extensions.md) | Plugin system (planned) |
-| [docs/versioning.md](docs/versioning.md) | Versioning strategy |
-| [docs/security.md](docs/security.md) | Security principles |
-| [docs/development.md](docs/development.md) | Contributor workflow |
+```bash
+docker compose exec php bash -c "cd apps/api && php artisan test"
+```
+
+**Studio:**
+
+```bash
+cd apps/studio
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 (proxies `/api` to the backend when Docker is running).
+
+See [apps/api/README.md](apps/api/README.md) and [apps/studio/README.md](apps/studio/README.md) for app-specific details.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
 ## License
 
