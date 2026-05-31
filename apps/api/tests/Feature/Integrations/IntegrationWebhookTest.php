@@ -7,11 +7,15 @@ namespace Tests\Feature\Integrations;
 use App\Modules\Forms\Database\Seeders\ContactFormSeeder;
 use App\Modules\Integrations\Enums\IntegrationEvent;
 use App\Modules\Integrations\Enums\WebhookDeliveryStatus;
+use App\Modules\Integrations\Jobs\DeliverWebhookJob;
+use App\Modules\Integrations\Models\Webhook;
 use App\Modules\Integrations\Models\WebhookDelivery;
 use App\Modules\Pages\Enums\PageStatus;
 use App\Modules\Pages\Models\Page;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\Concerns\AuthenticatesApiUsers;
 use Tests\TestCase;
 
@@ -183,5 +187,130 @@ final class IntegrationWebhookTest extends TestCase
             ],
             $this->withBearer($this->adminUser()),
         )->assertStatus(422);
+    }
+
+    public function test_publish_succeeds_when_webhook_dispatch_fails(): void
+    {
+        Bus::shouldReceive('dispatch')->andThrow(new \RuntimeException('Queue unavailable'));
+
+        $this->postJson(
+            '/api/v1/integrations/webhooks',
+            [
+                'name' => 'Dispatch fail hook',
+                'url' => 'https://example.com/hooks/dispatch-fail',
+                'events' => [IntegrationEvent::PagePublished],
+            ],
+            $this->withBearer($this->adminUser()),
+        )->assertCreated();
+
+        $page = Page::query()->create([
+            'title' => 'Dispatch fail page',
+            'slug' => 'dispatch-fail-page',
+            'status' => PageStatus::Draft,
+            'template' => 'default-page',
+            'content' => ['blocks' => []],
+            'created_by' => $this->adminUser()->id,
+            'updated_by' => $this->adminUser()->id,
+        ]);
+
+        $this->postJson(
+            '/api/v1/pages/dispatch-fail-page/publish',
+            [],
+            $this->withBearer($this->adminUser()),
+        )->assertOk()
+            ->assertJsonPath('status', PageStatus::Published->value);
+
+        $this->assertDatabaseHas('webhook_deliveries', [
+            'event' => IntegrationEvent::PagePublished,
+            'status' => WebhookDeliveryStatus::Pending->value,
+        ]);
+    }
+
+    public function test_failed_webhook_delivery_records_error_details(): void
+    {
+        Http::fake([
+            'https://example.com/hooks/failed' => Http::response('server error', 500),
+        ]);
+
+        $this->postJson(
+            '/api/v1/integrations/webhooks',
+            [
+                'name' => 'Failed hook',
+                'url' => 'https://example.com/hooks/failed',
+                'events' => [IntegrationEvent::PagePublished],
+            ],
+            $this->withBearer($this->adminUser()),
+        )->assertCreated();
+
+        Page::query()->create([
+            'title' => 'Failed delivery page',
+            'slug' => 'failed-delivery-page',
+            'status' => PageStatus::Draft,
+            'template' => 'default-page',
+            'content' => ['blocks' => []],
+            'created_by' => $this->adminUser()->id,
+            'updated_by' => $this->adminUser()->id,
+        ]);
+
+        $this->postJson(
+            '/api/v1/pages/failed-delivery-page/publish',
+            [],
+            $this->withBearer($this->adminUser()),
+        )->assertOk();
+
+        $delivery = WebhookDelivery::query()->firstOrFail();
+
+        $this->assertGreaterThanOrEqual(1, $delivery->attempts);
+        $this->assertNotNull($delivery->error_message);
+        $this->assertSame(500, $delivery->response_status);
+    }
+
+    public function test_webhook_failure_logs_do_not_include_secret(): void
+    {
+        Bus::shouldReceive('dispatch')->andThrow(new \RuntimeException('Queue unavailable'));
+
+        Log::spy();
+
+        $this->postJson(
+            '/api/v1/integrations/webhooks',
+            [
+                'name' => 'Secret log hook',
+                'url' => 'https://example.com/hooks/secret-log',
+                'events' => [IntegrationEvent::PagePublished],
+            ],
+            $this->withBearer($this->adminUser()),
+        )->assertCreated();
+
+        $webhook = Webhook::query()->where('name', 'Secret log hook')->firstOrFail();
+        $secret = $webhook->secret;
+
+        Page::query()->create([
+            'title' => 'Secret log page',
+            'slug' => 'secret-log-page',
+            'status' => PageStatus::Draft,
+            'template' => 'default-page',
+            'content' => ['blocks' => []],
+            'created_by' => $this->adminUser()->id,
+            'updated_by' => $this->adminUser()->id,
+        ]);
+
+        $this->postJson(
+            '/api/v1/pages/secret-log-page/publish',
+            [],
+            $this->withBearer($this->adminUser()),
+        )->assertOk();
+
+        Log::shouldHaveReceived('warning')
+            ->withArgs(function (string $message, array $context) use ($secret): bool {
+                if ($message !== 'Webhook delivery dispatch failed') {
+                    return false;
+                }
+
+                $encoded = json_encode($context);
+
+                return is_string($encoded) && ! str_contains($encoded, $secret);
+            })
+            ->atLeast()
+            ->once();
     }
 }

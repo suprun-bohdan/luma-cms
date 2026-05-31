@@ -87,6 +87,24 @@ final class SetupApiTest extends TestCase
         )->assertOk();
     }
 
+    public function test_setup_requirements_work_without_token_when_not_configured(): void
+    {
+        config(['luma.setup_token' => '']);
+
+        $this->getJson('/api/v1/setup/requirements')
+            ->assertOk()
+            ->assertJsonStructure(['passed', 'checks']);
+    }
+
+    public function test_setup_rejects_invalid_setup_token(): void
+    {
+        config(['luma.setup_token' => 'expected-token']);
+
+        $this->getJson('/api/v1/setup/requirements', [
+            'X-Luma-Setup-Token' => 'wrong-token',
+        ])->assertForbidden();
+    }
+
     public function test_production_rejects_weak_admin_password(): void
     {
         $this->seed(\App\Modules\Users\Database\Seeders\RolesAndPermissionsSeeder::class);

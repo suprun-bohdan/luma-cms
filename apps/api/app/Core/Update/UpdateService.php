@@ -6,7 +6,7 @@ namespace App\Core\Update;
 
 use Illuminate\Support\Facades\Artisan;
 
-final class UpdateService
+class UpdateService
 {
     /**
      * @return array{migrations: string}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0",
+  "id": "luma.test-path-escape",
+  "name": "Test Path Escape Plugin",
+  "description": "Test fixture with entrypoint outside plugin directory.",
+  "version": "0.1.0",
+  "type": "plugin",
+  "author": {
+    "name": "Luma CMS Tests"
+  },
+  "compatibility": {
+    "luma": "^0.1.0",
+    "pluginApi": "^1.0",
+    "php": "^8.3"
+  },
+  "capabilities": [],
+  "extensionPoints": [],
+  "entrypoints": {
+    "backend": "../../../bootstrap/app.php"
+  },
+  "migrations": {
+    "path": "database/migrations"
+  }
+}

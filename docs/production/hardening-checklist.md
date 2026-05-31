@@ -21,7 +21,7 @@ Use this before exposing Luma CMS to the public internet.
 
 - [ ] Review Sanctum token lifetime for admin sessions
 - [ ] Optional: force password change on first admin login (not in MVP)
-- [ ] Restrict Studio (`/studio/`) by network or additional auth at reverse proxy if needed
+- [ ] Restrict Luma Studio (`/admin/`) by network or additional auth at reverse proxy if needed
 
 ## Integrations
 

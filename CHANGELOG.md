@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Phase 8.2 clean-room validation: expanded `docs/installation-validation.md` (shared zip + Docker prod, Setup vs Onboarding)
+- Automated release artifact content checks in `DistributionArtifactsTest` and `DistributionStudioCopyTest`
+- PHPUnit coverage for setup token edge cases, owner/update RBAC, plugin path containment, webhook dispatch isolation, update failure audit
+
+### Changed
+
+- `UpdateService` is no longer `final` to allow failure-path testing via container mock
+
 ## [0.0.24] - 2026-05-30
 
 ### Added

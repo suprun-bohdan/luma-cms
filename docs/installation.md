@@ -22,7 +22,7 @@ make up          # development stack
 make prod-setup  # production profile with PostgreSQL, queue, scheduler
 ```
 
-Studio is served at `/admin/` with same-origin API.
+Studio is served at `/admin/` with same-origin API. For a full clean-room checklist including Docker prod, see [installation-validation.md](./installation-validation.md) Section B.
 
 ## Setup token (production)
 
