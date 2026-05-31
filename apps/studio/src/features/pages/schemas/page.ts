@@ -6,7 +6,7 @@ export type PageStatus = z.infer<typeof pageStatusSchema>
 
 export const blockSchema = z.object({
   id: z.string().min(1),
-  type: z.enum(['hero', 'rich_text', 'cta']),
+  type: z.enum(['hero', 'rich_text', 'cta', 'contact_form']),
   variant: z.string().optional(),
   props: z.record(z.string(), z.unknown()),
 })

@@ -14,6 +14,8 @@ use App\Modules\Navigation\Models\Menu;
 use App\Modules\Navigation\Policies\MenuPolicy;
 use App\Modules\Pages\Models\Page;
 use App\Modules\Pages\Policies\PagePolicy;
+use App\Modules\Forms\Models\Form;
+use App\Modules\Forms\Policies\FormPolicy;
 use App\Modules\Seo\Models\Redirect;
 use App\Modules\Seo\Policies\RedirectPolicy;
 use Illuminate\Support\Facades\Gate;
@@ -35,5 +37,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Page::class, PagePolicy::class);
         Gate::policy(Menu::class, MenuPolicy::class);
         Gate::policy(Redirect::class, RedirectPolicy::class);
+        Gate::policy(Form::class, FormPolicy::class);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Pages\Database\Seeders;
 
 use App\Models\User;
+use App\Modules\Forms\Database\Seeders\ContactFormSeeder;
 use App\Modules\Navigation\Models\Menu;
 use App\Modules\Navigation\Models\MenuItem;
 use App\Modules\Pages\Enums\PageStatus;
@@ -20,6 +21,8 @@ class DemoSiteSeeder extends Seeder
         if ($admin === null) {
             return;
         }
+
+        $this->call(ContactFormSeeder::class);
 
         $page = Page::query()->updateOrCreate(
             ['slug' => 'home'],
@@ -50,6 +53,15 @@ class DemoSiteSeeder extends Seeder
                             'props' => [
                                 'label' => 'Open Studio',
                                 'url' => '/dashboard',
+                            ],
+                        ],
+                        [
+                            'id' => 'contact-1',
+                            'type' => 'contact_form',
+                            'props' => [
+                                'form_slug' => 'contact',
+                                'title' => 'Contact us',
+                                'submit_label' => 'Send message',
                             ],
                         ],
                     ],

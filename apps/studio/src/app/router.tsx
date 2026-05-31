@@ -14,6 +14,9 @@ import { MenuEditorPage } from '../features/navigation/pages/MenuEditorPage'
 import { NavigationHubPage } from '../features/navigation/pages/NavigationHubPage'
 import { RedirectEditPage } from '../features/seo/pages/RedirectEditPage'
 import { RedirectsListPage } from '../features/seo/pages/RedirectsListPage'
+import { FormEditPage } from '../features/forms/pages/FormEditPage'
+import { FormsListPage } from '../features/forms/pages/FormsListPage'
+import { SubmissionsListPage } from '../features/forms/pages/SubmissionsListPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -44,6 +47,10 @@ export const router = createBrowserRouter([
       { path: 'seo/redirects', element: <RedirectsListPage /> },
       { path: 'seo/redirects/new', element: <RedirectEditPage /> },
       { path: 'seo/redirects/:id/edit', element: <RedirectEditPage /> },
+      { path: 'forms', element: <FormsListPage /> },
+      { path: 'forms/new', element: <FormEditPage /> },
+      { path: 'forms/:slug/edit', element: <FormEditPage /> },
+      { path: 'forms/:slug/submissions', element: <SubmissionsListPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

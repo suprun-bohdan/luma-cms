@@ -83,4 +83,34 @@ final class PublicPageViewTest extends TestCase
             ->assertSee('<link rel="canonical" href="'.url('/p/canonical-page').'"', false)
             ->assertSee('property="og:url" content="'.url('/p/canonical-page').'"', false);
     }
+
+    public function test_published_page_renders_contact_form_block(): void
+    {
+        $this->seed(\App\Modules\Forms\Database\Seeders\ContactFormSeeder::class);
+
+        $page = Page::factory()->published()->create([
+            'slug' => 'contact-page',
+            'content' => [
+                'blocks' => [
+                    [
+                        'id' => 'contact-1',
+                        'type' => 'contact_form',
+                        'props' => [
+                            'form_slug' => 'contact',
+                            'title' => 'Get in touch',
+                            'submit_label' => 'Send',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->get('/p/'.$page->slug);
+
+        $response
+            ->assertOk()
+            ->assertSee('Get in touch')
+            ->assertSee('name="name"', false)
+            ->assertSee('/public/forms/contact/submit', false);
+    }
 }

@@ -12,6 +12,7 @@ use App\Modules\Navigation\Http\Controllers\Api\V1\MenuController;
 use App\Modules\Navigation\Http\Controllers\Api\V1\PublicMenuController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
+use App\Modules\Forms\Http\Controllers\Api\V1\FormController;
 use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
 use Illuminate\Support\Facades\Route;
 
@@ -72,5 +73,12 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/redirects/{redirect}', [RedirectController::class, 'show']);
         Route::put('/redirects/{redirect}', [RedirectController::class, 'update']);
         Route::delete('/redirects/{redirect}', [RedirectController::class, 'destroy']);
+
+        Route::get('/forms', [FormController::class, 'index']);
+        Route::post('/forms', [FormController::class, 'store']);
+        Route::get('/forms/{form:slug}', [FormController::class, 'show']);
+        Route::put('/forms/{form:slug}', [FormController::class, 'update']);
+        Route::delete('/forms/{form:slug}', [FormController::class, 'destroy']);
+        Route::get('/forms/{form:slug}/submissions', [FormController::class, 'submissions']);
     });
 });

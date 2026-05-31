@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.14] - 2026-05-31
+
+### Added
+
+- Forms module (Phase 3.4): `forms`, `form_fields`, `form_submissions` tables
+- Forms CRUD API with `forms.manage` and `forms.read_submissions` permissions
+- Public form submit at `POST /public/forms/{slug}/submit` with honeypot anti-spam
+- `contact_form` page block type linked to form slug
+- Studio forms admin at `/forms` and read-only submissions inbox
+- `ContactFormSeeder` and demo contact block on `/p/home`
+
 ## [0.0.13] - 2026-05-31
 
 ### Added

@@ -40,7 +40,10 @@ final class DemoSiteSeederTest extends TestCase
         $response
             ->assertOk()
             ->assertSee('Build your business site with Luma')
-            ->assertSee('Home');
+            ->assertSee('Home')
+            ->assertSee('Contact us');
+
+        $this->assertDatabaseHas('forms', ['slug' => 'contact']);
     }
 
     public function test_public_footer_menu_api(): void

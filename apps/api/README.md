@@ -22,6 +22,7 @@ apps/api/
       Users/        # Roles, permissions, RBAC
       Content/      # Collections, fields, entries
       Media/        # Upload, storage, variants
+      Forms/        # Forms, fields, submissions
       Seo/
       Plugins/
       Settings/
@@ -41,6 +42,7 @@ Public web routes (no API prefix):
 GET /p/{slug}              Public HTML page renderer
 GET /sitemap.xml           Published pages sitemap
 GET /robots.txt            Crawler rules + sitemap reference
+POST /public/forms/{slug}/submit   Public HTML form submit (CSRF + honeypot)
 ```
 
 Public API routes:
@@ -77,6 +79,12 @@ POST   /api/v1/redirects
 GET    /api/v1/redirects/{id}
 PUT    /api/v1/redirects/{id}
 DELETE /api/v1/redirects/{id}              requires seo.manage
+GET    /api/v1/forms
+POST   /api/v1/forms
+GET    /api/v1/forms/{slug}
+PUT    /api/v1/forms/{slug}
+DELETE /api/v1/forms/{slug}              requires forms.manage
+GET    /api/v1/forms/{slug}/submissions  requires forms.read_submissions
 ```
 
 Laravel health check:
@@ -112,7 +120,7 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
 
 | Role | Permissions |
 |------|-------------|
-| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage |
+| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage, forms.manage, forms.read_submissions |
 | `editor` | content.view/create/update; media.read/upload/update; pages.view/create/update/publish; menus.view/update (no delete) |
 
 ### Media
@@ -159,6 +167,35 @@ curl -s -X POST http://localhost:8080/api/v1/redirects \
 ```
 
 Reserved page slugs: `admin`, `api`, `p`, `sitemap.xml`, `robots.txt`.
+
+### Forms (Phase 3.4)
+
+Seed default contact form (included in `DemoSiteSeeder`):
+
+```bash
+docker compose exec php bash -c "cd apps/api && php artisan db:seed --class=App\\\\Modules\\\\Forms\\\\Database\\\\Seeders\\\\ContactFormSeeder"
+```
+
+List forms:
+
+```bash
+curl -s http://localhost:8080/api/v1/forms \
+  -H 'Authorization: Bearer {token}'
+```
+
+Public submit (from HTML form on `/p/home`; honeypot field `_hp` must stay empty):
+
+```bash
+curl -s -X POST http://localhost:8080/public/forms/contact/submit \
+  -H 'Cookie: ...' \
+  -F '_token={csrf}' \
+  -F '_hp=' \
+  -F 'name=Ada' \
+  -F 'email=ada@example.com' \
+  -F 'message=Hello'
+```
+
+Page block type `contact_form` props: `form_slug`, `title`, `submit_label`.
 
 ### Fields
 

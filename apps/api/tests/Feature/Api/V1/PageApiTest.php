@@ -85,6 +85,36 @@ final class PageApiTest extends TestCase
         $response->assertUnprocessable();
     }
 
+    public function test_admin_creates_page_with_contact_form_block(): void
+    {
+        $this->seed(\App\Modules\Forms\Database\Seeders\ContactFormSeeder::class);
+
+        $response = $this->postJson(
+            '/api/v1/pages',
+            [
+                'title' => 'Contact',
+                'slug' => 'contact',
+                'content' => [
+                    'blocks' => [
+                        [
+                            'id' => 'contact-1',
+                            'type' => 'contact_form',
+                            'props' => [
+                                'form_slug' => 'contact',
+                                'title' => 'Contact us',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('slug', 'contact');
+    }
+
     public function test_admin_updates_page(): void
     {
         $page = Page::factory()->create([

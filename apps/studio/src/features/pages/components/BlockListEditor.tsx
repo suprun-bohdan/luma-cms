@@ -89,7 +89,7 @@ export function BlockListEditor({ value, onChange, error }: BlockListEditorProps
       </div>
 
       <p className="mb-2 text-xs text-slate-500">
-        Allowed block types: hero, rich_text, cta. Each block needs id, type, and props. Media
+        Allowed block types: hero, rich_text, cta, contact_form. Each block needs id, type, and props. Media
         references use a uuid string in props (e.g. media_uuid).
       </p>
       <Textarea

@@ -33,6 +33,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Update menus', 'slug' => 'menus.update'],
             ['name' => 'Delete menus', 'slug' => 'menus.delete'],
             ['name' => 'Manage SEO', 'slug' => 'seo.manage'],
+            ['name' => 'Manage forms', 'slug' => 'forms.manage'],
+            ['name' => 'Read form submissions', 'slug' => 'forms.read_submissions'],
         ];
 
         foreach ($permissions as $permission) {

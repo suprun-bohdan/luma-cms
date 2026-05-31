@@ -16,6 +16,7 @@ const navItems: NavItem[] = [
   { to: '/pages', label: 'Pages' },
   { to: '/menus', label: 'Navigation' },
   { to: '/seo/redirects', label: 'SEO' },
+  { to: '/forms', label: 'Forms' },
   { to: '/media', label: 'Media' },
 ]
 

@@ -59,6 +59,24 @@ export const blockTemplates: BlockTemplate[] = [
     },
   },
   {
+    id: 'contact-form',
+    label: 'Contact form',
+    description: 'Embeds the contact form (requires form slug "contact")',
+    content: {
+      blocks: [
+        {
+          id: 'contact-1',
+          type: 'contact_form',
+          props: {
+            form_slug: 'contact',
+            title: 'Contact us',
+            submit_label: 'Send message',
+          },
+        },
+      ],
+    },
+  },
+  {
     id: 'business-landing',
     label: 'Business landing preset',
     description: 'Hero + text + CTA — typical SMB homepage',

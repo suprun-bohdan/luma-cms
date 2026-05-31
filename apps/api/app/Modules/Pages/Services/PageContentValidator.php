@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 final class PageContentValidator
 {
-    private const ALLOWED_TYPES = ['hero', 'rich_text', 'cta'];
+    private const ALLOWED_TYPES = ['hero', 'rich_text', 'cta', 'contact_form'];
 
     /**
      * @param  array<string, mixed>|null  $content
@@ -65,6 +65,15 @@ final class PageContentValidator
 
             if (isset($block['variant']) && is_string($block['variant'])) {
                 $normalized['variant'] = $block['variant'];
+            }
+
+            if ($type === 'contact_form') {
+                $formSlug = $props['form_slug'] ?? null;
+                if (! is_string($formSlug) || $formSlug === '') {
+                    throw ValidationException::withMessages([
+                        "content.blocks.{$index}.props.form_slug" => ['Contact form block requires a form_slug prop.'],
+                    ]);
+                }
             }
 
             $blocks[] = $normalized;

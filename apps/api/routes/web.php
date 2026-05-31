@@ -1,5 +1,7 @@
 <?php
 
+use App\Modules\Forms\Http\Controllers\Api\V1\FormController;
+use App\Modules\Forms\Http\Controllers\PublicFormSubmitController;
 use App\Modules\Pages\Http\Controllers\PublicPageViewController;
 use App\Modules\Seo\Http\Controllers\RobotsController;
 use App\Modules\Seo\Http\Controllers\SitemapController;
@@ -14,4 +16,5 @@ Route::get('/', function () {
 
 Route::get('/sitemap.xml', SitemapController::class);
 Route::get('/robots.txt', RobotsController::class);
+Route::post('/public/forms/{form:slug}/submit', PublicFormSubmitController::class);
 Route::get('/p/{page:slug}', [PublicPageViewController::class, 'show']);

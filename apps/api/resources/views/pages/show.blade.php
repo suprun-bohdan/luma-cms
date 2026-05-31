@@ -35,6 +35,15 @@
         .rich-text { line-height: 1.7; margin: 2rem 0; }
         .cta { text-align: center; margin: 2rem 0; }
         .cta a { display: inline-block; background: #0f172a; color: #fff; padding: 0.75rem 1.5rem; border-radius: 0.5rem; text-decoration: none; }
+        .contact-form { margin: 2rem 0; padding: 2rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; }
+        .contact-form h2 { margin: 0 0 1.5rem; font-size: 1.5rem; }
+        .contact-form__field { margin-bottom: 1rem; }
+        .contact-form label { display: block; margin-bottom: 0.35rem; font-weight: 500; font-size: 0.875rem; }
+        .contact-form input, .contact-form textarea { width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; font: inherit; }
+        .contact-form button { margin-top: 0.5rem; background: #0f172a; color: #fff; border: 0; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer; font: inherit; }
+        .contact-form__success { color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.75rem 1rem; border-radius: 0.375rem; margin-bottom: 1rem; }
+        .contact-form__errors { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; padding: 0.75rem 1rem; border-radius: 0.375rem; margin-bottom: 1rem; list-style: none; }
+        .contact-form__hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
     </style>
 </head>
 <body>

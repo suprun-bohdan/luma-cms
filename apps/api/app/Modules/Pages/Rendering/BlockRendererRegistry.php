@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Pages\Rendering;
 
+use App\Modules\Forms\Models\Form;
 use App\Modules\Media\Models\Media;
 use App\Modules\Media\Services\MediaStorageService;
 use Illuminate\Support\Facades\View;
@@ -27,6 +28,7 @@ final class BlockRendererRegistry
             'hero' => $this->renderHero($props),
             'rich_text' => $this->renderRichText($props),
             'cta' => $this->renderCta($props),
+            'contact_form' => $this->renderContactForm($props),
             default => '',
         };
     }
@@ -70,6 +72,36 @@ final class BlockRendererRegistry
         return View::make('pages.blocks.cta', [
             'label' => $label,
             'url' => $url,
+        ])->render();
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     */
+    private function renderContactForm(array $props): string
+    {
+        $formSlug = is_string($props['form_slug'] ?? null) ? $props['form_slug'] : '';
+        if ($formSlug === '') {
+            return '';
+        }
+
+        $form = Form::query()
+            ->where('slug', $formSlug)
+            ->where('is_active', true)
+            ->with('fields')
+            ->first();
+
+        if ($form === null) {
+            return '';
+        }
+
+        $title = e(is_string($props['title'] ?? null) ? $props['title'] : 'Contact us');
+        $submitLabel = e(is_string($props['submit_label'] ?? null) ? $props['submit_label'] : 'Send message');
+
+        return View::make('pages.blocks.contact_form', [
+            'form' => $form,
+            'title' => $title,
+            'submitLabel' => $submitLabel,
         ])->render();
     }
 
