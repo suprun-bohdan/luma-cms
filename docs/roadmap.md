@@ -12,11 +12,11 @@ Public summary of Luma CMS direction. Detailed agent planning lives in the outer
 - Onboarding wizard and site settings
 - System updates: CLI and Studio (owner)
 
-**Current release track:** `0.0.24` — Phase 8.2 clean-room validation complete; Phase 8.3 UX cleanup next.
+**Current release track:** `0.0.24` — Phase 8.3 UX cleanup complete; Phase 8.4 real-user install rehearsal next.
 
 ## Near term
 
-- Phase 8.3: Studio UX polish (copy, empty states, permission messaging)
+- Phase 8.4: Shared-hosting install rehearsal (zip → setup → onboarding → first page)
 - Plugin upgrade path and registry hardening (symlink/depth limits)
 - Optional Redis queue / S3 media for larger deployments
 
