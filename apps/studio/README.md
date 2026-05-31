@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core + Media + Pages + Navigation — Phase 2X design system foundation in progress.
+> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Phase 3.2 Business Website Kit polish.
 
 ## Design system
 
@@ -62,9 +62,12 @@ apps/studio/src/
 | `/entries/:id/preview` | Admin + public preview |
 | `/media` | Media library (upload, alt text, delete) |
 | `/pages` | Pages list |
-| `/pages/new` | Create page |
-| `/pages/:slug/edit` | Edit page |
-| `/menus/header` | Header navigation editor |
+| `/pages/new` | Create page (block templates + SEO preview) |
+| `/pages/:slug/edit` | Edit page, publish, view public |
+| `/menus` | Navigation hub (header + footer) |
+| `/menus/footer` | Footer menu editor |
+| `/seo/redirects` | URL redirects list |
+| `/seo/redirects/new` | Create redirect |
 
 ## Local development
 
@@ -97,9 +100,12 @@ npm run lint
 ## Manual smoke test
 
 1. Sign in at `/login` with dev credentials
-2. Create a collection, add fields, create an entry
-3. Save draft, publish, open preview (admin + public tabs)
-4. Sign out — protected routes redirect to login
+2. Upload an image at `/media`
+3. Create a page at `/pages/new` — use block template buttons, fill SEO fields, check SEO preview pane
+4. Save draft, publish, open public URL `/p/{slug}` (via API origin or Studio link)
+5. Edit header menu at `/menus/header` — link to your page slug
+6. Optional: run demo seeder (`DemoSiteSeeder`) and open `/p/home`
+7. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling
 

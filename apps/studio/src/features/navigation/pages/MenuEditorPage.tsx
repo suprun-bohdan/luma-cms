@@ -1,16 +1,16 @@
 import { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { Card } from '../../../shared/components/Card'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
 import { Input } from '../../../shared/components/Input'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { Breadcrumbs } from '../../../shared/components/Breadcrumbs'
 import { ApiError } from '../../../shared/api/client'
 import { formatFieldErrors } from '../../../shared/utils/format'
 import { useCreateMenu, useMenu, useUpdateMenu } from '../hooks/useMenus'
 import type { Menu, MenuFormValues } from '../schemas/menu'
-
-const HEADER_SLUG = 'header'
 
 type ItemRow = MenuFormValues['items'][number]
 
@@ -21,9 +21,14 @@ const emptyItem = (sortOrder: number): ItemRow => ({
   sort_order: sortOrder,
 })
 
+const menuLabels: Record<string, string> = {
+  header: 'Header',
+  footer: 'Footer',
+}
+
 function menuToFormValues(menu?: Menu): { name: string; items: ItemRow[] } {
   if (!menu) {
-    return { name: 'Header', items: [emptyItem(0)] }
+    return { name: 'Menu', items: [emptyItem(0)] }
   }
 
   return {
@@ -40,6 +45,7 @@ function menuToFormValues(menu?: Menu): { name: string; items: ItemRow[] } {
 }
 
 type MenuFormProps = {
+  menuSlug: string
   initialValues: { name: string; items: ItemRow[] }
   isNew: boolean
   loading: boolean
@@ -48,6 +54,7 @@ type MenuFormProps = {
 }
 
 function MenuForm({
+  menuSlug,
   initialValues,
   isNew,
   loading,
@@ -71,10 +78,25 @@ function MenuForm({
     setItems((current) => current.filter((_, itemIndex) => itemIndex !== index))
   }
 
+  function moveItem(index: number, direction: -1 | 1) {
+    setItems((current) => {
+      const target = index + direction
+      if (target < 0 || target >= current.length) {
+        return current
+      }
+
+      const next = [...current]
+      const temp = next[index]
+      next[index] = next[target]!
+      next[target] = temp!
+      return next
+    })
+  }
+
   function handleSave() {
     onSave({
       name,
-      slug: HEADER_SLUG,
+      slug: menuSlug,
       items: items
         .filter((item) => item.label.trim() !== '')
         .map((item, index) => ({
@@ -125,8 +147,24 @@ function MenuForm({
               value={item.url ?? ''}
               onChange={(event) => updateItem(index, { url: event.target.value })}
             />
-            <div className="flex items-end">
-              <Button variant="ghost" onClick={() => removeItem(index)}>
+            <div className="flex flex-wrap items-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={index === 0}
+                onClick={() => moveItem(index, -1)}
+              >
+                Up
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={index === items.length - 1}
+                onClick={() => moveItem(index, 1)}
+              >
+                Down
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => removeItem(index)}>
                 Remove
               </Button>
             </div>
@@ -135,10 +173,10 @@ function MenuForm({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button variant="secondary" onClick={addItem}>
+        <Button type="button" variant="secondary" onClick={addItem}>
           Add item
         </Button>
-        <Button disabled={loading} onClick={handleSave}>
+        <Button type="button" disabled={loading} onClick={handleSave}>
           {loading ? 'Saving…' : isNew ? 'Create menu' : 'Save menu'}
         </Button>
       </div>
@@ -147,9 +185,10 @@ function MenuForm({
 }
 
 export function MenuEditorPage() {
-  const menuQuery = useMenu(HEADER_SLUG)
+  const { menuSlug = 'header' } = useParams()
+  const menuQuery = useMenu(menuSlug)
   const createMutation = useCreateMenu()
-  const updateMutation = useUpdateMenu(HEADER_SLUG)
+  const updateMutation = useUpdateMenu(menuSlug)
 
   const isNew = menuQuery.isError && menuQuery.error instanceof ApiError && menuQuery.error.status === 404
   const mutation = isNew ? createMutation : updateMutation
@@ -160,6 +199,8 @@ export function MenuEditorPage() {
         ? mutation.error.message
         : null
 
+  const menuLabel = menuLabels[menuSlug] ?? menuSlug
+
   if (menuQuery.isLoading) {
     return <LoadingState message="Loading menu…" />
   }
@@ -168,17 +209,31 @@ export function MenuEditorPage() {
     return <ErrorAlert message={menuQuery.error.message} />
   }
 
-  const formKey = isNew ? 'new' : (menuQuery.data?.updated_at ?? HEADER_SLUG)
+  const formKey = isNew ? 'new' : (menuQuery.data?.updated_at ?? menuSlug)
 
   return (
     <>
       <PageHeader
-        title="Header navigation"
-        description="Links shown in the public site header. Use page slug for internal pages or URL for external links."
+        title={`${menuLabel} navigation`}
+        breadcrumbs={
+          <Breadcrumbs
+            items={[
+              { label: 'Navigation', to: '/menus' },
+              { label: menuLabel },
+            ]}
+          />
+        }
+        description="Use page slug for internal pages or URL for external links. Reorder with Up/Down."
+        actions={
+          <Link to="/menus">
+            <Button variant="secondary">All menus</Button>
+          </Link>
+        }
       />
 
       <MenuForm
         key={formKey}
+        menuSlug={menuSlug}
         initialValues={menuToFormValues(isNew ? undefined : menuQuery.data)}
         isNew={isNew}
         loading={mutation.isPending}

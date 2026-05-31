@@ -11,6 +11,9 @@ import { MediaLibraryPage } from '../features/media/pages/MediaLibraryPage'
 import { PagesListPage } from '../features/pages/pages/PagesListPage'
 import { PageEditPage } from '../features/pages/pages/PageEditPage'
 import { MenuEditorPage } from '../features/navigation/pages/MenuEditorPage'
+import { NavigationHubPage } from '../features/navigation/pages/NavigationHubPage'
+import { RedirectEditPage } from '../features/seo/pages/RedirectEditPage'
+import { RedirectsListPage } from '../features/seo/pages/RedirectsListPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -36,7 +39,11 @@ export const router = createBrowserRouter([
       { path: 'pages', element: <PagesListPage /> },
       { path: 'pages/new', element: <PageEditPage /> },
       { path: 'pages/:slug/edit', element: <PageEditPage /> },
-      { path: 'menus/header', element: <MenuEditorPage /> },
+      { path: 'menus', element: <NavigationHubPage /> },
+      { path: 'menus/:menuSlug', element: <MenuEditorPage /> },
+      { path: 'seo/redirects', element: <RedirectsListPage /> },
+      { path: 'seo/redirects/new', element: <RedirectEditPage /> },
+      { path: 'seo/redirects/:id/edit', element: <RedirectEditPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

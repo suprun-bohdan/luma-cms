@@ -4,10 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $metaTitle }}</title>
+    <link rel="canonical" href="{{ $canonicalUrl }}">
     @if($metaDescription !== '')
         <meta name="description" content="{{ $metaDescription }}">
     @endif
     <meta property="og:title" content="{{ $metaTitle }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
     @if($metaDescription !== '')
         <meta property="og:description" content="{{ $metaDescription }}">
     @endif
@@ -21,6 +23,10 @@
         .site-header nav { display: flex; gap: 1rem; flex-wrap: wrap; max-width: 960px; margin: 0 auto; }
         .site-header a { color: #334155; text-decoration: none; font-weight: 500; }
         .site-header a:hover { color: #0f172a; }
+        .site-footer { border-top: 1px solid #e2e8f0; padding: 1.5rem; margin-top: 3rem; }
+        .site-footer nav { display: flex; gap: 1rem; flex-wrap: wrap; max-width: 960px; margin: 0 auto; justify-content: center; }
+        .site-footer a { color: #64748b; text-decoration: none; font-size: 0.875rem; }
+        .site-footer a:hover { color: #0f172a; }
         main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
         .hero { padding: 3rem 0; text-align: center; }
         .hero img { max-width: 100%; height: auto; border-radius: 0.5rem; margin-bottom: 1rem; }
@@ -44,5 +50,14 @@
             {!! $blockHtml !!}
         @endforeach
     </main>
+    @if($footerMenuItems->isNotEmpty())
+        <footer class="site-footer">
+            <nav>
+                @foreach($footerMenuItems as $item)
+                    <a href="{{ $item->resolved_url }}">{{ $item->label }}</a>
+                @endforeach
+            </nav>
+        </footer>
+    @endif
 </body>
 </html>

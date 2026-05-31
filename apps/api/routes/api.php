@@ -12,6 +12,7 @@ use App\Modules\Navigation\Http\Controllers\Api\V1\MenuController;
 use App\Modules\Navigation\Http\Controllers\Api\V1\PublicMenuController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
+use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -65,5 +66,11 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/menus/{menu:slug}', [MenuController::class, 'show']);
         Route::put('/menus/{menu:slug}', [MenuController::class, 'update']);
         Route::delete('/menus/{menu:slug}', [MenuController::class, 'destroy']);
+
+        Route::get('/redirects', [RedirectController::class, 'index']);
+        Route::post('/redirects', [RedirectController::class, 'store']);
+        Route::get('/redirects/{redirect}', [RedirectController::class, 'show']);
+        Route::put('/redirects/{redirect}', [RedirectController::class, 'update']);
+        Route::delete('/redirects/{redirect}', [RedirectController::class, 'destroy']);
     });
 });

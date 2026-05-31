@@ -35,15 +35,15 @@ apps/api/
 
 ## API
 
-Public routes:
+Public web routes (no API prefix):
 
 ```
-GET  /api/v1/health
-POST /api/v1/auth/login
-GET  /api/v1/public/collections/{slug}/entries
-GET  /api/v1/public/entries/{id}
-GET  /api/v1/public/media/{uuid}
+GET /p/{slug}              Public HTML page renderer
+GET /sitemap.xml           Published pages sitemap
+GET /robots.txt            Crawler rules + sitemap reference
 ```
+
+Public API routes:
 
 Authenticated routes (`Authorization: Bearer {token}`):
 
@@ -72,6 +72,11 @@ POST   /api/v1/media                         multipart: file, optional alt_text
 GET    /api/v1/media/{uuid}
 PUT    /api/v1/media/{uuid}                  { "alt_text": "..." }
 DELETE /api/v1/media/{uuid}
+GET    /api/v1/redirects
+POST   /api/v1/redirects
+GET    /api/v1/redirects/{id}
+PUT    /api/v1/redirects/{id}
+DELETE /api/v1/redirects/{id}              requires seo.manage
 ```
 
 Laravel health check:
@@ -107,8 +112,8 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
 
 | Role | Permissions |
 |------|-------------|
-| `admin` | all content.* and media.* permissions |
-| `editor` | content.view/create/update; media.read/upload/update (no delete) |
+| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage |
+| `editor` | content.view/create/update; media.read/upload/update; pages.view/create/update/publish; menus.view/update (no delete) |
 
 ### Media
 
@@ -134,6 +139,26 @@ Storage:
 - Outer Docker workspace mounts `luma-api-storage` volume on `apps/api/storage` for persistent uploads
 
 Config: `config/media.php` (max size, allowed mime types, thumbnail width).
+
+### SEO (Phase 3.3)
+
+Sitemap and robots (set `APP_URL=http://localhost:8080` in Docker dev):
+
+```bash
+curl -s http://localhost:8080/sitemap.xml
+curl -s http://localhost:8080/robots.txt
+```
+
+Create redirect:
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/redirects \
+  -H 'Authorization: Bearer {token}' \
+  -H 'Content-Type: application/json' \
+  -d '{"from_path":"/legacy","to_path":"/p/home","status_code":301}'
+```
+
+Reserved page slugs: `admin`, `api`, `p`, `sitemap.xml`, `robots.txt`.
 
 ### Fields
 

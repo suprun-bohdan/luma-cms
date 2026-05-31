@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.13] - 2026-05-31
+
+### Added
+
+- SEO module (Phase 3.3): `GET /sitemap.xml`, `GET /robots.txt` for published pages
+- URL redirects table, global redirect middleware, CRUD API with `seo.manage` permission
+- Canonical URL and `og:url` on public page renderer
+- Studio redirects UI at `/seo/redirects`
+- Reserved page slugs (`admin`, `api`, `p`, `sitemap.xml`, `robots.txt`)
+- Vite dev proxy for `/sitemap.xml` and `/robots.txt`
+
+### Fixed
+
+- Studio Tailwind utilities not applied when `@import 'tailwindcss'` lived in SCSS — split to `tailwind.css`
+
+## [0.0.12] - 2026-05-31
+
+### Added
+
+- Page block templates in Studio (hero, rich text, CTA, business landing preset)
+- SEO metadata preview pane on page create/edit (search + Open Graph warnings)
+- Navigation hub at `/menus` with header and footer menu editors
+- Menu item reorder (Up/Down) in Studio
+- Public footer menu on rendered pages
+- `DemoSiteSeeder` for local onboarding (`home` page + header/footer menus)
+- Product smoke test plan and `make setup` / `make test-api` Makefile targets
+
+### Fixed
+
+- API unauthenticated requests return 401 instead of 500 when no `login` web route exists
+- Docker storage directory permissions via PHP entrypoint
+
 ## [0.0.11] - 2026-05-31
 
 ### Added

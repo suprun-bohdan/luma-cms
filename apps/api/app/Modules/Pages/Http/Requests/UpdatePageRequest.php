@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Pages\Http\Requests;
 
+use App\Modules\Pages\Rules\ReservedPageSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -30,6 +31,7 @@ final class UpdatePageRequest extends FormRequest
                 'max:255',
                 'alpha_dash',
                 Rule::unique('pages', 'slug')->ignore($page?->id),
+                new ReservedPageSlug(),
             ],
             'template' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'array'],

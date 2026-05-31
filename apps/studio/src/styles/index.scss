@@ -1,11 +1,2 @@
 @use 'tokens' as *;
 @use 'theme';
-
-@import 'tailwindcss';
-
-body {
-  @apply min-h-screen antialiased;
-  background-color: var(--luma-color-bg);
-  color: var(--luma-color-text);
-  font-family: var(--luma-font-sans);
-}

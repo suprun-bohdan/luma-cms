@@ -252,4 +252,19 @@ final class PageApiTest extends TestCase
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.status', 'published');
     }
+
+    public function test_rejects_reserved_page_slug(): void
+    {
+        $response = $this->postJson(
+            '/api/v1/pages',
+            [
+                'title' => 'Admin Page',
+                'slug' => 'admin',
+                'content' => ['blocks' => []],
+            ],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response->assertUnprocessable();
+    }
 }

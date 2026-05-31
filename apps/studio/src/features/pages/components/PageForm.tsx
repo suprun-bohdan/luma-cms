@@ -3,8 +3,10 @@ import { Button } from '../../../shared/components/Button'
 import { Fieldset } from '../../../shared/components/Fieldset'
 import { Input } from '../../../shared/components/Input'
 import { Textarea } from '../../../shared/components/Textarea'
+import { PreviewPane, SplitPane } from '../../../shared/layout/SplitPane'
 import { slugify } from '../../../shared/utils/format'
 import { BlockListEditor } from './BlockListEditor'
+import { SeoPreviewPane } from './SeoPreviewPane'
 import {
   defaultContentJson,
   pageFormSchema,
@@ -70,7 +72,7 @@ export function PageForm({
     onSubmit(parsed.data)
   }
 
-  return (
+  const formFields = (
     <form className="space-y-6" onSubmit={handleSubmit}>
       {formError && <p className="text-sm text-red-600">{formError}</p>}
 
@@ -127,5 +129,22 @@ export function PageForm({
         {loading ? 'Saving…' : submitLabel}
       </Button>
     </form>
+  )
+
+  return (
+    <SplitPane
+      left={formFields}
+      right={
+        <PreviewPane title="SEO preview">
+          <SeoPreviewPane
+            pageTitle={title}
+            pageSlug={slug}
+            seoTitle={seoTitle}
+            seoDescription={seoDescription}
+            seoOgImage={seoOgImage}
+          />
+        </PreviewPane>
+      }
+    />
   )
 }

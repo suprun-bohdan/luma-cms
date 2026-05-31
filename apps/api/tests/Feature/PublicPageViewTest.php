@@ -69,4 +69,18 @@ final class PublicPageViewTest extends TestCase
             ->assertSee('meta name="description" content="Custom description for search engines."', false)
             ->assertSee('property="og:title" content="Custom SEO Title"', false);
     }
+
+    public function test_published_page_renders_canonical_url(): void
+    {
+        $page = Page::factory()->published()->create([
+            'slug' => 'canonical-page',
+        ]);
+
+        $response = $this->get('/p/'.$page->slug);
+
+        $response
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.url('/p/canonical-page').'"', false)
+            ->assertSee('property="og:url" content="'.url('/p/canonical-page').'"', false);
+    }
 }

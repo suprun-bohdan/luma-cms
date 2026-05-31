@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Pages\Http\Requests;
 
+use App\Modules\Pages\Rules\ReservedPageSlug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -21,7 +22,7 @@ final class StorePageRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('pages', 'slug')],
+            'slug' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('pages', 'slug'), new ReservedPageSlug()],
             'template' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'array'],
             'seo' => ['sometimes', 'nullable', 'array'],

@@ -69,4 +69,11 @@ final class AuthApiTest extends TestCase
 
         $response->assertUnauthorized();
     }
+
+    public function test_api_routes_return_401_without_accept_json_header(): void
+    {
+        $response = $this->get('/api/v1/collections');
+
+        $response->assertUnauthorized();
+    }
 }

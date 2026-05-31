@@ -53,13 +53,20 @@ final class PublicPageViewController extends Controller
         $menu = Menu::query()->where('slug', 'header')->with('items')->first();
         $menuItems = $menu?->items ?? collect();
 
+        $footerMenu = Menu::query()->where('slug', 'footer')->with('items')->first();
+        $footerMenuItems = $footerMenu?->items ?? collect();
+
+        $canonicalUrl = url('/p/'.$page->slug);
+
         return view('pages.show', [
             'page' => $page,
             'blocks' => $renderedBlocks,
             'metaTitle' => $metaTitle,
             'metaDescription' => $metaDescription,
             'ogImage' => $ogImage,
+            'canonicalUrl' => $canonicalUrl,
             'menuItems' => $menuItems,
+            'footerMenuItems' => $footerMenuItems,
         ]);
     }
 
