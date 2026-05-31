@@ -1,7 +1,28 @@
+import { ApiError } from '../api/client'
 import type { AuthUser } from '../../features/auth/schemas/auth'
 
 export function hasRole(user: AuthUser | null | undefined, role: string): boolean {
   return user?.roles.includes(role) ?? false
+}
+
+export function isOwner(user: AuthUser | null | undefined): boolean {
+  return hasRole(user, 'owner')
+}
+
+export function permissionMessage(action: string, role = 'Owner'): string {
+  return `${role} permission is required to ${action}.`
+}
+
+export function apiForbiddenMessage(error: unknown, fallback: string): string {
+  if (error instanceof ApiError && error.status === 403) {
+    return fallback
+  }
+
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return fallback
 }
 
 export function canDeleteContent(user: AuthUser | null | undefined): boolean {

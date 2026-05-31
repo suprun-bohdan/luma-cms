@@ -1,14 +1,25 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ApiError } from '../../../shared/api/client'
 import { Badge } from '../../../shared/components/Badge'
 import { Button } from '../../../shared/components/Button'
 import { Card } from '../../../shared/components/Card'
+import { ConfirmDialog } from '../../../shared/components/ConfirmDialog'
+import { DangerNotice } from '../../../shared/components/DangerNotice'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
+import { HelpText } from '../../../shared/components/HelpText'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PageHeader } from '../../../shared/components/PageHeader'
+import { PermissionNotice } from '../../../shared/components/PermissionNotice'
+import { SuccessAlert } from '../../../shared/components/SuccessAlert'
+import { useAuth } from '../../../shared/auth/useAuth'
+import { isOwner } from '../../../shared/utils/format'
 import { useRunSystemUpdate, useSystemVersion, useUpdateCheck } from '../hooks/useSystemUpdate'
 
 export function UpdatesPage() {
+  const { user } = useAuth()
+  const owner = isOwner(user)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const versionQuery = useSystemVersion()
   const updateCheckQuery = useUpdateCheck()
   const runUpdateMutation = useRunSystemUpdate()
@@ -28,14 +39,22 @@ export function UpdatesPage() {
     <>
       <PageHeader
         title="Updates"
-        description="Apply database migrations after replacing release files on shared hosting."
+        description="Apply database migrations after you replace release files on your server."
       />
+
+      {!owner && (
+        <div className="mb-4">
+          <PermissionNotice
+            message="Owner permission is required to run system updates. Ask your site owner to perform this step, or use SSH with php artisan luma:update if you have server access."
+          />
+        </div>
+      )}
 
       {runUpdateMutation.isError && runErrorMessage && <ErrorAlert message={runErrorMessage} />}
       {runUpdateMutation.isSuccess && (
-        <Card className="mb-4 border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
-          Update completed. Restart queue workers if your host runs them separately.
-        </Card>
+        <div className="mb-4">
+          <SuccessAlert message="Update completed. Restart queue workers if your host runs them separately." />
+        </div>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -66,19 +85,28 @@ export function UpdatesPage() {
       </div>
 
       <Card className="mt-4 space-y-4">
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <DangerNotice title="Back up before updating">
           Back up your database and <code>storage/</code> directory before running a database update.
           Keep a copy of <code>.env</code> outside the web root.
-        </div>
-        <p className="text-sm text-slate-700">
-          Shared hosting flow: upload and extract the new <code>luma-cms-*-shared.zip</code>, replace{' '}
-          <code>apps/api/app</code>, <code>vendor</code>, and <code>apps/studio/dist</code> via FTP while keeping{' '}
-          <code>.env</code> and <code>storage/</code>. Then run the database update below.
-        </p>
+        </DangerNotice>
+
+        <HelpText>
+          Shared hosting: upload and extract the new <code>luma-cms-*-shared.zip</code>, replace{' '}
+          <code>apps/api/app</code>, <code>vendor</code>, and <code>apps/studio/dist</code> via FTP
+          while keeping <code>.env</code> and <code>storage/</code>. Then run the database update
+          below. This is not an automatic app-store update — you upload files first, then migrate.
+        </HelpText>
+
+        <HelpText>
+          SSH or cron: after replacing files, you can run{' '}
+          <code className="font-mono text-xs">php artisan luma:update</code> instead of the button
+          below. Both paths run migrations only; neither downloads a release for you.
+        </HelpText>
+
         <div className="flex flex-wrap gap-2">
           <Button
-            onClick={() => runUpdateMutation.mutate()}
-            disabled={runUpdateMutation.isPending || !version?.installed}
+            onClick={() => setConfirmOpen(true)}
+            disabled={runUpdateMutation.isPending || !version?.installed || !owner}
           >
             Run database update
           </Button>
@@ -87,6 +115,20 @@ export function UpdatesPage() {
           </Link>
         </div>
       </Card>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Run database update?"
+        description="Confirm you have backed up your database and storage folder. This applies pending migrations and cannot be undone from Studio."
+        confirmLabel="Run update"
+        loading={runUpdateMutation.isPending}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          runUpdateMutation.mutate(undefined, {
+            onSettled: () => setConfirmOpen(false),
+          })
+        }}
+      />
     </>
   )
 }

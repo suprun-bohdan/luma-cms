@@ -1,4 +1,5 @@
 import { Button } from '../../../shared/components/Button'
+import { HelpText } from '../../../shared/components/HelpText'
 import { Input } from '../../../shared/components/Input'
 import { Textarea } from '../../../shared/components/Textarea'
 import { SettingsPanel } from '../../../shared/layout/SplitPane'
@@ -136,6 +137,7 @@ export function BlockInspector({ block, onChange, getBlockDefinition }: BlockIns
 
   return (
     <SettingsPanel title={definition.label}>
+      <HelpText className="mb-4">{definition.description}</HelpText>
       <div className="space-y-4">
         {definition.fields.map((field) => {
           if (field.type === 'item_list' && field.itemFields) {

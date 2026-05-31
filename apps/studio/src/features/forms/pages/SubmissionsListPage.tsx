@@ -44,7 +44,9 @@ export function SubmissionsListPage() {
             ]}
           />
           <h1 className="mt-2 text-2xl font-semibold text-slate-900">Submissions</h1>
-          <p className="mt-1 text-sm text-slate-600">Read-only inbox for form `{slug}`.</p>
+          <p className="mt-1 text-sm text-slate-600">
+            Messages sent from your public site for form &quot;{slug}&quot;.
+          </p>
         </div>
 
         <Link to={`/forms/${slug}/edit`}>
@@ -58,7 +60,7 @@ export function SubmissionsListPage() {
       {submissionsQuery.data?.length === 0 && (
         <EmptyState
           title="No submissions yet"
-          description="Publish a page with a contact_form block pointing at this form slug."
+          description="When a published page includes this form, submissions appear here automatically."
         />
       )}
 
@@ -67,7 +69,7 @@ export function SubmissionsListPage() {
           <TableHead>
             <TableRow>
               <TableHeaderCell>Received</TableHeaderCell>
-              <TableHeaderCell>Preview</TableHeaderCell>
+              <TableHeaderCell>Message preview</TableHeaderCell>
               <TableHeaderCell>IP</TableHeaderCell>
             </TableRow>
           </TableHead>

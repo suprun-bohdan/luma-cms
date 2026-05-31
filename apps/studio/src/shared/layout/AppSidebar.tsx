@@ -4,6 +4,7 @@ import { Button } from '../components/Button'
 import { useAuth } from '../auth/useAuth'
 import { logout } from '../../features/auth/api/authApi'
 import { useAdminNavigation } from '../../features/plugins/hooks/useAdminNavigation'
+import { isOwner } from '../utils/format'
 
 type NavItem = {
   to: string
@@ -11,20 +12,45 @@ type NavItem = {
   soon?: boolean
   external?: boolean
   plugin?: boolean
+  ownerOnly?: boolean
 }
 
-const navItems: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/collections', label: 'Collections' },
-  { to: '/pages', label: 'Pages' },
-  { to: '/menus', label: 'Navigation' },
-  { to: '/seo/redirects', label: 'SEO' },
-  { to: '/forms', label: 'Forms' },
-  { to: '/integrations/webhooks', label: 'Integrations' },
-  { to: '/integrations/tokens', label: 'API Tokens' },
-  { to: '/settings', label: 'Settings' },
-  { to: '/plugins', label: 'Plugins' },
-  { to: '/media', label: 'Media' },
+type NavGroup = {
+  label: string
+  items: NavItem[]
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Overview',
+    items: [{ to: '/dashboard', label: 'Dashboard' }],
+  },
+  {
+    label: 'Content',
+    items: [
+      { to: '/pages', label: 'Pages' },
+      { to: '/collections', label: 'Collections' },
+      { to: '/media', label: 'Media' },
+      { to: '/forms', label: 'Forms' },
+      { to: '/menus', label: 'Navigation' },
+    ],
+  },
+  {
+    label: 'Growth',
+    items: [
+      { to: '/seo/redirects', label: 'Redirects' },
+      { to: '/integrations/webhooks', label: 'Webhooks' },
+      { to: '/integrations/tokens', label: 'API Tokens' },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
+      { to: '/plugins', label: 'Plugins' },
+      { to: '/settings', label: 'Settings' },
+      { to: '/settings/updates', label: 'Updates', ownerOnly: true },
+    ],
+  },
 ]
 
 function isExternalUrl(path: string): boolean {
@@ -68,6 +94,8 @@ type SidebarNavProps = {
 }
 
 export function SidebarNav({ onNavigate }: SidebarNavProps) {
+  const { user } = useAuth()
+  const owner = isOwner(user)
   const adminNavigationQuery = useAdminNavigation()
   const pluginItems: NavItem[] =
     adminNavigationQuery.data?.map((item) => ({
@@ -78,18 +106,38 @@ export function SidebarNav({ onNavigate }: SidebarNavProps) {
     })) ?? []
 
   return (
-    <nav className="space-y-1">
-      {navItems.map((item) => (
-        <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
-      ))}
+    <nav className="space-y-4">
+      {navGroups.map((group) => {
+        const visibleItems = group.items.filter((item) => !item.ownerOnly || owner)
+        if (visibleItems.length === 0) {
+          return null
+        }
+
+        return (
+          <div key={group.label}>
+            <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              {group.label}
+            </p>
+            <div className="space-y-1">
+              {visibleItems.map((item) => (
+                <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </div>
+        )
+      })}
 
       {pluginItems.length > 0 && (
-        <>
-          <div className="my-2 border-t border-slate-200" />
-          {pluginItems.map((item) => (
-            <SidebarLink key={`${item.to}-${item.label}`} item={item} onNavigate={onNavigate} />
-          ))}
-        </>
+        <div>
+          <p className="mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Plugins
+          </p>
+          <div className="space-y-1">
+            {pluginItems.map((item) => (
+              <SidebarLink key={`${item.to}-${item.label}`} item={item} onNavigate={onNavigate} />
+            ))}
+          </div>
+        </div>
       )}
     </nav>
   )
@@ -118,7 +166,7 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
     <aside className="border-b border-slate-200 bg-white px-4 py-6 lg:min-h-screen lg:border-b-0 lg:border-r lg:w-[var(--luma-sidebar-width)]">
       <div className="mb-8">
         <h1 className="text-xl font-semibold text-slate-900">Luma Studio</h1>
-        <p className="mt-1 text-xs text-slate-500">Admin at /admin/</p>
+        <p className="mt-1 text-xs text-slate-500">Manage your site</p>
       </div>
       <SidebarNav onNavigate={onNavigate} />
       <div className="mt-8 border-t border-slate-200 pt-4">

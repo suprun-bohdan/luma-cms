@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { ApiError } from '../../../shared/api/client'
 import { Badge } from '../../../shared/components/Badge'
 import { Button } from '../../../shared/components/Button'
+import { DangerNotice } from '../../../shared/components/DangerNotice'
+import { EmptyState } from '../../../shared/components/EmptyState'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
 import {
   Table,
@@ -15,6 +17,19 @@ import {
 import { ListPage } from '../../../shared/layout'
 import { useDiscoveredPlugins, usePluginActions, usePlugins } from '../hooks/usePlugins'
 import type { Plugin, PluginCapability } from '../schemas/plugin'
+
+function pluginStatusBadge(status: Plugin['status']) {
+  if (status === 'enabled') {
+    return <Badge tone="success">Enabled</Badge>
+  }
+  if (status === 'failed') {
+    return <Badge tone="warning">Failed</Badge>
+  }
+  if (status === 'disabled') {
+    return <Badge tone="muted">Disabled</Badge>
+  }
+  return <Badge tone="muted">Installed</Badge>
+}
 
 function CapabilityRow({
   pluginId,
@@ -31,9 +46,9 @@ function CapabilityRow({
   return (
     <TableRow>
       <TableCell className="font-mono text-xs">{capability.capability}</TableCell>
-      <TableCell>{capability.granted ? 'Yes' : 'Pending'}</TableCell>
+      <TableCell>{capability.granted ? 'Approved' : 'Needs approval'}</TableCell>
       <TableCell>
-        {capability.is_dangerous ? <Badge tone="warning">Dangerous</Badge> : '—'}
+        {capability.is_dangerous ? <Badge tone="warning">High risk</Badge> : 'Standard'}
       </TableCell>
       <TableCell className="text-right">
         {!capability.granted && (
@@ -73,8 +88,8 @@ function PluginCapabilitiesPanel({ plugin }: { plugin: Plugin }) {
       <TableHead>
         <TableRow>
           <TableHeaderCell>Capability</TableHeaderCell>
-          <TableHeaderCell>Granted</TableHeaderCell>
-          <TableHeaderCell>Dangerous</TableHeaderCell>
+          <TableHeaderCell>Status</TableHeaderCell>
+          <TableHeaderCell>Risk</TableHeaderCell>
           <TableHeaderCell />
         </TableRow>
       </TableHead>
@@ -129,7 +144,7 @@ export function PluginsListPage() {
   return (
     <ListPage
       title="Plugins"
-      description="Install and manage internal plugins. Dangerous capabilities require explicit approval."
+      description="Install and manage internal plugins. High-risk capabilities require explicit approval."
       actions={
         <div className="flex flex-wrap gap-2">
           <Link to="/plugins/audit-logs">
@@ -160,20 +175,28 @@ export function PluginsListPage() {
         </div>
       )}
 
-      <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-        Plugins run as trusted PHP in the same process as the CMS. There is no sandbox. Only install
-        plugins from sources you trust, and review dangerous capabilities before approving them.
+      <div className="mb-4">
+        <DangerNotice title="Trusted PHP — no sandbox">
+          Plugins run as trusted PHP in the same process as the CMS. There is no sandbox. Only install
+          plugins from sources you trust, and review high-risk capabilities before approving them.
+        </DangerNotice>
       </div>
 
       {enableHintPluginId && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Approve pending dangerous capabilities below, then enable the plugin again.
+        <div className="mb-4">
+          <DangerNotice>
+            This plugin cannot be enabled until you approve its high-risk capabilities below. Expand
+            capabilities, approve each pending item, then try Enable again.
+          </DangerNotice>
         </div>
       )}
 
       {showDiscover && (
         <section className="mb-8 rounded-lg border border-slate-200 bg-slate-50 p-4">
           <h2 className="text-sm font-semibold text-slate-900">Discovered on disk</h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Scans the server plugins folder. Install only plugins you trust.
+          </p>
           {discoverQuery.isLoading && <p className="mt-2 text-sm text-slate-500">Scanning…</p>}
           {discoverQuery.data && discoverQuery.data.length === 0 && (
             <p className="mt-2 text-sm text-slate-500">No plugin manifests found.</p>
@@ -214,10 +237,18 @@ export function PluginsListPage() {
             >
               <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div>
-                  <p className="font-medium text-slate-900">{plugin.name}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-slate-900">{plugin.name}</p>
+                    {pluginStatusBadge(plugin.status)}
+                  </div>
                   <p className="font-mono text-xs text-slate-500">
-                    {plugin.plugin_id} · v{plugin.version} · {plugin.status}
+                    {plugin.plugin_id} · v{plugin.version}
                   </p>
+                  {plugin.status === 'failed' && plugin.last_error && (
+                    <div className="mt-2">
+                      <ErrorAlert message={plugin.last_error} />
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button
@@ -230,7 +261,7 @@ export function PluginsListPage() {
                   >
                     {expandedPluginId === plugin.plugin_id ? 'Hide capabilities' : 'Capabilities'}
                   </Button>
-                  {plugin.status !== 'enabled' ? (
+                  {plugin.status !== 'enabled' && plugin.status !== 'failed' && (
                     <Button
                       variant="secondary"
                       disabled={actions.enable.isPending}
@@ -238,7 +269,17 @@ export function PluginsListPage() {
                     >
                       Enable
                     </Button>
-                  ) : (
+                  )}
+                  {plugin.status === 'failed' && (
+                    <Button
+                      variant="secondary"
+                      disabled={actions.enable.isPending}
+                      onClick={() => handleEnable(plugin.plugin_id)}
+                    >
+                      Retry enable
+                    </Button>
+                  )}
+                  {plugin.status === 'enabled' && (
                     <Button
                       variant="secondary"
                       disabled={actions.disable.isPending}
@@ -268,9 +309,15 @@ export function PluginsListPage() {
       )}
 
       {pluginsQuery.data?.length === 0 && (
-        <p className="text-sm text-slate-500">
-          No plugins installed. Use Discover to scan the plugins directory.
-        </p>
+        <EmptyState
+          title="No plugins installed"
+          description="Use Discover to scan the plugins folder on your server, then install only plugins you trust."
+          action={
+            <Button variant="secondary" onClick={() => setShowDiscover(true)}>
+              Discover plugins
+            </Button>
+          }
+        />
       )}
     </ListPage>
   )

@@ -4,6 +4,7 @@ import { Card } from '../../../shared/components/Card'
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog'
 import { EmptyState } from '../../../shared/components/EmptyState'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
+import { HelpText } from '../../../shared/components/HelpText'
 import { Input } from '../../../shared/components/Input'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PageHeader } from '../../../shared/components/PageHeader'
@@ -38,7 +39,7 @@ export function MediaLibraryPage() {
     <>
       <PageHeader
         title="Media"
-        description="Upload and manage assets for your content."
+        description="Upload and manage images and files for your pages."
         actions={
           <Button
             disabled={uploadMutation.isPending}
@@ -79,6 +80,10 @@ export function MediaLibraryPage() {
             }}
           />
         </div>
+        <HelpText className="mt-4">
+          Accepted types: JPEG, PNG, WebP, GIF, and PDF. Maximum upload size depends on your server
+          PHP settings (typically 2–10 MB). Add alt text so images are accessible on the public site.
+        </HelpText>
         {uploadError && (
           <div className="mt-4">
             <ErrorAlert message={uploadError} />
@@ -92,7 +97,15 @@ export function MediaLibraryPage() {
       {mediaQuery.data?.length === 0 && (
         <EmptyState
           title="No media yet"
-          description="Upload images or PDFs to build your media library."
+          description="Upload images or PDFs to use in page blocks and SEO previews."
+          action={
+            <Button
+              disabled={uploadMutation.isPending}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Upload first file
+            </Button>
+          }
         />
       )}
 
@@ -178,7 +191,11 @@ export function MediaLibraryPage() {
       <ConfirmDialog
         open={pendingDelete !== null}
         title="Delete media"
-        description="This permanently removes the file from storage."
+        description={
+          pendingDelete
+            ? `Permanently delete "${pendingDelete.filename}" from storage? Pages using this file may show broken images.`
+            : 'This permanently removes the file from storage.'
+        }
         confirmLabel="Delete"
         loading={deleteMutation.isPending}
         onCancel={() => setPendingDelete(null)}

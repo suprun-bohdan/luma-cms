@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { EmptyState } from '../../../shared/components/EmptyState'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
+import { HelpText } from '../../../shared/components/HelpText'
 import {
   Table,
   TableBody,
@@ -40,7 +41,7 @@ export function FormsListPage() {
         formsQuery.data?.length === 0 ? (
           <EmptyState
             title="No forms yet"
-            description="Create a form, then embed it on a page with the contact_form block."
+            description="Create a form, then add it to a page using the Contact form block."
             action={
               <Link to="/forms/new">
                 <Button>Create form</Button>
@@ -50,14 +51,18 @@ export function FormsListPage() {
         ) : undefined
       }
     >
+      <HelpText className="mb-4">
+        Active forms accept public submissions on pages where you embed them. Inactive forms stay
+        hidden from visitors.
+      </HelpText>
       {formsQuery.data && formsQuery.data.length > 0 && (
         <Table>
           <TableHead>
             <TableRow>
               <TableHeaderCell>Name</TableHeaderCell>
-              <TableHeaderCell>Slug</TableHeaderCell>
+              <TableHeaderCell>Public URL slug</TableHeaderCell>
               <TableHeaderCell>Fields</TableHeaderCell>
-              <TableHeaderCell>Active</TableHeaderCell>
+              <TableHeaderCell>Accepting submissions</TableHeaderCell>
               <TableHeaderCell />
             </TableRow>
           </TableHead>
@@ -67,7 +72,7 @@ export function FormsListPage() {
                 <TableCell className="font-medium text-slate-900">{form.name}</TableCell>
                 <TableCell className="font-mono text-slate-600">{form.slug}</TableCell>
                 <TableCell>{form.fields.length}</TableCell>
-                <TableCell>{form.is_active ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{form.is_active ? 'Yes' : 'No (hidden)'}</TableCell>
                 <TableCell className="text-right space-x-2">
                   <Link to={`/forms/${form.slug}/submissions`}>
                     <Button variant="secondary">Submissions</Button>

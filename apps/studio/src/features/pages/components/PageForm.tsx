@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { Fieldset } from '../../../shared/components/Fieldset'
+import { HelpText } from '../../../shared/components/HelpText'
 import { Input } from '../../../shared/components/Input'
 import { Textarea } from '../../../shared/components/Textarea'
 import { PreviewPane, SplitPane } from '../../../shared/layout/SplitPane'
@@ -213,6 +214,10 @@ export function PageForm({
       />
 
       <Fieldset legend="Page blocks">
+        <HelpText className="mb-3">
+          Add sections from the palette below. Select a block to edit its content in the panel on the
+          right. Hero, rich text, call to action, and contact form blocks cover most landing pages.
+        </HelpText>
         <SectionTemplatePicker
           content={content}
           onApply={(next) => {
@@ -248,8 +253,12 @@ export function PageForm({
       </Fieldset>
 
       <Fieldset legend="SEO">
+        <HelpText className="mb-3">
+          Optional search and social preview text. Leave blank to use the page title and excerpt from
+          content.
+        </HelpText>
         <Input
-          label="Meta title (max 70)"
+          label="Search title (max 70 characters)"
           id="seo-title"
           value={seoTitle}
           maxLength={70}
@@ -257,7 +266,7 @@ export function PageForm({
         />
 
         <Textarea
-          label="Meta description (max 160)"
+          label="Search description (max 160 characters)"
           id="seo-description"
           value={seoDescription}
           maxLength={160}
@@ -266,10 +275,10 @@ export function PageForm({
         />
 
         <Input
-          label="OG image media uuid"
+          label="Social share image (media library UUID)"
           id="seo-og-image"
           value={seoOgImage}
-          placeholder="00000000-0000-0000-0000-000000000000"
+          placeholder="Paste UUID from Media library"
           className="font-mono"
           onChange={(event) => setSeoOgImage(event.target.value)}
         />

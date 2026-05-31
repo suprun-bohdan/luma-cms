@@ -14,7 +14,7 @@ import {
   useSetupStatus,
 } from '../hooks/useSetup'
 
-const steps = ['Requirements', 'Database', 'Admin', 'Finish'] as const
+const steps = ['Requirements', 'Database', 'Owner account', 'Finish'] as const
 
 export function SetupWizardPage() {
   const navigate = useNavigate()
@@ -177,8 +177,8 @@ export function SetupWizardPage() {
         {stepIndex === 2 && (
           <Card className="space-y-4">
             <Input label="Site title" value={siteTitle} onChange={(event) => setSiteTitle(event.target.value)} />
-            <Input label="Admin email" type="email" value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)} />
-            <Input label="Admin password" type="password" value={adminPassword} onChange={(event) => setAdminPassword(event.target.value)} />
+            <Input label="Owner email" type="email" value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)} />
+            <Input label="Owner password" type="password" value={adminPassword} onChange={(event) => setAdminPassword(event.target.value)} />
             <label className="flex items-center gap-2 text-sm text-slate-700">
               <input
                 type="checkbox"
@@ -197,7 +197,8 @@ export function SetupWizardPage() {
         {stepIndex === 3 && (
           <Card className="space-y-4">
             <p className="text-sm text-slate-600">
-              Ready to install Luma CMS with your database and admin account.
+              Ready to install Luma CMS with your database and owner account. After login, a short
+              onboarding wizard helps you choose starter content.
             </p>
             <div className="flex justify-between gap-2">
               <Button variant="secondary" onClick={() => setStepIndex(2)}>Back</Button>

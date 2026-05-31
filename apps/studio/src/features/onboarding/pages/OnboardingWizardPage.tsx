@@ -185,7 +185,8 @@ export function OnboardingWizardPage() {
         {stepIndex === 2 && (
           <Card className="space-y-4">
             <p className="text-sm text-slate-600">
-              Install a published home page, menus, and starter blocks using the {selectedPreset} preset.
+              Creates a published home page, navigation menus, and sample blocks using your chosen
+              preset. You can change everything later in Pages and Navigation.
             </p>
             <div className="flex justify-end">
               <Button
@@ -242,10 +243,10 @@ export function OnboardingWizardPage() {
         )}
 
         <Card>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Setup history</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Onboarding log</p>
           <div className="max-h-48 space-y-2 overflow-y-auto text-sm">
             {(journalQuery.data ?? []).length === 0 && (
-              <p className="text-slate-500">Events appear as you complete onboarding steps.</p>
+              <p className="text-slate-500">Steps you complete here appear in this log.</p>
             )}
             {(journalQuery.data ?? []).map((entry) => (
               <div key={entry.id} className="rounded border border-slate-200 px-3 py-2">

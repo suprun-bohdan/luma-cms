@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
+import { EmptyState } from '../../../shared/components/EmptyState'
 import { getBlockDefinition } from '../data/blockDefinitions'
 import type { PageContent } from '../schemas/page'
 
@@ -75,9 +76,10 @@ export function VisualBlockList({
 
   if (content.blocks.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500">
-        No blocks yet. Add a section from the palette above.
-      </p>
+      <EmptyState
+        title="No blocks yet"
+        description="Pick a starter section or add a block from the palette above."
+      />
     )
   }
 

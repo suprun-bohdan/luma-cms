@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { Checkbox } from '../../../shared/components/Checkbox'
+import { HelpText } from '../../../shared/components/HelpText'
 import { Input } from '../../../shared/components/Input'
 import {
   defaultContactFields,
@@ -96,6 +97,10 @@ export function FormForm({
         onChange={(event) => setSlug(event.target.value)}
         required
       />
+      <HelpText>
+        Used in the Contact form block and public submission URL. Use lowercase letters, numbers, and
+        hyphens only.
+      </HelpText>
 
       <Input
         label="Description"
@@ -105,6 +110,9 @@ export function FormForm({
       />
 
       <Checkbox label="Active" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} />
+      <HelpText>
+        Inactive forms are hidden from public pages and do not accept new submissions.
+      </HelpText>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">

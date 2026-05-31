@@ -47,8 +47,8 @@ export function FormEditPage() {
             {isNew ? 'Create form' : 'Edit form'}
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Embed on pages with a <code className="font-mono">contact_form</code> block using{' '}
-            <code className="font-mono">form_slug</code>.
+            Add this form to a page with the Contact form block. Visitors submit on the public site;
+            you review messages under Submissions.
           </p>
         </div>
 

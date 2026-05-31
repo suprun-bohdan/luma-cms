@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Phase 8.3 Studio UX cleanup: grouped sidebar navigation, dashboard welcome and action cards, setup/onboarding copy separation, owner-only update confirm and permission messaging, plugin trusted-PHP and failed-state display, forms/media/pages empty states and helper text, settings documentation links
 - `UpdateService` is no longer `final` to allow failure-path testing via container mock
 - `apps/api/.env.production.example` admin password placeholder avoids production guard blocked value
 

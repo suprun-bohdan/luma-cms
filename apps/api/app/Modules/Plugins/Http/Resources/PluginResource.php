@@ -21,6 +21,7 @@ final class PluginResource extends JsonResource
             'version' => $this->version,
             'status' => $this->status->value,
             'path' => $this->path,
+            'last_error' => $this->last_error,
             'installed_at' => $this->installed_at?->toIso8601String(),
             'enabled_at' => $this->enabled_at?->toIso8601String(),
             'capabilities' => PluginCapabilityResource::collection($this->whenLoaded('capabilities')),

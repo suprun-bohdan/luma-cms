@@ -2,11 +2,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { Card } from '../../../shared/components/Card'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
+import { HelpText } from '../../../shared/components/HelpText'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Breadcrumbs } from '../../../shared/components/Breadcrumbs'
 import { ApiError } from '../../../shared/api/client'
-import { canDeleteContent, formatFieldErrors } from '../../../shared/utils/format'
+import { apiForbiddenMessage, canDeleteContent, formatFieldErrors, permissionMessage } from '../../../shared/utils/format'
 import { useAuth } from '../../../shared/auth/useAuth'
 import { PageForm } from '../components/PageForm'
 import { PageStatusBadge } from '../components/PageStatusBadge'
@@ -34,6 +35,20 @@ export function PageEditPage() {
   const canDelete = canDeleteContent(user)
 
   const mutation = isNew ? createMutation : updateMutation
+  const publishError =
+    publishMutation.error instanceof ApiError
+      ? apiForbiddenMessage(
+          publishMutation.error,
+          permissionMessage('publish pages', 'Admin'),
+        )
+      : publishMutation.error?.message
+  const unpublishError =
+    unpublishMutation.error instanceof ApiError
+      ? apiForbiddenMessage(
+          unpublishMutation.error,
+          permissionMessage('unpublish pages', 'Admin'),
+        )
+      : unpublishMutation.error?.message
   const errorMessage =
     mutation.error instanceof ApiError
       ? formatFieldErrors(mutation.error.errors) || mutation.error.message
@@ -116,8 +131,24 @@ export function PageEditPage() {
       {!isNew && pageQuery.isError && <ErrorAlert message={pageQuery.error.message} />}
 
       {!isNew && pageQuery.data && (
-        <div className="mb-4">
+        <div className="mb-4 space-y-2">
           <PageStatusBadge status={pageQuery.data.status} />
+          {pageQuery.data.status !== 'published' ? (
+            <HelpText>
+              Publish makes this page visible at /p/{slug}. Save changes first, then publish.
+            </HelpText>
+          ) : (
+            <HelpText>Unpublish hides the page from visitors without deleting your draft.</HelpText>
+          )}
+          {!canDelete && (
+            <HelpText>Only admins can delete pages. Editors can edit and publish content.</HelpText>
+          )}
+        </div>
+      )}
+
+      {(publishError || unpublishError) && (
+        <div className="mb-4">
+          <ErrorAlert message={publishError ?? unpublishError ?? ''} />
         </div>
       )}
 
