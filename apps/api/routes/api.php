@@ -11,6 +11,7 @@ use App\Modules\Media\Http\Controllers\Api\V1\PublicMediaController;
 use App\Modules\Navigation\Http\Controllers\Api\V1\MenuController;
 use App\Modules\Navigation\Http\Controllers\Api\V1\PublicMenuController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
+use App\Modules\Pages\Http\Controllers\Api\V1\PagePreviewController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
 use App\Modules\Forms\Http\Controllers\Api\V1\FormController;
 use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
@@ -61,6 +62,8 @@ Route::prefix('v1')->group(function (): void {
         Route::delete('/pages/{page:slug}', [PageController::class, 'destroy']);
         Route::post('/pages/{page:slug}/publish', [PageController::class, 'publish']);
         Route::post('/pages/{page:slug}/unpublish', [PageController::class, 'unpublish']);
+        Route::get('/pages/{page:slug}/preview-html', [PagePreviewController::class, 'show']);
+        Route::post('/pages/{page:slug}/preview-html', [PagePreviewController::class, 'store']);
 
         Route::get('/menus', [MenuController::class, 'index']);
         Route::post('/menus', [MenuController::class, 'store']);

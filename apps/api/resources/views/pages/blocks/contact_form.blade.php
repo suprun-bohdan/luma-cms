@@ -5,7 +5,7 @@
         <p class="contact-form__success">{{ session('form_success') }}</p>
     @endif
 
-    @if($errors->any())
+    @if(isset($errors) && $errors->any())
         <ul class="contact-form__errors">
             @foreach($errors->all() as $error)
                 <li>{{ $error }}</li>

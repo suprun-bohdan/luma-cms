@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { apiGetList, apiRequest } from '../../../shared/api/client'
-import { pageSchema, type Page, type PageStatus } from '../schemas/page'
+import { pageSchema, type Page, type PageContent, type PageSeo, type PageStatus } from '../schemas/page'
 
 export async function listPages(status?: PageStatus): Promise<Page[]> {
   const query = status ? `?status=${status}` : ''
@@ -60,6 +60,31 @@ export async function unpublishPage(slug: string): Promise<Page> {
     method: 'POST',
     path: `/api/v1/pages/${slug}/unpublish`,
     schema: pageSchema,
+    auth: true,
+  })
+}
+
+const previewHtmlSchema = z.object({
+  html: z.string(),
+})
+
+export async function previewPageHtml(
+  slug: string,
+  body: {
+    title: string
+    content: PageContent
+    seo: PageSeo | null
+  },
+): Promise<{ html: string }> {
+  return apiRequest({
+    method: 'POST',
+    path: `/api/v1/pages/${slug}/preview-html`,
+    body: {
+      title: body.title,
+      content: body.content,
+      seo: body.seo,
+    },
+    schema: previewHtmlSchema,
     auth: true,
   })
 }

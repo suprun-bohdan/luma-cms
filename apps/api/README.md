@@ -85,6 +85,8 @@ GET    /api/v1/forms/{slug}
 PUT    /api/v1/forms/{slug}
 DELETE /api/v1/forms/{slug}              requires forms.manage
 GET    /api/v1/forms/{slug}/submissions  requires forms.read_submissions
+GET    /api/v1/pages/{slug}/preview-html       requires pages.view
+POST   /api/v1/pages/{slug}/preview-html       requires pages.view (live preview body)
 ```
 
 Laravel health check:
@@ -196,6 +198,26 @@ curl -s -X POST http://localhost:8080/public/forms/contact/submit \
 ```
 
 Page block type `contact_form` props: `form_slug`, `title`, `submit_label`.
+
+### Visual editing (Phase 4)
+
+Preview draft page HTML (admin, `pages.view`):
+
+```bash
+curl -s http://localhost:8080/api/v1/pages/home/preview-html \
+  -H 'Authorization: Bearer {token}'
+```
+
+Preview unsaved content (POST body overrides title/content/seo):
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/pages/home/preview-html \
+  -H 'Authorization: Bearer {token}' \
+  -H 'Content-Type: application/json' \
+  -d '{"title":"Draft","content":{"blocks":[{"id":"t1","type":"rich_text","props":{"body":"Hello"}}]}}'
+```
+
+Studio: edit page at `/pages/{slug}/edit` — visual block list, inspector, live preview pane.
 
 ### Fields
 

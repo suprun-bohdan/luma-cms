@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Phase 3.2 Business Website Kit polish.
+> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Business Website Kit + Forms + Visual Editing MVP.
 
 ## Design system
 
@@ -63,7 +63,7 @@ apps/studio/src/
 | `/media` | Media library (upload, alt text, delete) |
 | `/pages` | Pages list |
 | `/pages/new` | Create page (block templates + SEO preview) |
-| `/pages/:slug/edit` | Edit page, publish, view public |
+| `/pages/:slug/edit` | Visual page editor (blocks, preview, inspector) |
 | `/menus` | Navigation hub (header + footer) |
 | `/menus/footer` | Footer menu editor |
 | `/seo/redirects` | URL redirects list |
@@ -101,11 +101,12 @@ npm run lint
 
 1. Sign in at `/login` with dev credentials
 2. Upload an image at `/media`
-3. Create a page at `/pages/new` — use block template buttons, fill SEO fields, check SEO preview pane
-4. Save draft, publish, open public URL `/p/{slug}` (via API origin or Studio link)
+3. Create a page at `/pages/new` — save draft, then at `/pages/{slug}/edit` use block palette, inspector, and live preview
+4. Publish and open public URL `/p/{slug}`
 5. Edit header menu at `/menus/header` — link to your page slug
-6. Optional: run demo seeder (`DemoSiteSeeder`) and open `/p/home`
-7. Sign out — protected routes redirect to login; API returns 401 without token
+6. Optional: run demo seeder and open `/p/home` (includes contact form)
+7. Check `/forms/contact/submissions` after a form submit
+8. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling
 

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.15] - 2026-05-31
+
+### Added
+
+- Visual page editor (Phase 4 MVP): block palette, reorder list, typed block inspector
+- Live server-side page preview for draft pages (`GET/POST /api/v1/pages/{slug}/preview-html`)
+- `PageRenderService` shared between public renderer and preview API
+- Studio 3-column page edit layout: blocks / preview / inspector
+
 ## [0.0.14] - 2026-05-31
 
 ### Added
