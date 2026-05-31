@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.10] - 2026-05-30
+
+### Added
+
+- Media Core module: upload, list, show, update alt text, delete (soft delete)
+- Media RBAC permissions: `media.read`, `media.upload`, `media.update`, `media.delete`
+- Image thumbnail variants via `GenerateMediaVariantsJob`
+- Public media read: `GET /api/v1/public/media/{uuid}`
+- Studio media library UI (upload, grid, alt edit, delete, copy URL)
+- Docker volume `luma-api-storage` for persistent API uploads (outer workspace)
+
+### Changed
+
+- Studio `/media` replaces placeholder stub
+- Updated API and Studio READMEs for media workflows
+
 ## [0.0.9] - 2026-05-30
 
 ### Added

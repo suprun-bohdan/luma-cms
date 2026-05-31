@@ -7,7 +7,7 @@ import { CollectionFieldsPage } from '../features/fields/pages/CollectionFieldsP
 import { CollectionEntriesPage } from '../features/entries/pages/CollectionEntriesPage'
 import { EntryEditPage } from '../features/entries/pages/EntryEditPage'
 import { EntryPreviewPage } from '../features/preview/pages/EntryPreviewPage'
-import { MediaPlaceholderPage } from '../features/media/pages/MediaPlaceholderPage'
+import { MediaLibraryPage } from '../features/media/pages/MediaLibraryPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
       { path: 'collections/:slug/entries/new', element: <EntryEditPage /> },
       { path: 'entries/:id/edit', element: <EntryEditPage /> },
       { path: 'entries/:id/preview', element: <EntryPreviewPage /> },
-      { path: 'media', element: <MediaPlaceholderPage /> },
+      { path: 'media', element: <MediaLibraryPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

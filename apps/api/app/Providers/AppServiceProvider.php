@@ -8,6 +8,8 @@ use App\Modules\Content\Models\Field;
 use App\Modules\Content\Policies\CollectionPolicy;
 use App\Modules\Content\Policies\EntryPolicy;
 use App\Modules\Content\Policies\FieldPolicy;
+use App\Modules\Media\Models\Media;
+use App\Modules\Media\Policies\MediaPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,5 +25,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Collection::class, CollectionPolicy::class);
         Gate::policy(Field::class, FieldPolicy::class);
         Gate::policy(Entry::class, EntryPolicy::class);
+        Gate::policy(Media::class, MediaPolicy::class);
     }
 }

@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core MVP — auth, collections, fields, entries, preview; media is a UI stub until Media Core backend ships.
+> **Status:** Phase 2 Studio Core + Media library — auth, collections, fields, entries, preview, media upload/browse.
 
 ## Stack
 
@@ -47,7 +47,7 @@ apps/studio/src/
 | `/collections/:slug/entries/new` | Create entry |
 | `/entries/:id/edit` | Edit entry |
 | `/entries/:id/preview` | Admin + public preview |
-| `/media` | Placeholder (Media Core pending) |
+| `/media` | Media library (upload, alt text, delete) |
 
 ## Local development
 

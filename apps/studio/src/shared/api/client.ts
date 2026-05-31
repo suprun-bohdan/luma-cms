@@ -125,6 +125,54 @@ export async function apiGetWrapped<T>(
   return response.data
 }
 
+export async function apiUpload<T>(
+  path: string,
+  formData: FormData,
+  itemSchema: z.ZodType<T>,
+  options?: { auth?: boolean },
+): Promise<T> {
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  }
+
+  const bearer = options?.auth ? getToken() : null
+  if (bearer) {
+    headers.Authorization = `Bearer ${bearer}`
+  }
+
+  const response = await fetch(`${apiBase}${path}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  })
+
+  const payload = await parseJson(response)
+
+  if (!response.ok) {
+    const message =
+      typeof payload === 'object' &&
+      payload !== null &&
+      'message' in payload &&
+      typeof payload.message === 'string'
+        ? payload.message
+        : `Request failed: ${response.status}`
+
+    const errors =
+      typeof payload === 'object' &&
+      payload !== null &&
+      'errors' in payload &&
+      typeof payload.errors === 'object'
+        ? (payload.errors as Record<string, string[]>)
+        : undefined
+
+    throw new ApiError(message, response.status, errors)
+  }
+
+  const parsed = wrappedSchema(itemSchema).parse(payload)
+
+  return parsed.data
+}
+
 export async function apiGetList<T>(
   path: string,
   itemSchema: z.ZodType<T>,

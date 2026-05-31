@@ -53,7 +53,7 @@ export function DashboardPage() {
             </Link>
             <Link to="/media">
               <Button variant="secondary" className="w-full">
-                Media (soon)
+                Media library
               </Button>
             </Link>
           </div>

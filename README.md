@@ -2,7 +2,7 @@
 
 Open-source CMS for developers, agencies, and SMB — structured content, clean Laravel architecture, and a modern admin studio (in progress).
 
-> **Status: Pre-alpha.** Phase 1 Content Core API and Phase 2 Studio Core MVP are implemented; extensions and media backend are not ready for production.
+> **Status: Pre-alpha.** Phase 1 Content Core, Phase 2 Studio Core, and Media Core are implemented; Phase 3 (pages, SEO, forms) is next.
 
 [![PHP](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml)
 
@@ -30,8 +30,9 @@ Luma CMS is a modular content platform — **not** a WordPress clone. Small core
 | Collections / Fields / Entries API | Done |
 | Draft / publish + public read API | Done |
 | CI (GitHub Actions + GitLab CI) | Done |
-| React Studio (`apps/studio/`) | Phase 2 Core MVP (auth, collections, fields, entries, preview) |
-| Studio content UI (Phase 2) | Done (media UI stub only) |
+| React Studio (`apps/studio/`) | Phase 2 Core + media library |
+| Media Core (API + Studio) | Done |
+| Phase 3 Business Website Kit | Planned |
 | Plugin system | Planned |
 
 Details: [CHANGELOG.md](CHANGELOG.md) · [apps/api/README.md](apps/api/README.md)
@@ -45,6 +46,7 @@ GET  /api/v1/health
 POST /api/v1/auth/login
 GET  /api/v1/public/collections/{slug}/entries
 GET  /api/v1/public/entries/{id}
+GET  /api/v1/public/media/{uuid}
 ```
 
 Authenticated (`Authorization: Bearer {token}`) — collections, fields, entries CRUD, publish/unpublish. See [apps/api/README.md](apps/api/README.md) for the full list and examples.

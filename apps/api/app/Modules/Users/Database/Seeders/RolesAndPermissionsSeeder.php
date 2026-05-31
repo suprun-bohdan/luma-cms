@@ -19,6 +19,10 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Create content', 'slug' => 'content.create'],
             ['name' => 'Update content', 'slug' => 'content.update'],
             ['name' => 'Delete content', 'slug' => 'content.delete'],
+            ['name' => 'View media', 'slug' => 'media.read'],
+            ['name' => 'Upload media', 'slug' => 'media.upload'],
+            ['name' => 'Update media', 'slug' => 'media.update'],
+            ['name' => 'Delete media', 'slug' => 'media.delete'],
         ];
 
         foreach ($permissions as $permission) {
@@ -44,7 +48,14 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $editor->permissions()->sync(
             Permission::query()
-                ->whereIn('slug', ['content.view', 'content.create', 'content.update'])
+                ->whereIn('slug', [
+                    'content.view',
+                    'content.create',
+                    'content.update',
+                    'media.read',
+                    'media.upload',
+                    'media.update',
+                ])
                 ->pluck('id'),
         );
 

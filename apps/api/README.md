@@ -2,7 +2,7 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Pre-alpha (Phase 1). Content Core API: collections, fields, entries (draft/publish), auth/RBAC.
+> **Status:** Pre-alpha. Content Core + Media Core API with auth/RBAC.
 
 ## Stack
 
@@ -21,7 +21,7 @@ apps/api/
       Auth/         # Login, logout, me
       Users/        # Roles, permissions, RBAC
       Content/      # Collections, fields, entries
-      Media/
+      Media/        # Upload, storage, variants
       Seo/
       Plugins/
       Settings/
@@ -42,6 +42,7 @@ GET  /api/v1/health
 POST /api/v1/auth/login
 GET  /api/v1/public/collections/{slug}/entries
 GET  /api/v1/public/entries/{id}
+GET  /api/v1/public/media/{uuid}
 ```
 
 Authenticated routes (`Authorization: Bearer {token}`):
@@ -66,6 +67,11 @@ PUT    /api/v1/entries/{id}
 DELETE /api/v1/entries/{id}
 POST   /api/v1/entries/{id}/publish
 POST   /api/v1/entries/{id}/unpublish
+GET    /api/v1/media
+POST   /api/v1/media                         multipart: file, optional alt_text
+GET    /api/v1/media/{uuid}
+PUT    /api/v1/media/{uuid}                  { "alt_text": "..." }
+DELETE /api/v1/media/{uuid}
 ```
 
 Laravel health check:
@@ -101,8 +107,33 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
 
 | Role | Permissions |
 |------|-------------|
-| `admin` | content.view, content.create, content.update, content.delete |
-| `editor` | content.view, content.create, content.update |
+| `admin` | all content.* and media.* permissions |
+| `editor` | content.view/create/update; media.read/upload/update (no delete) |
+
+### Media
+
+Upload (multipart):
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/media \
+  -H 'Authorization: Bearer {token}' \
+  -F 'file=@/path/to/photo.jpg' \
+  -F 'alt_text=Hero image'
+```
+
+Public read:
+
+```bash
+curl -s http://localhost:8080/api/v1/public/media/{uuid}
+```
+
+Storage:
+
+- Files on the `public` disk under `storage/app/public/media/{uuid}/`
+- Run once after migrate: `php artisan storage:link`
+- Outer Docker workspace mounts `luma-api-storage` volume on `apps/api/storage` for persistent uploads
+
+Config: `config/media.php` (max size, allowed mime types, thumbnail width).
 
 ### Fields
 

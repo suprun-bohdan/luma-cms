@@ -4,10 +4,16 @@ import { Button } from './Button'
 import { useAuth } from '../auth/useAuth'
 import { logout } from '../../features/auth/api/authApi'
 
-const navItems = [
+type NavItem = {
+  to: string
+  label: string
+  soon?: boolean
+}
+
+const navItems: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard' },
   { to: '/collections', label: 'Collections' },
-  { to: '/media', label: 'Media', soon: true },
+  { to: '/media', label: 'Media' },
 ]
 
 type SidebarNavProps = {
