@@ -34,7 +34,8 @@ final class EnvFileWriter
             return;
         }
 
-        $lockPath = $path.'.lock';
+        $sidecarDir = $this->writableSidecarDir($path);
+        $lockPath = $sidecarDir.'/env-writer.lock';
         $lockHandle = fopen($lockPath, 'c+');
 
         if ($lockHandle === false) {
@@ -68,25 +69,41 @@ final class EnvFileWriter
             }
 
             if (is_file($path)) {
-                File::copy($path, $path.'.bak');
+                File::copy($path, $sidecarDir.'/env-writer.bak');
             }
 
             $contents = implode(PHP_EOL, $lines).PHP_EOL;
-            $temporaryPath = $path.'.tmp.'.getmypid();
 
-            if (file_put_contents($temporaryPath, $contents, LOCK_EX) === false) {
-                throw new RuntimeException('Unable to write temporary environment file.');
+            if (is_file($path) && ! is_writable($path)) {
+                throw new RuntimeException('Environment file is not writable.');
             }
 
-            if (! rename($temporaryPath, $path)) {
-                @unlink($temporaryPath);
-
-                throw new RuntimeException('Unable to replace environment file.');
+            if (file_put_contents($path, $contents, LOCK_EX) === false) {
+                throw new RuntimeException('Unable to write environment file.');
             }
         } finally {
             flock($lockHandle, LOCK_UN);
             fclose($lockHandle);
         }
+    }
+
+    /**
+     * Shared hosting often allows updating an existing .env (0666) but not creating
+     * new files next to it — use storage/framework which is world-writable in releases.
+     */
+    private function writableSidecarDir(string $envPath): string
+    {
+        $dir = dirname($envPath).'/storage/framework';
+
+        if (! is_dir($dir)) {
+            throw new RuntimeException('Storage framework directory is missing.');
+        }
+
+        if (! is_writable($dir)) {
+            throw new RuntimeException('Storage framework directory is not writable.');
+        }
+
+        return $dir;
     }
 
     private function formatLine(string $key, mixed $value): string

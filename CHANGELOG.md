@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.11] - 2026-05-31
+
+### Fixed
+
+- Setup `.env` writer uses `storage/framework/` for lock/backup and writes `.env` in place (shared hosting cannot create `.env.lock` beside `.env` or rename across directories)
+- Setup write rate limit raised to 20/min so the installer can try several database drivers without "Too Many Attempts"
+- Finish install no longer fails when `storage:link` cannot create a symlink on shared hosting
+
 ## [0.0.25-rc.10] - 2026-05-31
 
 ### Added

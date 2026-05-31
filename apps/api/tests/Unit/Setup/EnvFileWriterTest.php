@@ -27,11 +27,11 @@ final class EnvFileWriterTest extends TestCase
         $this->assertStringContainsString('DB_HOST=127.0.0.1', $contents);
         $this->assertStringNotContainsString('APP_URL=', $contents);
         $this->assertStringContainsString('APP_NAME=Laravel', $contents);
-        $this->assertFileExists($path.'.bak');
+        $this->assertFileExists(storage_path('framework/env-writer.bak'));
 
         @unlink($path);
-        @unlink($path.'.bak');
-        @unlink($path.'.lock');
+        @unlink(storage_path('framework/env-writer.bak'));
+        @unlink(storage_path('framework/env-writer.lock'));
     }
 
     public function test_merge_ignores_keys_outside_allowlist(): void
@@ -51,7 +51,7 @@ final class EnvFileWriterTest extends TestCase
         $this->assertStringContainsString('APP_NAME="Safe Site"', $contents);
 
         @unlink($path);
-        @unlink($path.'.bak');
-        @unlink($path.'.lock');
+        @unlink(storage_path('framework/env-writer.bak'));
+        @unlink(storage_path('framework/env-writer.lock'));
     }
 }

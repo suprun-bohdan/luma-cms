@@ -68,7 +68,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('setup', static fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
-        RateLimiter::for('setup-write', static fn (Request $request) => Limit::perMinute(6)->by($request->ip()));
+        RateLimiter::for('setup-write', static fn (Request $request) => Limit::perMinute(20)->by($request->ip()));
 
         Gate::policy(Collection::class, CollectionPolicy::class);
         Gate::policy(Field::class, FieldPolicy::class);

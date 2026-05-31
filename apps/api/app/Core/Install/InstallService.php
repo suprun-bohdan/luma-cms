@@ -173,8 +173,13 @@ final class InstallService
         }
 
         if (! File::exists(public_path('storage'))) {
-            Artisan::call('storage:link');
-            $this->log('storage_link', 'success', 'Public storage linked.');
+            try {
+                Artisan::call('storage:link');
+                $this->log('storage_link', 'success', 'Public storage linked.');
+            } catch (Throwable $exception) {
+                // Shared hosting often forbids symlinks under public/; media can still use app routes.
+                $this->log('storage_link', 'warning', 'Public storage link skipped: '.$exception->getMessage());
+            }
         }
 
         Artisan::call('config:clear');

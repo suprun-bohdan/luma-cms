@@ -20,7 +20,7 @@ final class SetupApiTest extends TestCase
         $this->getJson('/api/v1/setup/status')
             ->assertOk()
             ->assertJsonPath('installed', false)
-            ->assertJsonPath('version', '0.0.25-rc.10');
+            ->assertJsonPath('version', '0.0.25-rc.11');
     }
 
     public function test_sqlite_database_test_uses_default_path_when_empty(): void
@@ -64,11 +64,12 @@ final class SetupApiTest extends TestCase
         } finally {
             if ($backup === null) {
                 @unlink($envPath);
-                @unlink($envPath.'.bak');
-                @unlink($envPath.'.lock');
             } else {
                 file_put_contents($envPath, $backup);
             }
+
+            @unlink(storage_path('framework/env-writer.bak'));
+            @unlink(storage_path('framework/env-writer.lock'));
         }
     }
 
@@ -161,7 +162,7 @@ final class SetupApiTest extends TestCase
     {
         config(['luma.setup_token' => '']);
 
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $this->postJson('/api/v1/setup/database/test', [
                 'driver' => 'sqlite',
                 'database' => database_path('database.sqlite'),
