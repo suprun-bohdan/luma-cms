@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2026-05-30
+
+### Added
+
+- Content model migrations: collections, fields, entries, entry_versions
+- Content module with Actions, Form Requests, API Resources, Policy
+- Collections CRUD API: `/api/v1/collections`
+- Feature tests for collections API
+
 ## [0.0.3] - 2026-05-30
 
 ### Added
