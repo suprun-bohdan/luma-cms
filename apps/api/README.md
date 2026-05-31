@@ -2,7 +2,7 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Pre-alpha (Phase 1D). Collections and Fields CRUD API with Sanctum auth and RBAC.
+> **Status:** Pre-alpha (Phase 1). Content Core API: collections, fields, entries (draft/publish), auth/RBAC.
 
 ## Stack
 
@@ -40,6 +40,8 @@ Public routes:
 ```
 GET  /api/v1/health
 POST /api/v1/auth/login
+GET  /api/v1/public/collections/{slug}/entries
+GET  /api/v1/public/entries/{id}
 ```
 
 Authenticated routes (`Authorization: Bearer {token}`):
@@ -57,6 +59,13 @@ POST   /api/v1/collections/{slug}/fields
 GET    /api/v1/collections/{slug}/fields/{field}
 PUT    /api/v1/collections/{slug}/fields/{field}
 DELETE /api/v1/collections/{slug}/fields/{field}
+GET    /api/v1/collections/{slug}/entries          ?status=draft|published|archived
+POST   /api/v1/collections/{slug}/entries
+GET    /api/v1/entries/{id}
+PUT    /api/v1/entries/{id}
+DELETE /api/v1/entries/{id}
+POST   /api/v1/entries/{id}/publish
+POST   /api/v1/entries/{id}/unpublish
 ```
 
 Laravel health check:
@@ -109,6 +118,34 @@ curl -s -X POST http://localhost:8080/api/v1/collections/pages/fields \
 ```
 
 Adding, updating (schema-affecting attrs), or deleting a field increments the parent collection `schema_version`.
+
+### Entries
+
+Entry `data` is validated against the collection field schema (strict keys, required fields, type checks).
+
+Create draft entry:
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/collections/pages/entries \
+  -H 'Authorization: Bearer {token}' \
+  -H 'Content-Type: application/json' \
+  -d '{"data":{"title":"Hello"}}'
+```
+
+Publish (creates `entry_versions` snapshot with current `schema_version`):
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/entries/1/publish \
+  -H 'Authorization: Bearer {token}'
+```
+
+Public read (published entries only, no auth):
+
+```bash
+curl -s http://localhost:8080/api/v1/public/collections/pages/entries
+```
+
+Note: single-entry JSON responses return fields at the root (no outer `data` wrapper) because the payload attribute is also named `data`. List responses use a standard `data` array wrapper.
 
 ## Local development
 

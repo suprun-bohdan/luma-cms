@@ -6,12 +6,17 @@ namespace App\Modules\Content\Models;
 
 use App\Models\User;
 use App\Modules\Content\Enums\EntryStatus;
+use Database\Factories\EntryFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Entry extends Model
 {
+    /** @use HasFactory<EntryFactory> */
+    use HasFactory;
+
     protected $fillable = [
         'collection_id',
         'status',
@@ -48,5 +53,10 @@ class Entry extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    protected static function newFactory(): EntryFactory
+    {
+        return EntryFactory::new();
     }
 }

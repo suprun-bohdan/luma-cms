@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.7] - 2026-05-31
+
+### Added
+
+- Entries CRUD with draft/publish workflow
+- `EntryDataValidator` — strict schema validation against collection fields
+- Publish/unpublish actions with `entry_versions` snapshot on publish
+- Public read API for published entries (`/api/v1/public/...`)
+- `EntryPolicy` with RBAC permission checks
+- Feature tests for entries and public entry API
+
 ## [0.0.6] - 2026-05-31
 
 ### Added
