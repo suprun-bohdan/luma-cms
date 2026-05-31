@@ -25,6 +25,9 @@ final class StorePageRequest extends FormRequest
             'template' => ['sometimes', 'string', 'max:255'],
             'content' => ['sometimes', 'array'],
             'seo' => ['sometimes', 'nullable', 'array'],
+            'seo.title' => ['sometimes', 'nullable', 'string', 'max:70'],
+            'seo.description' => ['sometimes', 'nullable', 'string', 'max:160'],
+            'seo.og_image' => ['sometimes', 'nullable', 'uuid', 'exists:media,uuid'],
         ];
     }
 }

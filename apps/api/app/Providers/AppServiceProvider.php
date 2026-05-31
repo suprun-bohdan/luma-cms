@@ -10,6 +10,8 @@ use App\Modules\Content\Policies\EntryPolicy;
 use App\Modules\Content\Policies\FieldPolicy;
 use App\Modules\Media\Models\Media;
 use App\Modules\Media\Policies\MediaPolicy;
+use App\Modules\Navigation\Models\Menu;
+use App\Modules\Navigation\Policies\MenuPolicy;
 use App\Modules\Pages\Models\Page;
 use App\Modules\Pages\Policies\PagePolicy;
 use Illuminate\Support\Facades\Gate;
@@ -29,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Entry::class, EntryPolicy::class);
         Gate::policy(Media::class, MediaPolicy::class);
         Gate::policy(Page::class, PagePolicy::class);
+        Gate::policy(Menu::class, MenuPolicy::class);
     }
 }

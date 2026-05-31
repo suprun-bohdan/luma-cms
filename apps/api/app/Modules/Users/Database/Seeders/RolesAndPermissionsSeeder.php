@@ -28,6 +28,10 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Update pages', 'slug' => 'pages.update'],
             ['name' => 'Delete pages', 'slug' => 'pages.delete'],
             ['name' => 'Publish pages', 'slug' => 'pages.publish'],
+            ['name' => 'View menus', 'slug' => 'menus.view'],
+            ['name' => 'Create menus', 'slug' => 'menus.create'],
+            ['name' => 'Update menus', 'slug' => 'menus.update'],
+            ['name' => 'Delete menus', 'slug' => 'menus.delete'],
         ];
 
         foreach ($permissions as $permission) {
@@ -64,6 +68,8 @@ class RolesAndPermissionsSeeder extends Seeder
                     'pages.create',
                     'pages.update',
                     'pages.publish',
+                    'menus.view',
+                    'menus.update',
                 ])
                 ->pluck('id'),
         );

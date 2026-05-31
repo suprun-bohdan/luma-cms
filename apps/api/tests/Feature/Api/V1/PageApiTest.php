@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api\V1;
 
+use App\Modules\Media\Models\Media;
 use App\Modules\Pages\Enums\PageStatus;
 use App\Modules\Pages\Models\Page;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -184,6 +185,48 @@ final class PageApiTest extends TestCase
         $response = $this->getJson('/api/v1/public/pages/'.$page->slug);
 
         $response->assertNotFound();
+    }
+
+    public function test_rejects_invalid_seo_og_image(): void
+    {
+        $page = Page::factory()->create([
+            'created_by' => $this->adminUser()->id,
+            'updated_by' => $this->adminUser()->id,
+        ]);
+
+        $response = $this->putJson(
+            '/api/v1/pages/'.$page->slug,
+            ['seo' => ['og_image' => '00000000-0000-0000-0000-000000000000']],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response->assertUnprocessable();
+    }
+
+    public function test_updates_seo_with_valid_media(): void
+    {
+        $media = Media::factory()->create();
+        $page = Page::factory()->create([
+            'created_by' => $this->adminUser()->id,
+            'updated_by' => $this->adminUser()->id,
+        ]);
+
+        $response = $this->putJson(
+            '/api/v1/pages/'.$page->slug,
+            [
+                'seo' => [
+                    'title' => 'SEO Title',
+                    'description' => 'SEO description',
+                    'og_image' => $media->uuid,
+                ],
+            ],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('seo.title', 'SEO Title')
+            ->assertJsonPath('seo.og_image', $media->uuid);
     }
 
     public function test_filters_pages_by_status(): void
