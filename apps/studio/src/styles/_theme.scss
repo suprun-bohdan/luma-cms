@@ -1,0 +1,44 @@
+@use 'tokens' as *;
+
+:root {
+  --luma-color-bg: #{$color-bg};
+  --luma-color-surface: #{$color-surface};
+  --luma-color-surface-muted: #{$color-surface-muted};
+  --luma-color-text: #{$color-text};
+  --luma-color-text-muted: #{$color-text-muted};
+  --luma-color-border: #{$color-border};
+  --luma-color-primary: #{$color-primary};
+  --luma-color-primary-hover: #{$color-primary-hover};
+  --luma-color-danger: #{$color-danger};
+  --luma-color-success: #{$color-success};
+  --luma-color-warning: #{$color-warning};
+
+  --luma-font-sans: #{$font-sans};
+  --luma-font-mono: #{$font-mono};
+
+  --luma-text-xs: #{$text-xs};
+  --luma-text-sm: #{$text-sm};
+  --luma-text-base: #{$text-base};
+  --luma-text-lg: #{$text-lg};
+  --luma-text-xl: #{$text-xl};
+
+  --luma-space-1: #{$space-1};
+  --luma-space-2: #{$space-2};
+  --luma-space-3: #{$space-3};
+  --luma-space-4: #{$space-4};
+  --luma-space-6: #{$space-6};
+  --luma-space-8: #{$space-8};
+
+  --luma-radius-sm: #{$radius-sm};
+  --luma-radius-md: #{$radius-md};
+  --luma-radius-lg: #{$radius-lg};
+  --luma-radius-xl: #{$radius-xl};
+
+  --luma-sidebar-width: #{$sidebar-width};
+  --luma-topbar-height: #{$topbar-height};
+  --luma-content-max-width: #{$content-max-width};
+
+  --luma-z-dropdown: #{$z-dropdown};
+  --luma-z-modal: #{$z-modal};
+  --luma-z-toast: #{$z-toast};
+}

@@ -2,7 +2,20 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core + Media library — auth, collections, fields, entries, preview, media upload/browse.
+> **Status:** Phase 2 Studio Core + Media + Pages + Navigation — Phase 2X design system foundation in progress.
+
+## Design system
+
+See [docs/studio-design-system.md](./docs/studio-design-system.md) for tokens, layout primitives, UI kit, and migration rules.
+
+```text
+shared/
+  components/   # UI primitives (Button, Input, Table, …)
+  layout/       # AdminShell, ListPage, FormPage, SplitPane, …
+styles/
+  _tokens.scss  # SCSS design tokens
+  _theme.scss   # :root CSS custom properties
+```
 
 ## Stack
 
@@ -20,8 +33,8 @@ React TypeScript admin interface for Luma CMS.
 ```text
 apps/studio/src/
   app/              # App shell, router, query client
-  shared/           # API client, auth, UI primitives, hooks
-  features/         # auth, collections, fields, entries, preview, media
+  shared/           # API client, auth, layout, UI primitives, hooks
+  features/         # auth, collections, fields, entries, preview, media, pages, navigation
   pages/            # Dashboard, NotFound
   styles/           # SCSS entry, tokens (extend for themes)
 ```
@@ -48,6 +61,10 @@ apps/studio/src/
 | `/entries/:id/edit` | Edit entry |
 | `/entries/:id/preview` | Admin + public preview |
 | `/media` | Media library (upload, alt text, delete) |
+| `/pages` | Pages list |
+| `/pages/new` | Create page |
+| `/pages/:slug/edit` | Edit page |
+| `/menus/header` | Header navigation editor |
 
 ## Local development
 

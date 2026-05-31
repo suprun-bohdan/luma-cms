@@ -1,12 +1,48 @@
-// Studio SCSS tokens — extend for theming, dark mode, white-label.
+// Luma Studio design tokens — source of truth for SCSS and CSS custom properties.
 
-$font-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
-
-$color-surface: #f8fafc;
+// Colors
+$color-bg: #f8fafc;
+$color-surface: #ffffff;
+$color-surface-muted: #f1f5f9;
 $color-text: #0f172a;
+$color-text-muted: #64748b;
 $color-border: #e2e8f0;
+$color-primary: #0f172a;
+$color-primary-hover: #1e293b;
+$color-danger: #dc2626;
+$color-success: #16a34a;
+$color-warning: #d97706;
 
+// Typography
+$font-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+$font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+$text-xs: 0.75rem;
+$text-sm: 0.875rem;
+$text-base: 1rem;
+$text-lg: 1.125rem;
+$text-xl: 1.25rem;
+
+// Spacing
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-6: 1.5rem;
+$space-8: 2rem;
+
+// Radius
+$radius-sm: 0.375rem;
 $radius-md: 0.5rem;
 $radius-lg: 0.75rem;
+$radius-xl: 1rem;
 
+// Layout
 $sidebar-width: 16rem;
+$topbar-height: 3.5rem;
+$content-max-width: 72rem;
+
+// Z-index
+$z-dropdown: 1000;
+$z-modal: 1100;
+$z-toast: 1200;
