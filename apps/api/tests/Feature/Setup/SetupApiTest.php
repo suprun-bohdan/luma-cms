@@ -20,7 +20,7 @@ final class SetupApiTest extends TestCase
         $this->getJson('/api/v1/setup/status')
             ->assertOk()
             ->assertJsonPath('installed', false)
-            ->assertJsonPath('version', '0.0.25-rc.14');
+            ->assertJsonPath('version', (string) config('luma.version'));
     }
 
     public function test_sqlite_database_test_uses_default_path_when_empty(): void

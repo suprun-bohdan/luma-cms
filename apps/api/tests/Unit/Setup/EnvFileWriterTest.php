@@ -11,7 +11,7 @@ final class EnvFileWriterTest extends TestCase
 {
     public function test_merge_updates_and_appends_env_values(): void
     {
-        $path = storage_path('framework/testing-env-writer.env');
+        $path = base_path('.env.testing');
         file_put_contents($path, "APP_NAME=Laravel\nDB_CONNECTION=sqlite\n");
 
         $writer = new EnvFileWriter();
@@ -36,7 +36,7 @@ final class EnvFileWriterTest extends TestCase
 
     public function test_merge_ignores_keys_outside_allowlist(): void
     {
-        $path = storage_path('framework/testing-env-writer-allowlist.env');
+        $path = base_path('.env.testing-allowlist');
         file_put_contents($path, "APP_KEY=secret\n");
 
         $writer = new EnvFileWriter();

@@ -1,5 +1,4 @@
 import {
-  createContext,
   useCallback,
   useEffect,
   useMemo,
@@ -10,10 +9,9 @@ import { detectSuggestedLocale } from './detectLocale'
 import { wordPressLanguageCatalog } from './languageCatalog'
 import { localeDirection } from './localeFallbacks'
 import { loadMessages } from './loadMessages'
+import { SetupI18nContext } from './setupI18nContext'
 import type { SetupI18nContextValue, SetupMessages } from './types'
 import { setSetupApiLocale } from '../api/setupApi'
-
-export const SetupI18nContext = createContext<SetupI18nContextValue | null>(null)
 
 type SetupI18nProviderProps = {
   children: ReactNode

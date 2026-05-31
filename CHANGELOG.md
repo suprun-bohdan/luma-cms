@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.15] - 2026-05-31
+
+### Fixed
+
+- PHPUnit: reset `.luma-installed` marker between tests; assert version via `config('luma.version')`
+- PHPUnit: `EnvFileWriterTest` uses API-root `.env` paths matching production sidecar layout
+- Studio ESLint: split React contexts into dedicated modules for `react-refresh/only-export-components`
+
 ## [0.0.25-rc.14] - 2026-05-31
 
 ### Fixed

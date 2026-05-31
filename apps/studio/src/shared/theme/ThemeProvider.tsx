@@ -1,14 +1,7 @@
-import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { applyThemeMode, readStoredThemeMode } from './applyTheme'
+import { ThemeContext } from './themeContext'
 import type { LumaThemeMode } from './types'
-
-type ThemeContextValue = {
-  mode: LumaThemeMode
-  setMode: (mode: LumaThemeMode) => void
-  toggleMode: () => void
-}
-
-export const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 type ThemeProviderProps = {
   children: ReactNode
