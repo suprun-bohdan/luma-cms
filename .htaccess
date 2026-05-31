@@ -1,5 +1,5 @@
 # Luma CMS — shared hosting root entry (Apache / BrainyCP / HestiaCP)
-# Document root = extracted archive folder (e.g. subdomain site directory).
+# Document root = project root (same folder as index.php and apps/).
 
 <IfModule mod_negotiation.c>
     Options -MultiViews -Indexes
@@ -40,8 +40,8 @@
     RewriteCond %{DOCUMENT_ROOT}/apps/api/public%{REQUEST_URI} -f
     RewriteRule ^ apps/api/public%{REQUEST_URI} [L]
 
-    # Root PHP entrypoints (wrapper files in archive root)
-    RewriteRule ^(luma-requirements|install)\.php$ - [L]
+    # Root PHP entrypoints
+    RewriteRule ^(index|install|luma-requirements)\.php$ - [L]
 
     # Front controller
     RewriteCond %{REQUEST_FILENAME} !-d

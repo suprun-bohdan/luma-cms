@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.4] - 2026-05-31
+
+### Added
+
+- Project root web entry: `index.php`, `install.php`, `.htaccess`, `luma-requirements.php` (WordPress/OpenCart style)
+- `index.php` redirects fresh installs to `install.php` before booting Laravel
+
+### Changed
+
+- Root entry files live in repository root (not a separate deploy copy step)
+- Shared zip is flat — extract directly into site folder, no nested wrapper directory
+
+### Fixed
+
+- `install.php` is removed automatically after successful web setup (`InstallationStateService::markInstalled`)
+
 ## [0.0.25-rc.3] - 2026-05-31
 
 ### Added

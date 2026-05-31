@@ -6,6 +6,7 @@ namespace Tests\Feature\Console;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\SharedHostingInstallScript;
 use Tests\TestCase;
 
 final class InstallLumaCommandTest extends TestCase
@@ -14,18 +15,22 @@ final class InstallLumaCommandTest extends TestCase
 
     public function test_install_command_runs_successfully(): void
     {
-        $this->artisan('luma:install', [
-            '--force' => true,
-            '--admin-email' => 'installer@luma.test',
-            '--admin-password' => 'secret-password',
-        ])
-            ->assertSuccessful();
+        try {
+            $this->artisan('luma:install', [
+                '--force' => true,
+                '--admin-email' => 'installer@luma.test',
+                '--admin-password' => 'secret-password',
+            ])
+                ->assertSuccessful();
 
-        $this->assertDatabaseHas('users', [
-            'email' => 'installer@luma.test',
-        ]);
+            $this->assertDatabaseHas('users', [
+                'email' => 'installer@luma.test',
+            ]);
 
-        $admin = User::query()->where('email', 'installer@luma.test')->firstOrFail();
-        $this->assertTrue($admin->roles()->where('slug', 'owner')->exists());
+            $admin = User::query()->where('email', 'installer@luma.test')->firstOrFail();
+            $this->assertTrue($admin->roles()->where('slug', 'owner')->exists());
+        } finally {
+            SharedHostingInstallScript::restore();
+        }
     }
 }

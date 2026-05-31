@@ -25,20 +25,24 @@ Primary install path
    - .htaccess         (may be hidden in file manager — enable "show hidden files")
 
    When extracting the zip, put files directly in your site folder.
-   Do NOT leave them inside a nested staging-shared/ subfolder.
+   Do NOT leave files inside an extra nested subfolder from the zip.
 
 4. Open your site in a browser:
 
    https://your-domain.example/
 
-   If CMS is not installed yet, you are redirected to the setup wizard at
-   /admin/setup automatically.
+   Flow (like WordPress / OpenCart):
+   - index.php checks whether Luma is installed
+   - if not installed → redirects to install.php
+   - install.php opens the setup wizard at /admin/setup
+   - after successful setup, install.php is removed automatically
+   - only index.php remains as the public entry point
+
+   You can also open install.php directly:
 
    https://your-domain.example/install.php
 
-   Optional first check:
-
-   https://your-domain.example/luma-requirements.php
+   Optional PHP check first:
 
 5. On first visit, Luma may copy apps/api/.env.shared.example to apps/api/.env
    if the folder is writable. Otherwise copy it manually in File Manager:

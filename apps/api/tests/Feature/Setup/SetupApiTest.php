@@ -8,6 +8,7 @@ use App\Modules\Setup\Models\LumaInstallation;
 use App\Modules\Setup\Services\InstallationStateService;
 use App\Modules\Users\Models\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\SharedHostingInstallScript;
 use Tests\TestCase;
 
 final class SetupApiTest extends TestCase
@@ -25,23 +26,31 @@ final class SetupApiTest extends TestCase
     {
         $this->seed(\App\Modules\Users\Database\Seeders\RolesAndPermissionsSeeder::class);
 
-        $this->postJson('/api/v1/setup/finish', [
-            'site_title' => 'Test Site',
-            'admin_email' => 'setup@luma.test',
-            'admin_password' => 'secure-owner-pass',
-            'with_starter_site' => true,
-        ])
-            ->assertOk()
-            ->assertJsonPath('ok', true);
+        $state = app(InstallationStateService::class);
+        $installPath = $state->installScriptPath();
 
-        $this->assertTrue(app(InstallationStateService::class)->isInstalled());
-        $this->assertFileExists(app(InstallationStateService::class)->installedMarkerPath());
-        $this->assertDatabaseHas('users', ['email' => 'setup@luma.test']);
-        $this->assertDatabaseHas('pages', ['slug' => 'home']);
+        try {
+            $this->postJson('/api/v1/setup/finish', [
+                'site_title' => 'Test Site',
+                'admin_email' => 'setup@luma.test',
+                'admin_password' => 'secure-owner-pass',
+                'with_starter_site' => true,
+            ])
+                ->assertOk()
+                ->assertJsonPath('ok', true);
 
-        $user = \App\Models\User::query()->where('email', 'setup@luma.test')->firstOrFail();
-        $ownerRole = Role::query()->where('slug', 'owner')->firstOrFail();
-        $this->assertTrue($user->roles()->where('roles.id', $ownerRole->id)->exists());
+            $this->assertTrue($state->isInstalled());
+            $this->assertFileExists($state->installedMarkerPath());
+            $this->assertFileDoesNotExist($installPath);
+            $this->assertDatabaseHas('users', ['email' => 'setup@luma.test']);
+            $this->assertDatabaseHas('pages', ['slug' => 'home']);
+
+            $user = \App\Models\User::query()->where('email', 'setup@luma.test')->firstOrFail();
+            $ownerRole = Role::query()->where('slug', 'owner')->firstOrFail();
+            $this->assertTrue($user->roles()->where('roles.id', $ownerRole->id)->exists());
+        } finally {
+            SharedHostingInstallScript::restore();
+        }
     }
 
     public function test_web_root_redirects_to_setup_when_not_installed(): void

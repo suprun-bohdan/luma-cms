@@ -13,44 +13,46 @@ final class DistributionArtifactsTest extends TestCase
         $root = dirname(base_path(), 2);
 
         $this->assertFileExists($root.'/INSTALL.txt');
+        $this->assertFileExists($root.'/index.php');
+        $this->assertFileExists($root.'/install.php');
+        $this->assertFileExists($root.'/.htaccess');
+        $this->assertFileExists($root.'/luma-requirements.php');
         $this->assertFileExists($root.'/apps/api/.env.shared.example');
         $this->assertFileExists($root.'/deploy/nginx/luma.conf');
         $this->assertFileExists($root.'/deploy/nginx/luma-root.conf.example');
         $this->assertFileExists($root.'/deploy/apache/luma.htaccess');
-        $this->assertFileExists($root.'/deploy/shared-hosting-root/index.php');
-        $this->assertFileExists($root.'/deploy/shared-hosting-root/install.php');
-        $this->assertFileExists($root.'/deploy/shared-hosting-root/.htaccess');
-        $this->assertFileExists($root.'/deploy/shared-hosting-root/luma-requirements.php');
         $this->assertFileExists($root.'/docs/installation-validation.md');
     }
 
     public function test_shared_hosting_root_entry_routes_admin_and_blocks_apps(): void
     {
         $root = dirname(base_path(), 2);
-        $htaccess = (string) file_get_contents($root.'/deploy/shared-hosting-root/.htaccess');
-        $index = (string) file_get_contents($root.'/deploy/shared-hosting-root/index.php');
+        $htaccess = (string) file_get_contents($root.'/.htaccess');
+        $index = (string) file_get_contents($root.'/index.php');
+        $install = (string) file_get_contents($root.'/install.php');
 
-        $this->assertStringContainsString('apps/api/public/index.php', $index);
+        $this->assertStringContainsString('install.php', $index);
+        $this->assertStringContainsString('public/index.php', $index);
+        $this->assertStringContainsString('/admin/setup', $install);
         $this->assertStringContainsString('^apps/', $htaccess);
         $this->assertStringContainsString('^admin/', $htaccess);
         $this->assertStringContainsString('index.php', $htaccess);
-        $this->assertStringContainsString('studio', $htaccess);
+        $this->assertStringContainsString('install', $htaccess);
     }
 
     public function test_install_guide_uses_admin_setup_url(): void
     {
         $root = dirname(base_path(), 2);
-        $install = (string) file_get_contents($root.'/INSTALL.txt');
+        $installGuide = (string) file_get_contents($root.'/INSTALL.txt');
 
-        $this->assertStringContainsString('/admin/setup', $install);
-        $this->assertStringContainsString('LUMA_SETUP_TOKEN', $install);
-        $this->assertStringContainsString('browser', strtolower($install));
-        $this->assertStringContainsString('extract', strtolower($install));
-        $this->assertStringContainsString('index.php', $install);
-        $this->assertStringContainsString('install.php', $install);
+        $this->assertStringContainsString('/admin/setup', $installGuide);
+        $this->assertStringContainsString('LUMA_SETUP_TOKEN', $installGuide);
+        $this->assertStringContainsString('index.php', $installGuide);
+        $this->assertStringContainsString('install.php', $installGuide);
+        $this->assertStringContainsString('directly in your site folder', strtolower($installGuide));
     }
 
-    public function test_release_script_packages_flat_zip_from_staging_root(): void
+    public function test_release_script_packages_flat_zip_from_project_root(): void
     {
         $root = dirname(base_path(), 2);
         $scriptPath = dirname($root).'/scripts/release-shared.sh';
@@ -61,9 +63,9 @@ final class DistributionArtifactsTest extends TestCase
 
         $script = (string) file_get_contents($scriptPath);
 
-        $this->assertStringContainsString('rsync -a "$LUMA/deploy/shared-hosting-root/" "$STAGING/"', $script);
         $this->assertStringContainsString('cd "$STAGING"', $script);
         $this->assertStringContainsString('zip -rq "$ARCHIVE" .', $script);
+        $this->assertStringNotContainsString('deploy/shared-hosting-root', $script);
     }
 
     public function test_nginx_deploy_sample_serves_admin_and_redirects_studio(): void
