@@ -17,6 +17,7 @@ final class DistributionArtifactsTest extends TestCase
         $this->assertFileExists($root.'/install.php');
         $this->assertFileExists($root.'/.htaccess');
         $this->assertFileExists($root.'/luma-requirements.php');
+        $this->assertFileExists($root.'/scripts/ensure-writable-paths.sh');
         $this->assertFileExists($root.'/apps/api/.env.shared.example');
         $this->assertFileExists($root.'/deploy/nginx/luma.conf');
         $this->assertFileExists($root.'/deploy/nginx/luma-root.conf.example');

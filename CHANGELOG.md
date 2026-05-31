@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.9] - 2026-05-31
+
+### Added
+
+- `scripts/ensure-writable-paths.sh` in product repo for shared-hosting packaging
+
+### Fixed
+
+- Buttons and selects use `cursor: pointer` in installer UI
+
 ## [0.0.25-rc.8] - 2026-05-31
 
 ### Changed

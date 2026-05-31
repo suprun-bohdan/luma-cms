@@ -20,7 +20,7 @@ final class SetupApiTest extends TestCase
         $this->getJson('/api/v1/setup/status')
             ->assertOk()
             ->assertJsonPath('installed', false)
-            ->assertJsonPath('version', '0.0.25-rc.8');
+            ->assertJsonPath('version', '0.0.25-rc.9');
     }
 
     public function test_setup_status_and_logs_work_when_database_is_unreachable(): void
