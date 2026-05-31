@@ -85,6 +85,14 @@ GET    /api/v1/forms/{slug}
 PUT    /api/v1/forms/{slug}
 DELETE /api/v1/forms/{slug}              requires forms.manage
 GET    /api/v1/forms/{slug}/submissions  requires forms.read_submissions
+GET    /api/v1/plugins/discover               requires plugins.manage
+POST   /api/v1/plugins/install                requires plugins.manage
+GET    /api/v1/plugins                        requires plugins.manage
+POST   /api/v1/plugins/{plugin_id}/enable     requires plugins.manage
+POST   /api/v1/plugins/{plugin_id}/disable    requires plugins.manage
+POST   /api/v1/plugins/{plugin_id}/capabilities/approve  requires plugins.manage
+DELETE /api/v1/plugins/{plugin_id}            requires plugins.manage
+GET    /api/v1/audit-logs                     requires plugins.audit
 GET    /api/v1/pages/{slug}/preview-html       requires pages.view
 POST   /api/v1/pages/{slug}/preview-html       requires pages.view (live preview body)
 ```
@@ -122,8 +130,23 @@ curl -s -X POST http://localhost:8080/api/v1/auth/login \
 
 | Role | Permissions |
 |------|-------------|
-| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage, forms.manage, forms.read_submissions |
+| `admin` | all content.*, media.*, pages.*, menus.*, seo.manage, forms.*, plugins.manage, plugins.audit |
 | `editor` | content.view/create/update; media.read/upload/update; pages.view/create/update/publish; menus.view/update (no delete) |
+
+### Plugins
+
+Plugins live under `plugins/` at the repo root (override with `LUMA_PLUGINS_PATH`). Lifecycle:
+
+1. **Discover** — scan manifests on disk
+2. **Install** — persist manifest snapshot in SQLite
+3. **Enable** — load backend entrypoint (`PluginContract::register` + `boot`)
+4. **Disable** / **Uninstall** — unregister and remove
+
+Each plugin ships `luma.plugin.json` and a backend class implementing `App\Modules\Plugins\Contracts\PluginContract`. Plugins receive `PluginContext` only (not the Laravel container).
+
+Dangerous capabilities require explicit admin approval before enable. Lifecycle events are written to `audit_logs`.
+
+Demo plugin: `plugins/luma.demo/` (extension point `system.booted`).
 
 ### Media
 

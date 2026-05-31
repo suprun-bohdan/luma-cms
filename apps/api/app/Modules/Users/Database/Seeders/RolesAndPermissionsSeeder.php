@@ -35,6 +35,8 @@ class RolesAndPermissionsSeeder extends Seeder
             ['name' => 'Manage SEO', 'slug' => 'seo.manage'],
             ['name' => 'Manage forms', 'slug' => 'forms.manage'],
             ['name' => 'Read form submissions', 'slug' => 'forms.read_submissions'],
+            ['name' => 'Manage plugins', 'slug' => 'plugins.manage'],
+            ['name' => 'View plugin audit logs', 'slug' => 'plugins.audit'],
         ];
 
         foreach ($permissions as $permission) {

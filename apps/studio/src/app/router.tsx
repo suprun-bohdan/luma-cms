@@ -17,6 +17,7 @@ import { RedirectsListPage } from '../features/seo/pages/RedirectsListPage'
 import { FormEditPage } from '../features/forms/pages/FormEditPage'
 import { FormsListPage } from '../features/forms/pages/FormsListPage'
 import { SubmissionsListPage } from '../features/forms/pages/SubmissionsListPage'
+import { PluginsListPage } from '../features/plugins/pages/PluginsListPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -51,6 +52,7 @@ export const router = createBrowserRouter([
       { path: 'forms/new', element: <FormEditPage /> },
       { path: 'forms/:slug/edit', element: <FormEditPage /> },
       { path: 'forms/:slug/submissions', element: <SubmissionsListPage /> },
+      { path: 'plugins', element: <PluginsListPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

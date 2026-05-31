@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Business Website Kit + Forms + Visual Editing MVP.
+> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Business Website Kit + Forms + Visual Editing + Plugin admin.
 
 ## Design system
 
@@ -34,7 +34,7 @@ styles/
 apps/studio/src/
   app/              # App shell, router, query client
   shared/           # API client, auth, layout, UI primitives, hooks
-  features/         # auth, collections, fields, entries, preview, media, pages, navigation
+  features/         # auth, collections, fields, entries, preview, media, pages, navigation, forms, plugins
   pages/            # Dashboard, NotFound
   styles/           # SCSS entry, tokens (extend for themes)
 ```
@@ -63,9 +63,13 @@ apps/studio/src/
 | `/media` | Media library (upload, alt text, delete) |
 | `/pages` | Pages list |
 | `/pages/new` | Create page (block templates + SEO preview) |
-| `/pages/:slug/edit` | Visual page editor (blocks, preview, inspector) |
+| `/pages/:slug/edit` | Visual page editor (drag-and-drop blocks, preview, inspector) |
 | `/menus` | Navigation hub (header + footer) |
 | `/menus/footer` | Footer menu editor |
+| `/forms` | Forms list |
+| `/forms/:slug/edit` | Edit form fields |
+| `/forms/:slug/submissions` | Form submissions inbox |
+| `/plugins` | Discover, install, enable/disable plugins |
 | `/seo/redirects` | URL redirects list |
 | `/seo/redirects/new` | Create redirect |
 
@@ -101,12 +105,13 @@ npm run lint
 
 1. Sign in at `/login` with dev credentials
 2. Upload an image at `/media`
-3. Create a page at `/pages/new` — save draft, then at `/pages/{slug}/edit` use block palette, inspector, and live preview
+3. Create a page at `/pages/new` — save draft, then at `/pages/{slug}/edit` use block palette, drag-and-drop reorder, inspector, and live preview
 4. Publish and open public URL `/p/{slug}`
 5. Edit header menu at `/menus/header` — link to your page slug
 6. Optional: run demo seeder and open `/p/home` (includes contact form)
 7. Check `/forms/contact/submissions` after a form submit
-8. Sign out — protected routes redirect to login; API returns 401 without token
+8. At `/plugins` — discover and install `luma.demo`, then enable
+9. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling
 

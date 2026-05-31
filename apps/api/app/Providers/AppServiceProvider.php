@@ -16,9 +16,15 @@ use App\Modules\Pages\Models\Page;
 use App\Modules\Pages\Policies\PagePolicy;
 use App\Modules\Forms\Models\Form;
 use App\Modules\Forms\Policies\FormPolicy;
+use App\Modules\Plugins\Models\AuditLog;
+use App\Modules\Plugins\Models\Plugin;
+use App\Modules\Plugins\Policies\AuditLogPolicy;
+use App\Modules\Plugins\Policies\PluginPolicy;
+use App\Modules\Plugins\Services\PluginRuntimeService;
 use App\Modules\Seo\Models\Redirect;
 use App\Modules\Seo\Policies\RedirectPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -38,5 +44,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Menu::class, MenuPolicy::class);
         Gate::policy(Redirect::class, RedirectPolicy::class);
         Gate::policy(Form::class, FormPolicy::class);
+        Gate::policy(Plugin::class, PluginPolicy::class);
+        Gate::policy(AuditLog::class, AuditLogPolicy::class);
+
+        if (Schema::hasTable('plugins')) {
+            $this->app->booted(function (): void {
+                $this->app->make(PluginRuntimeService::class)->bootEnabledPlugins();
+            });
+        }
     }
 }

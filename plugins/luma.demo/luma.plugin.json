@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0",
+  "id": "luma.demo",
+  "name": "Luma Demo Plugin",
+  "description": "Internal demo plugin for validating the plugin lifecycle.",
+  "version": "0.1.0",
+  "type": "plugin",
+  "author": {
+    "name": "Luma CMS",
+    "url": "https://github.com/suprun-bohdan/luma-cms"
+  },
+  "compatibility": {
+    "luma": "^0.1.0",
+    "pluginApi": "^1.0",
+    "php": "^8.3"
+  },
+  "capabilities": [
+    "admin.extend"
+  ],
+  "extensionPoints": [
+    "system.booted"
+  ],
+  "entrypoints": {
+    "backend": "src/Plugin.php"
+  },
+  "migrations": {
+    "path": "database/migrations"
+  }
+}

@@ -71,6 +71,7 @@ export function PageForm({
     () => parseContentJson(initialValues?.contentJson ?? defaultContentJson).blocks[0]?.id ?? null,
   )
   const [showAdvancedJson, setShowAdvancedJson] = useState(false)
+  const [advancedJsonDraft, setAdvancedJsonDraft] = useState<string | null>(null)
   const [seoTitle, setSeoTitle] = useState(initialValues?.seoTitle ?? '')
   const [seoDescription, setSeoDescription] = useState(initialValues?.seoDescription ?? '')
   const [seoOgImage, setSeoOgImage] = useState(initialValues?.seoOgImage ?? '')
@@ -83,6 +84,37 @@ export function PageForm({
   )
 
   const contentJson = useMemo(() => JSON.stringify(content, null, 2), [content])
+  const advancedJsonValue = advancedJsonDraft ?? contentJson
+
+  function updateContent(next: PageContent) {
+    setContent(next)
+    setAdvancedJsonDraft(null)
+    setContentError(null)
+  }
+
+  function handleAdvancedJsonChange(value: string) {
+    setAdvancedJsonDraft(value)
+
+    try {
+      const parsed = JSON.parse(value) as unknown
+      updateContent(pageContentSchema.parse(parsed))
+    } catch {
+      setContentError('Invalid JSON or block schema.')
+    }
+  }
+
+  function toggleAdvancedJson() {
+    setShowAdvancedJson((current) => {
+      if (!current) {
+        setAdvancedJsonDraft(contentJson)
+        setContentError(null)
+      } else {
+        setAdvancedJsonDraft(null)
+      }
+
+      return !current
+    })
+  }
 
   function handleTitleChange(value: string) {
     setTitle(value)
@@ -112,11 +144,12 @@ export function PageForm({
     }
 
     setContent(nextContent)
+    setAdvancedJsonDraft(null)
     setSelectedBlockId(id)
   }
 
   function handleBlockPropsChange(blockId: string, props: Record<string, unknown>) {
-    setContent({
+    updateContent({
       blocks: content.blocks.map((block) =>
         block.id === blockId ? { ...block, props } : block,
       ),
@@ -182,29 +215,19 @@ export function PageForm({
             content={content}
             selectedBlockId={selectedBlockId}
             onSelect={setSelectedBlockId}
-            onChange={setContent}
+            onChange={updateContent}
           />
         </div>
         <div className="mt-4">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowAdvancedJson((current) => !current)}
-          >
+          <Button type="button" variant="ghost" onClick={toggleAdvancedJson}>
             {showAdvancedJson ? 'Hide advanced JSON' : 'Show advanced JSON'}
           </Button>
         </div>
         {showAdvancedJson && (
           <div className="mt-3">
             <BlockListEditor
-              value={contentJson}
-              onChange={(value) => {
-                try {
-                  setContent(parseContentJson(value))
-                } catch {
-                  // Invalid JSON stays in textarea until fixed.
-                }
-              }}
+              value={advancedJsonValue}
+              onChange={handleAdvancedJsonChange}
               error={contentError}
             />
           </div>

@@ -6,7 +6,7 @@
 
 Open-source CMS for developers, agencies, and SMB — structured content, clean Laravel architecture, and a modern admin studio (in progress).
 
-> **Status: Pre-alpha.** Content Core, Studio Core, Media Core, Pages + Navigation, Business Website Kit, SEO, Forms, and Visual Editing MVP are implemented; Plugin Foundation is next.
+> **Status: Pre-alpha.** Content Core, Studio Core, Media Core, Pages + Navigation, Business Website Kit, SEO, Forms, Visual Editing, and Plugin Foundation MVP are implemented; content hooks and third-party plugins are next.
 
 [![PHP](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml/badge.svg)](https://github.com/suprun-bohdan/luma-cms/actions/workflows/php.yml)
 
@@ -21,7 +21,7 @@ Luma CMS is a modular content platform — **not** a WordPress clone. Small core
 - **Small core** — official features live in modules
 - **Structured content** — collections, fields, entries; not raw HTML as source of truth
 - **Modular monolith** — Core, modules, versioned API, Luma Studio
-- **Secure extensions** — RBAC + plugin capabilities (plugins planned); default deny
+- **Secure extensions** — RBAC + plugin capabilities; manifest-driven lifecycle (Phase 5 MVP)
 - **Versioned API** — REST under `/api/v1/`
 - **Engineering discipline** — Actions, Policies, Form Requests, API Resources, feature tests
 
@@ -41,9 +41,10 @@ Luma CMS is a modular content platform — **not** a WordPress clone. Small core
 | SEO infrastructure (Phase 3.3) | Done |
 | Forms module (Phase 3.4) | Done |
 | Visual editing MVP (Phase 4) | Done |
-| Plugin system (Phase 5) | Planned |
+| Plugin foundation (Phase 5 MVP) | Done |
+| Content hooks + plugin admin UI (Phase 5.1+) | Planned |
 
-Details: [CHANGELOG.md](CHANGELOG.md) · [apps/api/README.md](apps/api/README.md)
+Details: [CHANGELOG.md](CHANGELOG.md) · [apps/api/README.md](apps/api/README.md) · [plugins/README.md](plugins/README.md)
 
 ## API overview (pre-alpha)
 
@@ -66,10 +67,12 @@ luma-cms/
   apps/
     api/          # Laravel 13 backend
     studio/       # React + TypeScript admin
+  plugins/        # Internal plugins (luma.plugin.json + backend entrypoint)
   packages/
     sdk/          # Public TypeScript SDK (planned)
     plugin-sdk/   # Plugin development kit (planned)
     ui/           # Shared UI components (planned)
+  docs/           # Product docs (extensions, local dev, …)
   .github/        # GitHub Actions (PHP build & test)
   .gitlab-ci.yml  # GitLab CI (PHP build & test)
 ```

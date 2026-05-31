@@ -14,6 +14,7 @@ use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PagePreviewController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
 use App\Modules\Forms\Http\Controllers\Api\V1\FormController;
+use App\Modules\Plugins\Http\Controllers\Api\V1\PluginController;
 use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
 use Illuminate\Support\Facades\Route;
 
@@ -83,5 +84,14 @@ Route::prefix('v1')->group(function (): void {
         Route::put('/forms/{form:slug}', [FormController::class, 'update']);
         Route::delete('/forms/{form:slug}', [FormController::class, 'destroy']);
         Route::get('/forms/{form:slug}/submissions', [FormController::class, 'submissions']);
+
+        Route::get('/plugins/discover', [PluginController::class, 'discover']);
+        Route::post('/plugins/install', [PluginController::class, 'install']);
+        Route::get('/plugins', [PluginController::class, 'index']);
+        Route::post('/plugins/{plugin:plugin_id}/enable', [PluginController::class, 'enable']);
+        Route::post('/plugins/{plugin:plugin_id}/disable', [PluginController::class, 'disable']);
+        Route::post('/plugins/{plugin:plugin_id}/capabilities/approve', [PluginController::class, 'approveCapability']);
+        Route::delete('/plugins/{plugin:plugin_id}', [PluginController::class, 'destroy']);
+        Route::get('/audit-logs', [PluginController::class, 'auditLogs']);
     });
 });

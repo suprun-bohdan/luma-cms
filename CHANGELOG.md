@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.16] - 2026-05-31
+
+### Added
+
+- Phase 4.2: drag-and-drop block reorder in visual page editor
+- Phase 5 plugin foundation: manifest validation, lifecycle (discover/install/enable/disable/uninstall)
+- Plugin tables (`plugins`, `plugin_capabilities`, `audit_logs`) and `PluginContext` API
+- Plugin admin API and Studio page at `/plugins`
+- Internal demo plugin at `plugins/luma.demo/`
+
+### Fixed
+
+- Advanced JSON editor keeps local draft while JSON is invalid (no more reset on typo)
+
 ## [0.0.15] - 2026-05-31
 
 ### Added
