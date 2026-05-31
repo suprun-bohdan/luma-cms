@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Pages\Http\Controllers\PublicPageViewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,3 +9,5 @@ Route::get('/', function () {
         'status' => 'pre-alpha',
     ]);
 });
+
+Route::get('/p/{page:slug}', [PublicPageViewController::class, 'show']);
