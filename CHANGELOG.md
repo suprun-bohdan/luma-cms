@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.24] - 2026-05-30
+
+### Added
+
+- `owner` role; first install user receives owner (admin no longer has `system.update.run` or `setup.view_logs`)
+- `ProductionPasswordGuard` blocks weak and default passwords in production during setup
+- Setup API hardening: `EnsureSetupToken` (`LUMA_SETUP_TOKEN` / `X-Luma-Setup-Token`), rate limiters `setup` and `setup-write`
+- `SystemUpdatePolicy` with dedicated permissions `system.update.check` and `system.update.run`; audit logs on update run
+- `EnvFileWriter` allowlist, file lock, and atomic rename for `.env` writes during install
+- Plugin runtime path containment (`realpath`), boot failure isolation (`PluginStatus::Failed`, `last_error`)
+- Queue-native webhook delivery retry in `DeliverWebhookJob`; publish path isolates webhook dispatch failures
+- Studio setup wizard sends `X-Luma-Setup-Token` when `VITE_LUMA_SETUP_TOKEN` is set
+- Public documentation set under `docs/` (installation, production, security, plugins, integrations, studio, roadmap)
+- `docs/installation-validation.md` clean-room install and update smoke checklist
+
+### Changed
+
+- Canonical admin UI URL is `/admin/` (Luma Studio); legacy `/studio/` redirects in nginx/apache samples
+- Makefile and `release-shared.sh` build Studio with `VITE_BASE_PATH=/admin/`
+- `StarterSiteService` CTA links to `/admin/`
+- Studio Updates page shows owner-specific message on HTTP 403
+- Settings PATCH validated via `UpdateSettingsRequest` FormRequest whitelist
+- `AppServiceProvider::shouldBootPlugins()` tolerates missing DB during `composer install` / CI
+
+### Fixed
+
+- Integration webhook retry test stability; emitter no longer fails publish on dispatch errors
+
 ## [0.0.23] - 2026-05-31
 
 ### Added

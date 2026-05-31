@@ -40,7 +40,7 @@ final class StarterSiteService
                     'type' => 'cta',
                     'props' => [
                         'label' => 'Open Studio',
-                        'url' => '/studio/',
+                        'url' => '/admin/',
                     ],
                 ],
                 [

@@ -108,9 +108,9 @@ export function wrappedListSchema<T extends z.ZodType>(itemSchema: T) {
 export async function apiGet<T>(
   path: string,
   schema: z.ZodType<T>,
-  options?: { auth?: boolean },
+  options?: { auth?: boolean; headers?: Record<string, string> },
 ): Promise<T> {
-  return apiRequest({ method: 'GET', path, schema, auth: options?.auth })
+  return apiRequest({ method: 'GET', path, schema, auth: options?.auth, headers: options?.headers })
 }
 
 export async function apiGetWrapped<T>(

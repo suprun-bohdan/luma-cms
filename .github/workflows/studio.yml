@@ -48,4 +48,4 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npm run build
+        run: VITE_BASE_PATH=/admin/ npm run build

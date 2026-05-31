@@ -93,7 +93,7 @@ export function OnboardingWizardPage() {
       <div className="mx-auto max-w-3xl space-y-6">
         <PageHeader
           title="Welcome to Luma"
-          description="A short guided setup for your new workspace."
+          description="First-login onboarding — site type, starter content, and workspace preferences."
         />
 
         <Card>

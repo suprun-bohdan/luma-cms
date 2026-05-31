@@ -13,9 +13,12 @@ Luma CMS — Shared hosting install (no Composer required)
 
 5. Open in browser:
    `/luma-requirements.php`  — PHP version check
-   `/studio/setup`           — guided installer
+   `/admin/setup`            — guided installer (Luma Studio UI)
 
-6. Optional cron (webhooks / queue):
+6. Optional: set `LUMA_SETUP_TOKEN` in `.env` before exposing the installer to the internet.
+   Build Studio with the same value as `VITE_LUMA_SETUP_TOKEN` so the setup wizard sends header `X-Luma-Setup-Token`.
+
+7. Optional cron (webhooks / queue):
    `* * * * * php ~/luma/apps/api/artisan schedule:run`
 
 See `deploy/nginx/luma.conf` or `deploy/apache/luma-vhost.conf.example` for web server samples.

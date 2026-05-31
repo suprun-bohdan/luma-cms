@@ -3,8 +3,8 @@
 node_modules/
 **/node_modules/
 
-# Product docs (maintained outside git / in outer workspace)
-/docs/
+# Product docs — deployment samples live in deploy/; public docs in docs/
+/docs/deployment/
 
 npm-debug.log
 yarn-error.log

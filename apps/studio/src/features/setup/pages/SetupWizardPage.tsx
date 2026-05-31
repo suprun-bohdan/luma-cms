@@ -73,7 +73,7 @@ export function SetupWizardPage() {
         admin_password: adminPassword,
         with_starter_site: withStarterSite,
       })
-      navigate(result.redirect.replace(/^\/studio/, '') || '/login', { replace: true })
+      navigate(result.redirect.replace(/^\/(?:studio|admin)/, '') || '/login', { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Installation failed')
     }
@@ -88,7 +88,7 @@ export function SetupWizardPage() {
       <div className="mx-auto max-w-3xl space-y-6">
         <PageHeader
           title="Install Luma CMS"
-          description="Guided setup for shared hosting and Docker deployments."
+          description="Technical installer — database, admin account, and environment. Run once before first login."
         />
 
         <Card>

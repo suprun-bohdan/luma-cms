@@ -1,6 +1,18 @@
 import { z } from 'zod'
 import { apiGet, apiRequest } from '../../../shared/api/client'
 
+const setupToken = import.meta.env.VITE_LUMA_SETUP_TOKEN ?? ''
+
+function setupHeaders(): Record<string, string> {
+  if (setupToken === '') {
+    return {}
+  }
+
+  return {
+    'X-Luma-Setup-Token': setupToken,
+  }
+}
+
 const setupStatusSchema = z.object({
   installed: z.boolean(),
 })
@@ -49,11 +61,11 @@ export async function fetchSetupRequirements(): Promise<{
   passed: boolean
   checks: SetupRequirementCheck[]
 }> {
-  return apiGet('/api/v1/setup/requirements', setupRequirementsSchema)
+  return apiGet('/api/v1/setup/requirements', setupRequirementsSchema, { headers: setupHeaders() })
 }
 
 export async function fetchSetupLogs(): Promise<{ logs: SetupLogEntry[] }> {
-  return apiGet('/api/v1/setup/logs', setupLogsSchema)
+  return apiGet('/api/v1/setup/logs', setupLogsSchema, { headers: setupHeaders() })
 }
 
 export async function testSetupDatabase(payload: Record<string, unknown>): Promise<{ ok: boolean }> {
@@ -62,6 +74,7 @@ export async function testSetupDatabase(payload: Record<string, unknown>): Promi
     method: 'POST',
     body: payload,
     schema: okSchema,
+    headers: setupHeaders(),
   })
 }
 
@@ -71,6 +84,7 @@ export async function saveSetupDatabase(payload: Record<string, unknown>): Promi
     method: 'POST',
     body: payload,
     schema: okSchema,
+    headers: setupHeaders(),
   })
 }
 
@@ -80,5 +94,6 @@ export async function finishSetup(payload: Record<string, unknown>): Promise<{ o
     method: 'POST',
     body: payload,
     schema: finishSchema,
+    headers: setupHeaders(),
   })
 }

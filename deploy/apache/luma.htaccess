@@ -4,8 +4,11 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Studio static (when dist is deployed under apps/studio/dist)
-    RewriteRule ^studio/(.*)$ ../studio/dist/$1 [L]
+    # Legacy Studio path → canonical admin UI
+    RewriteRule ^studio/?(.*)$ admin/$1 [R=301,L]
+
+    # Luma Studio static (when dist is deployed under apps/studio/dist)
+    RewriteRule ^admin/(.*)$ ../studio/dist/$1 [L]
 
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f

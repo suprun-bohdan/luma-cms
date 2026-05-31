@@ -160,6 +160,11 @@ export function PluginsListPage() {
         </div>
       )}
 
+      <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        Plugins run as trusted PHP in the same process as the CMS. There is no sandbox. Only install
+        plugins from sources you trust, and review dangerous capabilities before approving them.
+      </div>
+
       {enableHintPluginId && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Approve pending dangerous capabilities below, then enable the plugin again.

@@ -117,8 +117,8 @@ export function AppSidebar({ onNavigate }: AppSidebarProps) {
   return (
     <aside className="border-b border-slate-200 bg-white px-4 py-6 lg:min-h-screen lg:border-b-0 lg:border-r lg:w-[var(--luma-sidebar-width)]">
       <div className="mb-8">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Luma CMS</p>
-        <h1 className="mt-1 text-xl font-semibold text-slate-900">Studio</h1>
+        <h1 className="text-xl font-semibold text-slate-900">Luma Studio</h1>
+        <p className="mt-1 text-xs text-slate-500">Admin at /admin/</p>
       </div>
       <SidebarNav onNavigate={onNavigate} />
       <div className="mt-8 border-t border-slate-200 pt-4">

@@ -137,11 +137,11 @@ GitLab CI runs the same jobs via [`.gitlab-ci.yml`](.gitlab-ci.yml) (`build`/`te
 **Docker prod** (optional outer workspace):
 
 ```bash
-make prod-setup   # PostgreSQL + luma:install + Studio at /studio/
+make prod-setup   # PostgreSQL + luma:install + Luma Studio at /admin/
 make update       # luma:update --force after a release upgrade
 ```
 
-**Shared hosting:** extract release zip (vendor + `studio/dist` included), copy `apps/api/.env.shared.example` → `.env`, open `/studio/setup`. See [INSTALL.txt](INSTALL.txt) and [deploy/](deploy/).
+**Shared hosting:** extract release zip (vendor + `studio/dist` included), copy `apps/api/.env.shared.example` → `.env`, open `/admin/setup`. See [INSTALL.txt](INSTALL.txt) and [deploy/](deploy/).
 
 After replacing release files via FTP, run database migrations from Studio → **Settings → Release updates** or `php artisan luma:update --force`.
 

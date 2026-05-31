@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ApiError } from '../../../shared/api/client'
 import { Badge } from '../../../shared/components/Badge'
 import { Button } from '../../../shared/components/Button'
 import { Card } from '../../../shared/components/Card'
@@ -18,6 +19,10 @@ export function UpdatesPage() {
 
   const version = versionQuery.data
   const updateCheck = updateCheckQuery.data
+  const runErrorMessage =
+    runUpdateMutation.error instanceof ApiError && runUpdateMutation.error.status === 403
+      ? 'Owner permission required to run system updates.'
+      : runUpdateMutation.error?.message
 
   return (
     <>
@@ -26,7 +31,7 @@ export function UpdatesPage() {
         description="Apply database migrations after replacing release files on shared hosting."
       />
 
-      {runUpdateMutation.isError && <ErrorAlert message={runUpdateMutation.error.message} />}
+      {runUpdateMutation.isError && runErrorMessage && <ErrorAlert message={runErrorMessage} />}
       {runUpdateMutation.isSuccess && (
         <Card className="mb-4 border-emerald-200 bg-emerald-50 text-sm text-emerald-900">
           Update completed. Restart queue workers if your host runs them separately.
@@ -61,6 +66,10 @@ export function UpdatesPage() {
       </div>
 
       <Card className="mt-4 space-y-4">
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Back up your database and <code>storage/</code> directory before running a database update.
+          Keep a copy of <code>.env</code> outside the web root.
+        </div>
         <p className="text-sm text-slate-700">
           Shared hosting flow: upload and extract the new <code>luma-cms-*-shared.zip</code>, replace{' '}
           <code>apps/api/app</code>, <code>vendor</code>, and <code>apps/studio/dist</code> via FTP while keeping{' '}

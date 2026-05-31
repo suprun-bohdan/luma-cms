@@ -53,9 +53,9 @@ apps/studio/src/
 
 | Route | Description |
 |-------|-------------|
-| `/setup` | Web installer (before app is installed) |
+| `/setup` | Technical web installer (database, admin user — before app is installed) |
 | `/login` | Sign in |
-| `/onboarding` | First-run wizard (site profile, starter preset, optional integrations) |
+| `/onboarding` | First-run product wizard after login (site profile, starter preset) |
 | `/dashboard` | Overview, API health, setup history |
 | `/collections` | List collections |
 | `/collections/new` | Create collection |
@@ -82,7 +82,7 @@ apps/studio/src/
 | `/seo/redirects` | URL redirects list |
 | `/seo/redirects/new` | Create redirect |
 
-Production builds are served under `/studio/` (Vite `base` / router basename from `VITE_BASE_PATH`).
+Production builds are served under `/admin/` (Vite `base` / router basename from `VITE_BASE_PATH`). The product name in the UI remains **Luma Studio**; legacy `/studio/` URLs redirect to `/admin/` in sample deploy configs.
 
 ## Local development
 
@@ -101,6 +101,8 @@ Optional env:
 ```bash
 # .env.local
 VITE_API_BASE_URL=
+# Optional: must match API LUMA_SETUP_TOKEN when installer is token-protected
+# VITE_LUMA_SETUP_TOKEN=
 ```
 
 Leave empty to use the Vite proxy (recommended for local dev). For non-proxy deployments, set the full API origin.
@@ -115,7 +117,7 @@ npm run build
 Production bundle (same as CI and release packaging):
 
 ```bash
-VITE_BASE_PATH=/studio/ npm run build
+VITE_BASE_PATH=/admin/ npm run build
 ```
 
 GitHub Actions [`.github/workflows/studio.yml`](../../.github/workflows/studio.yml) runs on changes to `apps/studio/**`: Node 22, `npm ci`, lint, build. GitLab CI: `studio:build` job in [`.gitlab-ci.yml`](../../.gitlab-ci.yml).

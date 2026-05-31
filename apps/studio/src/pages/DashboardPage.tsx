@@ -6,13 +6,16 @@ import { Card } from '../shared/components/Card'
 import { ErrorAlert } from '../shared/components/ErrorAlert'
 import { LoadingState } from '../shared/components/LoadingState'
 import { PageHeader } from '../shared/components/PageHeader'
+import { useAuth } from '../shared/auth/useAuth'
 import { useHealth } from '../shared/hooks/useHealth'
 import { useCollections } from '../features/collections/hooks/useCollections'
 
 export function DashboardPage() {
+  const { user } = useAuth()
+  const canViewSetupLogs = user?.roles.includes('owner') ?? false
   const healthQuery = useHealth()
   const collectionsQuery = useCollections()
-  const journalQuery = useOnboardingJournal()
+  const journalQuery = useOnboardingJournal(canViewSetupLogs)
 
   return (
     <>
@@ -62,23 +65,25 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="mt-6">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Setup history</p>
-        <div className="space-y-2 text-sm">
-          {(journalQuery.data ?? []).length === 0 && (
-            <p className="text-slate-500">Recent setup and onboarding events appear here.</p>
-          )}
-          {(journalQuery.data ?? []).map((entry) => (
-            <div key={entry.id} className="rounded border border-slate-200 px-3 py-2">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-medium">{entry.step}</span>
-                <Badge tone="muted">{entry.status}</Badge>
+      {canViewSetupLogs && (
+        <Card className="mt-6">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Setup history</p>
+          <div className="space-y-2 text-sm">
+            {(journalQuery.data ?? []).length === 0 && (
+              <p className="text-slate-500">Recent setup and onboarding events appear here.</p>
+            )}
+            {(journalQuery.data ?? []).map((entry) => (
+              <div key={entry.id} className="rounded border border-slate-200 px-3 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">{entry.step}</span>
+                  <Badge tone="muted">{entry.status}</Badge>
+                </div>
+                <p className="text-slate-600">{entry.message}</p>
               </div>
-              <p className="text-slate-600">{entry.message}</p>
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+        </Card>
+      )}
     </>
   )
 }
