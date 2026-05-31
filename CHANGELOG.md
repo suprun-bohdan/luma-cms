@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.8] - 2026-05-31
+
+### Added
+
+- GitHub Actions workflow: PHP build and test (`apps/api`, Composer + PHPUnit)
+- GitLab CI pipeline: build and test stages for the Laravel API
+
+### Changed
+
+- Updated root README, CONTRIBUTING, and app READMEs for current Phase 1 status
+- CONTRIBUTING: correct repo URL, CI instructions, removed stale “no dev setup” note
+
 ## [0.0.7] - 2026-05-31
 
 ### Added

@@ -7,18 +7,18 @@ Thank you for your interest in Luma CMS. This project is in **pre-alpha** — AP
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-org/luma-cms.git
+   git clone https://github.com/suprun-bohdan/luma-cms.git
    cd luma-cms
    ```
 
-2. Read the documentation before writing code:
+2. Read before coding:
 
-   - [docs/vision.md](docs/vision.md)
-   - [docs/architecture.md](docs/architecture.md)
-   - [docs/roadmap.md](docs/roadmap.md)
-   - [docs/development.md](docs/development.md)
+   - [README.md](README.md) — project status and layout
+   - [CHANGELOG.md](CHANGELOG.md) — what shipped recently
+   - [apps/api/README.md](apps/api/README.md) — API, auth, local setup, tests
+   - [apps/studio/README.md](apps/studio/README.md) — frontend scaffold
 
-3. Check [docs/roadmap.md](docs/roadmap.md) for current phase and scope. Do not implement features marked as "Not Now".
+3. Stay in scope. Phase 1 (Content Core API) backend is done; next focus is **Studio Core** (login, collections, fields, entries UI). Do not build marketplace, full visual builder, or e-commerce engine before core workflows are stable.
 
 ## How to contribute
 
@@ -32,10 +32,26 @@ Thank you for your interest in Luma CMS. This project is in **pre-alpha** — AP
 
 - Keep PRs small and focused on one concern.
 - Reference related issues when applicable.
-- Update documentation when behavior or architecture changes.
-- Add tests when application code exists and your change affects behavior.
+- Update README / CHANGELOG when behavior or public API changes.
+- Add or update feature tests when API behavior changes.
 
-### Code style (when code exists)
+### CI
+
+Pull requests and pushes to `main` run **PHP build & test** (Composer + `php artisan test`) via:
+
+- GitHub Actions: [`.github/workflows/php.yml`](.github/workflows/php.yml)
+- GitLab CI: [`.gitlab-ci.yml`](.gitlab-ci.yml)
+
+Ensure tests pass locally before pushing:
+
+```bash
+cd apps/api
+composer install
+cp .env.example .env && php artisan key:generate
+php artisan test
+```
+
+### Code style
 
 **Backend (Laravel / PHP 8.3+):**
 
@@ -47,7 +63,7 @@ Thank you for your interest in Luma CMS. This project is in **pre-alpha** — AP
 **Frontend (React / TypeScript):**
 
 - Strict TypeScript; avoid `any`
-- TanStack Query for server state; Zod for form validation
+- TanStack Query for server state; Zod for API validation
 - Small components; separate API clients, hooks, and UI
 
 **General:**
@@ -59,9 +75,9 @@ Thank you for your interest in Luma CMS. This project is in **pre-alpha** — AP
 
 ## Development environment
 
-A runnable development setup is not available yet. Instructions will be added in [docs/development.md](docs/development.md) once the monorepo skeleton and first API exist.
+The Laravel API lives in `apps/api/`. Use PHP 8.3+ with Composer, or an optional outer Docker stack if you have one. See [apps/api/README.md](apps/api/README.md).
 
-Some contributors may use an optional outer local workspace with Docker for convenience. That workspace is **not** part of this repository and is not required to contribute to Luma CMS.
+Luma Studio (`apps/studio/`) expects the API reachable for `/api` calls during local dev.
 
 ## Code of conduct
 

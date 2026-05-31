@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Pre-alpha scaffold (Phase 1C). Content workflows not implemented yet.
+> **Status:** Pre-alpha scaffold (Phase 1C). Phase 2 Studio Core (login, collections, fields, entries UI) not started.
 
 ## Stack
 

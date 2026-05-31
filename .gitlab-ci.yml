@@ -1,0 +1,65 @@
+# GitLab CI/CD — Luma CMS API (PHP / Composer)
+# https://docs.gitlab.com/ee/ci/examples/php.html
+
+stages:
+  - build
+  - test
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - apps/api/**/*
+        - .gitlab-ci.yml
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - apps/api/**/*
+        - .gitlab-ci.yml
+
+variables:
+  APP_DIR: apps/api
+  COMPOSER_CACHE_DIR: ${CI_PROJECT_DIR}/${APP_DIR}/.composer-cache
+  COMPOSER_ALLOW_SUPERUSER: "1"
+  COMPOSER_NO_INTERACTION: "1"
+
+default:
+  image: php:8.4-cli-bookworm
+
+cache:
+  key: "${CI_COMMIT_REF_SLUG}-composer"
+  paths:
+    - ${APP_DIR}/vendor/
+    - ${APP_DIR}/.composer-cache/
+  policy: pull-push
+
+.php_base: &php_base
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq git unzip libzip-dev libsqlite3-dev
+    - docker-php-ext-configure zip
+    - docker-php-ext-install -j"$(nproc)" bcmath pdo_sqlite zip
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    - cd "${APP_DIR}"
+
+build:
+  stage: build
+  <<: *php_base
+  script:
+    - composer validate --strict --no-check-publish
+    - composer install --prefer-dist --no-ansi --no-progress
+    - composer dump-autoload --optimize
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - ${APP_DIR}/vendor/
+
+test:
+  stage: test
+  <<: *php_base
+  needs:
+    - job: build
+      artifacts: true
+  script:
+    - cp .env.example .env
+    - php artisan key:generate --force --no-interaction
+    - php artisan test --colors=never

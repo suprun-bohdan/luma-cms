@@ -147,6 +147,15 @@ curl -s http://localhost:8080/api/v1/public/collections/pages/entries
 
 Note: single-entry JSON responses return fields at the root (no outer `data` wrapper) because the payload attribute is also named `data`. List responses use a standard `data` array wrapper.
 
+## CI
+
+On push/PR to `main`, PHP 8.4 build and tests run automatically:
+
+- **GitHub Actions:** `.github/workflows/php.yml`
+- **GitLab CI:** `.gitlab-ci.yml`
+
+Steps: `composer validate` → `composer install` → Laravel `.env` bootstrap → `php artisan test` (SQLite in-memory).
+
 ## Local development
 
 From the outer dev workspace (Docker):
@@ -168,5 +177,3 @@ docker compose exec php bash -c "cd apps/api && php artisan test"
 - Public API uses `/api/v1/` prefix
 - API Resources for all public responses
 - SQLite is source of truth; policies enforce RBAC permissions
-
-See [../../docs/architecture.md](../../docs/architecture.md).
