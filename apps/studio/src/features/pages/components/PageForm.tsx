@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
+import { Fieldset } from '../../../shared/components/Fieldset'
+import { Input } from '../../../shared/components/Input'
+import { Textarea } from '../../../shared/components/Textarea'
 import { slugify } from '../../../shared/utils/format'
 import { BlockListEditor } from './BlockListEditor'
 import {
@@ -71,87 +74,54 @@ export function PageForm({
     <form className="space-y-6" onSubmit={handleSubmit}>
       {formError && <p className="text-sm text-red-600">{formError}</p>}
 
-      <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="page-title">
-          Title
-        </label>
-        <input
-          id="page-title"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          value={title}
-          onChange={(event) => handleTitleChange(event.target.value)}
-          required
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="page-slug">
-          Slug
-        </label>
-        <input
-          id="page-slug"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          value={slug}
-          onChange={(event) => {
-            setSlugTouched(true)
-            setSlug(event.target.value)
-          }}
-          required
-        />
-      </div>
-
-      <BlockListEditor
-        value={contentJson}
-        onChange={setContentJson}
-        error={contentError}
+      <Input
+        label="Title"
+        id="page-title"
+        value={title}
+        onChange={(event) => handleTitleChange(event.target.value)}
+        required
       />
 
-      <fieldset className="space-y-4 rounded-lg border border-slate-200 p-4">
-        <legend className="px-1 text-sm font-semibold text-slate-900">SEO</legend>
+      <Input
+        label="Slug"
+        id="page-slug"
+        value={slug}
+        onChange={(event) => {
+          setSlugTouched(true)
+          setSlug(event.target.value)
+        }}
+        required
+      />
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="seo-title">
-            Meta title (max 70)
-          </label>
-          <input
-            id="seo-title"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            value={seoTitle}
-            maxLength={70}
-            onChange={(event) => setSeoTitle(event.target.value)}
-          />
-        </div>
+      <BlockListEditor value={contentJson} onChange={setContentJson} error={contentError} />
 
-        <div>
-          <label
-            className="mb-1 block text-sm font-medium text-slate-700"
-            htmlFor="seo-description"
-          >
-            Meta description (max 160)
-          </label>
-          <textarea
-            id="seo-description"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-            value={seoDescription}
-            maxLength={160}
-            rows={3}
-            onChange={(event) => setSeoDescription(event.target.value)}
-          />
-        </div>
+      <Fieldset legend="SEO">
+        <Input
+          label="Meta title (max 70)"
+          id="seo-title"
+          value={seoTitle}
+          maxLength={70}
+          onChange={(event) => setSeoTitle(event.target.value)}
+        />
 
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="seo-og-image">
-            OG image media uuid
-          </label>
-          <input
-            id="seo-og-image"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
-            value={seoOgImage}
-            placeholder="00000000-0000-0000-0000-000000000000"
-            onChange={(event) => setSeoOgImage(event.target.value)}
-          />
-        </div>
-      </fieldset>
+        <Textarea
+          label="Meta description (max 160)"
+          id="seo-description"
+          value={seoDescription}
+          maxLength={160}
+          rows={3}
+          onChange={(event) => setSeoDescription(event.target.value)}
+        />
+
+        <Input
+          label="OG image media uuid"
+          id="seo-og-image"
+          value={seoOgImage}
+          placeholder="00000000-0000-0000-0000-000000000000"
+          className="font-mono"
+          onChange={(event) => setSeoOgImage(event.target.value)}
+        />
+      </Fieldset>
 
       <Button type="submit" disabled={loading}>
         {loading ? 'Saving…' : submitLabel}

@@ -4,8 +4,7 @@ import { Button } from '../../../shared/components/Button'
 import { ConfirmDialog } from '../../../shared/components/ConfirmDialog'
 import { EmptyState } from '../../../shared/components/EmptyState'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
-import { LoadingState } from '../../../shared/components/LoadingState'
-import { PageHeader } from '../../../shared/components/PageHeader'
+import { ListPage } from '../../../shared/layout'
 import { ApiError } from '../../../shared/api/client'
 import { CollectionTable } from '../components/CollectionTable'
 import { useCollections, useDeleteCollection } from '../hooks/useCollections'
@@ -17,7 +16,7 @@ export function CollectionsListPage() {
 
   return (
     <>
-      <PageHeader
+      <ListPage
         title="Collections"
         description="Content types for structured entries."
         actions={
@@ -25,37 +24,40 @@ export function CollectionsListPage() {
             <Button>Create collection</Button>
           </Link>
         }
-      />
-
-      {collectionsQuery.isLoading && <LoadingState message="Loading collections…" />}
-      {collectionsQuery.isError && (
-        <ErrorAlert
-          message={
-            collectionsQuery.error instanceof Error
-              ? collectionsQuery.error.message
-              : 'Failed to load collections'
-          }
-        />
-      )}
-
-      {collectionsQuery.data?.length === 0 && (
-        <EmptyState
-          title="No collections yet"
-          description="Create your first collection to define a content type."
-          action={
-            <Link to="/collections/new">
-              <Button>Create collection</Button>
-            </Link>
-          }
-        />
-      )}
-
-      {collectionsQuery.data && collectionsQuery.data.length > 0 && (
-        <CollectionTable
-          collections={collectionsQuery.data}
-          onDelete={(slug) => setPendingDeleteSlug(slug)}
-        />
-      )}
+        loading={collectionsQuery.isLoading}
+        loadingMessage="Loading collections…"
+        error={
+          collectionsQuery.isError ? (
+            <ErrorAlert
+              message={
+                collectionsQuery.error instanceof Error
+                  ? collectionsQuery.error.message
+                  : 'Failed to load collections'
+              }
+            />
+          ) : undefined
+        }
+        empty={
+          collectionsQuery.data?.length === 0 ? (
+            <EmptyState
+              title="No collections yet"
+              description="Create your first collection to define a content type."
+              action={
+                <Link to="/collections/new">
+                  <Button>Create collection</Button>
+                </Link>
+              }
+            />
+          ) : undefined
+        }
+      >
+        {collectionsQuery.data && collectionsQuery.data.length > 0 && (
+          <CollectionTable
+            collections={collectionsQuery.data}
+            onDelete={(slug) => setPendingDeleteSlug(slug)}
+          />
+        )}
+      </ListPage>
 
       <ConfirmDialog
         open={pendingDeleteSlug !== null}

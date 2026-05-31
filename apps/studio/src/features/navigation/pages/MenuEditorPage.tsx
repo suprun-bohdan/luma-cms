@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Button } from '../../../shared/components/Button'
 import { Card } from '../../../shared/components/Card'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
+import { Input } from '../../../shared/components/Input'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { ApiError } from '../../../shared/api/client'
@@ -93,17 +94,12 @@ function MenuForm({
         </div>
       )}
 
-      <div className="mb-4">
-        <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="menu-name">
-          Menu name
-        </label>
-        <input
-          id="menu-name"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-      </div>
+      <Input
+        label="Menu name"
+        id="menu-name"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
 
       <div className="space-y-4">
         {items.map((item, index) => (
@@ -111,32 +107,24 @@ function MenuForm({
             key={index}
             className="grid gap-3 rounded-lg border border-slate-200 p-4 md:grid-cols-[1fr_1fr_1fr_auto]"
           >
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Label</label>
-              <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                value={item.label}
-                onChange={(event) => updateItem(index, { label: event.target.value })}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">Page slug</label>
-              <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
-                placeholder="about-us"
-                value={item.page_slug ?? ''}
-                onChange={(event) => updateItem(index, { page_slug: event.target.value })}
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-xs font-medium text-slate-600">External URL</label>
-              <input
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                placeholder="https://example.com"
-                value={item.url ?? ''}
-                onChange={(event) => updateItem(index, { url: event.target.value })}
-              />
-            </div>
+            <Input
+              label="Label"
+              value={item.label}
+              onChange={(event) => updateItem(index, { label: event.target.value })}
+            />
+            <Input
+              label="Page slug"
+              placeholder="about-us"
+              className="font-mono"
+              value={item.page_slug ?? ''}
+              onChange={(event) => updateItem(index, { page_slug: event.target.value })}
+            />
+            <Input
+              label="External URL"
+              placeholder="https://example.com"
+              value={item.url ?? ''}
+              onChange={(event) => updateItem(index, { url: event.target.value })}
+            />
             <div className="flex items-end">
               <Button variant="ghost" onClick={() => removeItem(index)}>
                 Remove

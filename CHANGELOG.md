@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.11] - 2026-05-31
+
+### Added
+
+- Pages module (Phase 3.1): CRUD, publish/unpublish, public API, block content validation
+- Public HTML page renderer at `GET /p/{slug}` with hero, rich_text, cta blocks
+- Page SEO fields (title, description, og_image) with meta tags in public renderer
+- Navigation module: menus + menu items API, public menu read, Studio header editor
+- Studio pages list/create/edit with JSON block editor and SEO form
+- Studio Design System Foundation (Phase 2X): expanded SCSS tokens, CSS theme vars
+- Layout primitives: AdminShell, AppSidebar, ListPage, FormPage, SplitPane, PreviewPane, SettingsPanel
+- UI primitives: Table, Checkbox, Fieldset; shared form field styles
+- Design system documentation: `apps/studio/docs/studio-design-system.md`
+
+### Changed
+
+- AppShell refactored to AdminShell layout primitives
+- Collections, pages, navigation, and entry preview migrated to ListPage/Table/Input primitives
+
 ## [0.0.10] - 2026-05-30
 
 ### Added

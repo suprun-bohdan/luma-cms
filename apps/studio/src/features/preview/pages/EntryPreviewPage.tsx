@@ -1,11 +1,19 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
-import { Card } from '../../../shared/components/Card'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PageHeader } from '../../../shared/components/PageHeader'
 import { Breadcrumbs } from '../../../shared/components/Breadcrumbs'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from '../../../shared/components/Table'
+import { PreviewPane, SettingsPanel, SplitPane } from '../../../shared/layout'
 import { formatDate } from '../../../shared/utils/format'
 import { useCollection, useCollections } from '../../collections/hooks/useCollections'
 import { useFields } from '../../fields/hooks/useFields'
@@ -117,60 +125,62 @@ export function EntryPreviewPage() {
       )}
 
       {previewEntry && (
-        <div className="space-y-4">
-          <Card>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <p className="text-xs uppercase text-slate-500">Status</p>
-                <EntryStatusBadge status={previewEntry.status} />
-              </div>
-              <div>
-                <p className="text-xs uppercase text-slate-500">Collection</p>
-                <p className="text-sm font-medium">{collectionQuery.data?.name ?? collectionSlug}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase text-slate-500">Published at</p>
-                <p className="text-sm">{formatDate(previewEntry.published_at)}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase text-slate-500">Updated</p>
-                <p className="text-sm">{formatDate(previewEntry.updated_at)}</p>
-              </div>
-              {collectionQuery.data && (
+        <SplitPane
+          left={
+            <SettingsPanel title="Entry metadata">
+              <div className="grid gap-4">
                 <div>
-                  <p className="text-xs uppercase text-slate-500">Schema version</p>
-                  <p className="text-sm">v{collectionQuery.data.schema_version}</p>
+                  <p className="text-xs uppercase text-slate-500">Status</p>
+                  <EntryStatusBadge status={previewEntry.status} />
                 </div>
-              )}
-            </div>
-          </Card>
-
-          <Card>
-            <h2 className="mb-4 text-lg font-medium">Content</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
-                <thead className="border-b border-slate-200 text-slate-600">
-                  <tr>
-                    <th className="px-3 py-2 font-medium">Field</th>
-                    <th className="px-3 py-2 font-medium">Value</th>
-                  </tr>
-                </thead>
-                <tbody>
+                <div>
+                  <p className="text-xs uppercase text-slate-500">Collection</p>
+                  <p className="text-sm font-medium">
+                    {collectionQuery.data?.name ?? collectionSlug}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase text-slate-500">Published at</p>
+                  <p className="text-sm">{formatDate(previewEntry.published_at)}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase text-slate-500">Updated</p>
+                  <p className="text-sm">{formatDate(previewEntry.updated_at)}</p>
+                </div>
+                {collectionQuery.data && (
+                  <div>
+                    <p className="text-xs uppercase text-slate-500">Schema version</p>
+                    <p className="text-sm">v{collectionQuery.data.schema_version}</p>
+                  </div>
+                )}
+              </div>
+            </SettingsPanel>
+          }
+          right={
+            <PreviewPane title="Content">
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeaderCell>Field</TableHeaderCell>
+                    <TableHeaderCell>Value</TableHeaderCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {Object.entries(previewEntry.data).map(([key, value]) => (
-                    <tr key={key} className="border-b border-slate-100 last:border-b-0">
-                      <td className="px-3 py-2 font-medium">
+                    <TableRow key={key}>
+                      <TableCell className="font-medium">
                         {fieldLabels.get(key) ?? key}
-                      </td>
-                      <td className="px-3 py-2 whitespace-pre-wrap font-mono text-xs">
+                      </TableCell>
+                      <TableCell className="whitespace-pre-wrap font-mono text-xs">
                         {renderValue(value)}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        </div>
+                </TableBody>
+              </Table>
+            </PreviewPane>
+          }
+        />
       )}
     </>
   )
