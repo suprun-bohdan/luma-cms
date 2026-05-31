@@ -2,15 +2,15 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Not scaffolded yet. Directory reserved for Phase 1B (Laravel API scaffold).
+> **Status:** Pre-alpha scaffold (Phase 1B). Content Core API not implemented yet.
 
-## Planned stack
+## Stack
 
 - PHP 8.3+
-- Laravel
-- PostgreSQL
+- Laravel 13
+- SQLite (local dev default); PostgreSQL planned for production
 
-## Planned structure
+## Structure
 
 ```text
 apps/api/
@@ -24,15 +24,46 @@ apps/api/
       Plugins/
       Settings/
     Support/
+    Http/Controllers/
   routes/
+    api.php         # Versioned API routes
   database/
   tests/
+```
+
+## API
+
+Versioned public routes:
+
+```
+GET /api/v1/health
+```
+
+Laravel health check:
+
+```
+GET /up
+```
+
+## Local development
+
+From the outer dev workspace (Docker):
+
+```bash
+make up
+# API: http://localhost:8080/api/v1/health
+```
+
+Run tests inside the PHP container:
+
+```bash
+docker compose exec php bash -c "cd apps/api && php artisan test"
 ```
 
 ## Rules
 
 - Thin controllers; business logic in Actions, Services, Policies
-- Versioned public API: `/api/v1/...`
-- API Resources for all public responses
+- Public API uses `/api/v1/` prefix
+- API Resources for all public responses (when endpoints exist)
 
 See [../../docs/architecture.md](../../docs/architecture.md).

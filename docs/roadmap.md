@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Status:** Pre-alpha. Phase 0 complete; Phase 1 next.
+> **Status:** Pre-alpha. Phase 1B complete; Content Core next.
 
 ## Phase 0: Foundation
 
@@ -14,6 +14,8 @@
 ## Phase 1: Content Core (MVP 0.1)
 
 **Goal:** First usable CMS core.
+
+**Progress:** Laravel API scaffold complete (`apps/api/`). Content modules not started.
 
 A developer can define a collection. An editor can create an entry. A client can read published content via the API.
 

@@ -55,7 +55,7 @@ luma-cms/
 
 ## Development status
 
-Early development. Monorepo skeleton is in place; Laravel and React scaffolds are not yet created.
+Early development. Laravel API scaffold is available at `apps/api/`. React Studio is not yet created.
 
 Installation instructions will be added once the first runnable development version is available.
 

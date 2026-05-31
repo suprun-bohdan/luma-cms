@@ -2,7 +2,7 @@
 
 Guide for contributors working on Luma CMS.
 
-> **Status:** Pre-alpha. No runnable development environment yet.
+> **Status:** Pre-alpha. Laravel API scaffold available; Studio not yet created.
 
 ## Repository layout
 
@@ -26,27 +26,35 @@ luma-cms/
 
 ## Current phase
 
-**Phase 1: Content Core (MVP 0.1)** — next up.
+**Phase 1: Content Core (MVP 0.1)** — in progress.
 
-1. **Phase 1B** — Laravel API scaffold (`apps/api/`)
+1. ~~**Phase 1B** — Laravel API scaffold (`apps/api/`)~~ done
 2. **Phase 1C** — React Studio scaffold (`apps/studio/`)
 3. **Phase 1D** — Content Core (collections, fields, entries, API v1)
 
 See [roadmap.md](roadmap.md) for the full plan.
 
-## Getting started (when code exists)
+## Getting started
 
-Installation and development setup instructions will be added here once the first runnable version is available.
+### API (local Docker)
 
-Expected workflow (planned):
+If you use the optional outer dev workspace with Docker:
 
 ```bash
-git clone https://github.com/your-org/luma-cms.git
-cd luma-cms
-# setup commands TBD
+# from outer LUMACMS/ workspace
+make up
+curl http://localhost:8080/api/v1/health
 ```
 
-Do not add fake install commands before the application exists.
+Run API tests:
+
+```bash
+docker compose exec php bash -c "cd apps/api && php artisan test"
+```
+
+### Full setup (when available)
+
+Installation instructions for a self-contained setup will be added once the monorepo tooling is complete.
 
 ## How to contribute
 
