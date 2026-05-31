@@ -33,6 +33,10 @@ final class WritablePathEvaluator implements RequirementEvaluator
                 label: 'Writable directories',
                 status: RequirementStatus::Failed,
                 message: 'These paths must be writable: '.implode(', ', $notWritable),
+                messageKey: RequirementCheck::messageKeyFor('paths.writable', 'failed'),
+                messageParams: [
+                    'paths' => implode(', ', $notWritable),
+                ],
             );
         }
 
@@ -41,6 +45,7 @@ final class WritablePathEvaluator implements RequirementEvaluator
             label: 'Writable directories',
             status: RequirementStatus::Passed,
             message: 'Storage, bootstrap cache, and database directory are writable.',
+            messageKey: RequirementCheck::messageKeyFor('paths.writable', 'passed'),
         );
     }
 }

@@ -11,5 +11,6 @@ final readonly class InstallOptions
         public ?string $adminPassword = null,
         public bool $withStarterSite = false,
         public ?string $siteTitle = null,
+        public bool $allowWeakPassword = false,
     ) {}
 }

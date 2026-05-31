@@ -2,15 +2,27 @@ import { z } from 'zod'
 import { apiGet, apiRequest } from '../../../shared/api/client'
 
 const setupToken = import.meta.env.VITE_LUMA_SETUP_TOKEN ?? ''
+let setupLocale = 'en_US'
+
+export function setSetupApiLocale(locale: string): void {
+  setupLocale = locale
+}
+
+export function getSetupApiLocale(): string {
+  return setupLocale
+}
 
 function setupHeaders(): Record<string, string> {
-  if (setupToken === '') {
-    return {}
+  const headers: Record<string, string> = {
+    'Accept-Language': setupLocale,
+    'X-Luma-Setup-Locale': setupLocale,
   }
 
-  return {
-    'X-Luma-Setup-Token': setupToken,
+  if (setupToken !== '') {
+    headers['X-Luma-Setup-Token'] = setupToken
   }
+
+  return headers
 }
 
 const setupStatusSchema = z.object({
@@ -23,6 +35,9 @@ const requirementCheckSchema = z.object({
   label: z.string(),
   status: z.enum(['passed', 'warning', 'failed']),
   message: z.string(),
+  label_key: z.string().optional(),
+  message_key: z.string().optional(),
+  message_params: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
 })
 
 const setupRequirementsSchema = z.object({
@@ -60,9 +75,15 @@ const healthSchema = z.object({
 export type SetupRequirementCheck = z.infer<typeof requirementCheckSchema>
 export type SetupLogEntry = z.infer<typeof setupLogSchema>
 
+export type ApiTranslatableError = {
+  message?: string
+  message_key?: string
+  message_params?: Record<string, string | number>
+}
+
 export async function fetchSetupStatus(): Promise<{ installed: boolean; version: string }> {
   try {
-    return await apiGet('/api/v1/setup/status', setupStatusSchema)
+    return await apiGet('/api/v1/setup/status', setupStatusSchema, { headers: setupHeaders() })
   } catch {
     const health = await apiGet('/api/v1/health', healthSchema)
 
@@ -77,8 +98,7 @@ export async function fetchSetupRequirements(): Promise<{
   passed: boolean
   checks: SetupRequirementCheck[]
 }> {
-  // Public endpoint — readable before install without LUMA_SETUP_TOKEN / VITE_LUMA_SETUP_TOKEN.
-  return apiGet('/api/v1/system/requirements', setupRequirementsSchema)
+  return apiGet('/api/v1/system/requirements', setupRequirementsSchema, { headers: setupHeaders() })
 }
 
 export async function fetchSetupLogs(): Promise<{ logs: SetupLogEntry[] }> {

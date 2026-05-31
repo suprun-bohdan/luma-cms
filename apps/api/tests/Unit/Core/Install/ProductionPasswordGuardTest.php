@@ -53,6 +53,17 @@ final class ProductionPasswordGuardTest extends TestCase
         $guard->assertAllowed('admin');
     }
 
+    public function test_allows_weak_password_when_explicitly_allowed(): void
+    {
+        config(['luma.enforce_strong_passwords' => true]);
+
+        $guard = app(ProductionPasswordGuard::class);
+
+        $guard->assertAllowed('short123', true);
+
+        $this->assertTrue(true);
+    }
+
     public function test_rejects_short_password_when_enforced(): void
     {
         config(['luma.enforce_strong_passwords' => true]);

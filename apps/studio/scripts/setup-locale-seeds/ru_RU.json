@@ -1,0 +1,14 @@
+{
+  "common.continue": "Продолжить",
+  "welcome.start": "Начать настройку",
+  "welcome.title": "Добро пожаловать в Luma CMS",
+  "steps.welcome": "Приветствие",
+  "steps.requirements": "Требования",
+  "steps.database": "База данных",
+  "steps.site": "Сайт",
+  "steps.owner": "Владелец",
+  "steps.install": "Установка",
+  "language.label": "Язык",
+  "common.back": "Назад",
+  "install.button": "Установить Luma CMS"
+}

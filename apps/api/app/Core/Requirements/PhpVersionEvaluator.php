@@ -29,6 +29,11 @@ final class PhpVersionEvaluator implements RequirementEvaluator
                     $minimum,
                     $this->currentVersion,
                 ),
+                messageKey: RequirementCheck::messageKeyFor('php.version', 'failed'),
+                messageParams: [
+                    'minimum' => $minimum,
+                    'current' => $this->currentVersion,
+                ],
             );
         }
 
@@ -46,6 +51,13 @@ final class PhpVersionEvaluator implements RequirementEvaluator
                     implode(', ', $supportedBranches),
                     $recommended,
                 ),
+                messageKey: RequirementCheck::messageKeyFor('php.version', 'warning_unsupported_branch'),
+                messageParams: [
+                    'current' => $this->currentVersion,
+                    'branch' => $branch,
+                    'supported' => implode(', ', $supportedBranches),
+                    'recommended' => $recommended,
+                ],
             );
         }
 
@@ -59,6 +71,11 @@ final class PhpVersionEvaluator implements RequirementEvaluator
                     $this->currentVersion,
                     $recommended,
                 ),
+                messageKey: RequirementCheck::messageKeyFor('php.version', 'warning_below_recommended'),
+                messageParams: [
+                    'current' => $this->currentVersion,
+                    'recommended' => $recommended,
+                ],
             );
         }
 
@@ -67,6 +84,10 @@ final class PhpVersionEvaluator implements RequirementEvaluator
             label: 'PHP version',
             status: RequirementStatus::Passed,
             message: sprintf('PHP %s meets requirements.', $this->currentVersion),
+            messageKey: RequirementCheck::messageKeyFor('php.version', 'passed'),
+            messageParams: [
+                'current' => $this->currentVersion,
+            ],
         );
     }
 

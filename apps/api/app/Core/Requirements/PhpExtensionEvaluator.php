@@ -24,6 +24,10 @@ final class PhpExtensionEvaluator implements RequirementEvaluator
                 label: 'PHP extensions',
                 status: RequirementStatus::Failed,
                 message: 'Missing required extensions: '.implode(', ', $missing),
+                messageKey: RequirementCheck::messageKeyFor('php.extensions', 'failed'),
+                messageParams: [
+                    'extensions' => implode(', ', $missing),
+                ],
             );
         }
 
@@ -32,6 +36,7 @@ final class PhpExtensionEvaluator implements RequirementEvaluator
             label: 'PHP extensions',
             status: RequirementStatus::Passed,
             message: 'All required PHP extensions are loaded.',
+            messageKey: RequirementCheck::messageKeyFor('php.extensions', 'passed'),
         );
     }
 }

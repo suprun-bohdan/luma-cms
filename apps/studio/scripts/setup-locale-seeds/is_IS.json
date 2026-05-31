@@ -1,0 +1,14 @@
+{
+  "common.continue": "Halda áfram",
+  "welcome.start": "Hefja uppsetningu",
+  "welcome.title": "Velkomin í Luma CMS",
+  "steps.welcome": "Velkomin",
+  "steps.requirements": "Kröfur",
+  "steps.database": "Gagnagrunnur",
+  "steps.site": "Vefur",
+  "steps.owner": "Eigandi",
+  "steps.install": "Uppsetning",
+  "language.label": "Tungumál",
+  "common.back": "Til baka",
+  "install.button": "Setja upp Luma CMS"
+}

@@ -19,53 +19,30 @@ import {
   useSetupRequirements,
   useSetupStatus,
 } from '../hooks/useSetup'
+import { SetupI18nProvider } from '../i18n/SetupI18nContext'
+import { translateApiError } from '../i18n/translateApiError'
+import { translateRequirementCheck } from '../i18n/setupI18nHelpers'
+import { useSetupI18n } from '../i18n/useSetupI18n'
 import {
   clearSetupWizardState,
   loadSetupWizardState,
   saveSetupWizardState,
 } from '../setupWizardStorage'
 
-const steps = [
-  'Welcome',
-  'Requirements',
-  'Database',
-  'Site settings',
-  'Owner account',
-  'Install',
-] as const
-
 const blockedPasswords = new Set(['password', 'admin', 'change-me', 'password123'])
 
-function isStrongPassword(password: string): string | null {
-  if (password.length < 12) {
-    return 'Use at least 12 characters for the owner password.'
-  }
+const stepKeys = [
+  'steps.welcome',
+  'steps.requirements',
+  'steps.database',
+  'steps.site',
+  'steps.owner',
+  'steps.install',
+] as const
 
-  if (blockedPasswords.has(password.toLowerCase())) {
-    return 'Choose a stronger password — avoid common defaults like "password" or "admin".'
-  }
-
-  return null
-}
-
-function requirementsErrorMessage(error: unknown): string {
-  if (error instanceof ApiError) {
-    if (error.status === 403) {
-      return 'Could not read server requirements (access denied). Check nginx /api/ routing.'
-    }
-
-    return error.message
-  }
-
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  return 'Could not load server requirements.'
-}
-
-export function SetupWizardPage() {
+function SetupWizardContent() {
   const navigate = useNavigate()
+  const { t, locale, setLocale, suggestedLocale, regionHint, languages } = useSetupI18n()
   const statusQuery = useSetupStatus()
   const savedState = loadSetupWizardState()
   const [stepIndex, setStepIndex] = useState(savedState?.stepIndex ?? 0)
@@ -85,7 +62,10 @@ export function SetupWizardPage() {
   const [adminPassword, setAdminPassword] = useState('')
   const [adminPasswordConfirm, setAdminPasswordConfirm] = useState('')
   const [withStarterSite, setWithStarterSite] = useState(savedState?.withStarterSite ?? true)
+  const [allowWeakPassword, setAllowWeakPassword] = useState(savedState?.allowWeakPassword ?? false)
   const [error, setError] = useState<string | null>(null)
+
+  const steps = useMemo(() => stepKeys.map((key) => t(key)), [t])
 
   useEffect(() => {
     if (statusQuery.data?.installed) {
@@ -110,6 +90,8 @@ export function SetupWizardPage() {
       ownerName,
       adminEmail,
       withStarterSite,
+      locale,
+      allowWeakPassword,
     })
   }, [
     stepIndex,
@@ -122,10 +104,12 @@ export function SetupWizardPage() {
     ownerName,
     adminEmail,
     withStarterSite,
+    locale,
+    allowWeakPassword,
     statusQuery.data?.installed,
   ])
 
-  const progress = useMemo(() => Math.round(((stepIndex + 1) / steps.length) * 100), [stepIndex])
+  const progress = useMemo(() => Math.round(((stepIndex + 1) / steps.length) * 100), [stepIndex, steps.length])
 
   const databasePayload = {
     driver,
@@ -136,6 +120,67 @@ export function SetupWizardPage() {
     password,
   }
 
+  function validatePassword(): string | null {
+    if (adminPassword !== adminPasswordConfirm) {
+      return t('owner.passwordMismatch')
+    }
+
+    if (allowWeakPassword) {
+      if (adminPassword.length < 8) {
+        return t('errors.password.minLength', { min: 8 })
+      }
+
+      return null
+    }
+
+    if (adminPassword.length < 12) {
+      return t('errors.password.minLength', { min: 12 })
+    }
+
+    if (blockedPasswords.has(adminPassword.toLowerCase())) {
+      return t('errors.password.strongRequired')
+    }
+
+    return null
+  }
+
+  function resolveApiError(err: unknown, fallbackKey: string): string {
+    if (err instanceof ApiError) {
+      if (err.status === 429) {
+        return t('errors.finish.rateLimited')
+      }
+
+      if (err.errors?.admin_password?.[0]?.startsWith('errors.')) {
+        const key = err.errors.admin_password[0]
+        return t(key, key === 'errors.password.minLength' ? { min: 12 } : undefined)
+      }
+
+      return translateApiError(t, err, fallbackKey)
+    }
+
+    if (err instanceof Error && err.message) {
+      return err.message
+    }
+
+    return t(fallbackKey)
+  }
+
+  function requirementsErrorMessage(errorValue: unknown): string {
+    if (errorValue instanceof ApiError) {
+      if (errorValue.status === 403) {
+        return t('errors.requirements.accessDenied')
+      }
+
+      return translateApiError(t, errorValue, 'errors.requirements.loadFailed')
+    }
+
+    if (errorValue instanceof Error) {
+      return errorValue.message
+    }
+
+    return t('errors.requirements.loadFailed')
+  }
+
   async function handleDatabaseNext() {
     setError(null)
     try {
@@ -143,25 +188,14 @@ export function SetupWizardPage() {
       await saveMutation.mutateAsync(databasePayload)
       setStepIndex(3)
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : err instanceof Error
-            ? err.message
-            : 'Database setup failed',
-      )
+      setError(resolveApiError(err, 'errors.database.saveFailed'))
     }
   }
 
   function handleOwnerNext() {
     setError(null)
 
-    if (adminPassword !== adminPasswordConfirm) {
-      setError('Passwords do not match.')
-      return
-    }
-
-    const passwordError = isStrongPassword(adminPassword)
+    const passwordError = validatePassword()
     if (passwordError) {
       setError(passwordError)
       return
@@ -174,45 +208,51 @@ export function SetupWizardPage() {
     setError(null)
     try {
       const result = await finishMutation.mutateAsync({
-        site_title: siteTitle || ownerName || 'My Luma Site',
+        site_title: siteTitle || ownerName || t('install.defaultSiteTitle'),
         admin_email: adminEmail,
         admin_password: adminPassword,
         with_starter_site: withStarterSite,
+        allow_weak_password: allowWeakPassword,
       })
       clearSetupWizardState()
       navigate(result.redirect.replace(/^\/(?:studio|admin)/, '') || '/login', { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Installation failed')
+      setError(resolveApiError(err, 'errors.finish.installFailed'))
     }
+  }
+
+  const themeLabels = {
+    lightLabel: t('theme.dark'),
+    darkLabel: t('theme.light'),
+    lightAria: t('theme.switchToDark'),
+    darkAria: t('theme.switchToLight'),
   }
 
   if (statusQuery.isLoading) {
     return (
-      <InstallerShell>
-        <PageHeader
-          title="Install Luma CMS"
-          description="Browser setup wizard — no terminal required. Complete these steps once, then sign in at /admin/login."
-        />
+      <InstallerShell themeLabels={themeLabels}>
+        <PageHeader title={t('meta.title')} description={t('meta.description')} />
         <Card>
-          <LoadingState message="Checking installation status…" />
+          <LoadingState message={t('status.checking')} />
         </Card>
       </InstallerShell>
     )
   }
 
   return (
-    <InstallerShell>
-      <PageHeader
-        title="Install Luma CMS"
-        description="Browser setup wizard — no terminal required. Complete these steps once, then sign in at /admin/login."
-      />
+    <InstallerShell themeLabels={themeLabels}>
+      <PageHeader title={t('meta.title')} description={t('meta.description')} />
 
       <Card>
         <div className="mb-4 flex items-center justify-between gap-4">
           <p className="text-sm font-medium text-[var(--luma-color-text)]">
-            Step {stepIndex + 1} of {steps.length}: {steps[stepIndex]}
+            {t('common.stepProgress', {
+              current: stepIndex + 1,
+              total: steps.length,
+              step: steps[stepIndex],
+            })}
           </p>
-          <Badge tone="muted">{progress}%</Badge>
+          <Badge tone="muted">{t('common.percentComplete', { percent: progress })}</Badge>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-[var(--luma-color-progress-track)]">
           <div
@@ -226,64 +266,87 @@ export function SetupWizardPage() {
 
       {stepIndex === 0 && (
         <Card className="space-y-4">
-          <p className="text-lg font-semibold text-[var(--luma-color-text)]">Welcome to Luma CMS</p>
-          <HelpText>
-            This wizard configures your database, site settings, and owner account. You only run it
-            once after uploading the release archive to your hosting account.
-          </HelpText>
+          <p className="text-lg font-semibold text-[var(--luma-color-text)]">{t('welcome.title')}</p>
+          <HelpText>{t('welcome.intro')}</HelpText>
+
+          <div className="space-y-2">
+            <Select
+              label={t('language.label')}
+              value={locale}
+              onChange={(event) => setLocale(event.target.value)}
+            >
+              {languages.map((language) => (
+                <option key={language.code} value={language.code}>
+                  {language.nativeName}
+                  {language.code === suggestedLocale ? ` — ${t('language.suggested')}` : ''}
+                </option>
+              ))}
+            </Select>
+            {regionHint && (
+              <HelpText>{t('language.regionHint', { region: regionHint })}</HelpText>
+            )}
+          </div>
+
           <div className={mutedPanelClassName()}>
             <p>
-              <span className="font-medium">Version:</span>{' '}
-              {statusQuery.data?.version ?? 'Unknown'}
+              <span className="font-medium">{t('welcome.version')}</span>{' '}
+              {statusQuery.data?.version ?? t('common.unknown')}
             </p>
             <p className="mt-1">
-              <span className="font-medium">Web root:</span> point your domain at the folder
-              containing <code>index.php</code> and <code>apps/</code>
+              <span className="font-medium">{t('welcome.webRoot')}</span> {t('welcome.webRootHelp')}
             </p>
           </div>
-          <HelpText>
-            Safe defaults are used for cache, session, and queue (file/file/database). Redis is not
-            required on shared hosting.
-          </HelpText>
+          <HelpText>{t('welcome.defaultsHelp')}</HelpText>
           <div className="flex justify-end">
-            <Button onClick={() => setStepIndex(1)}>Start setup</Button>
+            <Button onClick={() => setStepIndex(1)}>{t('welcome.start')}</Button>
           </div>
         </Card>
       )}
 
       {stepIndex === 1 && (
         <Card>
-          {requirementsQuery.isLoading && <LoadingState message="Checking server requirements…" />}
+          {requirementsQuery.isLoading && <LoadingState message={t('requirements.loading')} />}
           {requirementsQuery.isError && (
             <div className="space-y-3">
               <ErrorAlert message={requirementsErrorMessage(requirementsQuery.error)} />
               <Button variant="secondary" onClick={() => void requirementsQuery.refetch()}>
-                Retry requirements check
+                {t('requirements.retry')}
               </Button>
             </div>
           )}
           {requirementsQuery.data && (
             <ul className="space-y-3">
-              {requirementsQuery.data.checks.map((check) => (
-                <li key={check.id} className={listItemPanelClassName()}>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-[var(--luma-color-text)]">{check.label}</span>
-                    <Badge tone={check.status === 'failed' ? 'warning' : check.status === 'warning' ? 'warning' : 'success'}>
-                      {check.status}
-                    </Badge>
-                  </div>
-                  <p className="mt-1 text-sm text-[var(--luma-color-text-muted)]">{check.message}</p>
-                </li>
-              ))}
+              {requirementsQuery.data.checks.map((check) => {
+                const translated = translateRequirementCheck(check, t)
+
+                return (
+                  <li key={check.id} className={listItemPanelClassName()}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium text-[var(--luma-color-text)]">{translated.label}</span>
+                      <Badge
+                        tone={
+                          check.status === 'failed'
+                            ? 'warning'
+                            : check.status === 'warning'
+                              ? 'warning'
+                              : 'success'
+                        }
+                      >
+                        {t(`status.${check.status}`)}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 text-sm text-[var(--luma-color-text-muted)]">{translated.message}</p>
+                  </li>
+                )
+              })}
             </ul>
           )}
           <div className="mt-6 flex justify-between gap-2">
-            <Button variant="secondary" onClick={() => setStepIndex(0)}>Back</Button>
-            <Button
-              disabled={!requirementsQuery.data?.passed}
-              onClick={() => setStepIndex(2)}
-            >
-              Continue
+            <Button variant="secondary" onClick={() => setStepIndex(0)}>
+              {t('common.back')}
+            </Button>
+            <Button disabled={!requirementsQuery.data?.passed} onClick={() => setStepIndex(2)}>
+              {t('common.continue')}
             </Button>
           </div>
         </Card>
@@ -291,45 +354,60 @@ export function SetupWizardPage() {
 
       {stepIndex === 2 && (
         <Card className="space-y-4">
-          <HelpText>
-            Test the connection before continuing. Credentials are saved to <code>.env</code> on
-            your server — never displayed in the browser after save.
-          </HelpText>
+          <HelpText>{t('database.help')}</HelpText>
           <Select
-            label="Database driver"
+            label={t('database.driver.label')}
             value={driver}
             onChange={(event) => setDriver(event.target.value)}
           >
-            <option value="mysql">MySQL (shared hosting)</option>
-            <option value="mariadb">MariaDB</option>
-            <option value="pgsql">PostgreSQL</option>
-            <option value="sqlite">SQLite (simple / local)</option>
+            <option value="mysql">{t('database.driver.mysql')}</option>
+            <option value="mariadb">{t('database.driver.mariadb')}</option>
+            <option value="pgsql">{t('database.driver.pgsql')}</option>
+            <option value="sqlite">{t('database.driver.sqlite')}</option>
           </Select>
           {driver !== 'sqlite' && (
             <>
-              <Input label="Host" value={host} onChange={(event) => setHost(event.target.value)} />
-              <Input label="Port" value={port} onChange={(event) => setPort(event.target.value)} />
-              <Input label="Database name" value={database} onChange={(event) => setDatabase(event.target.value)} />
-              <Input label="Username" value={username} onChange={(event) => setUsername(event.target.value)} />
-              <Input label="Password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+              <Input label={t('database.host')} value={host} onChange={(event) => setHost(event.target.value)} />
+              <Input label={t('database.port')} value={port} onChange={(event) => setPort(event.target.value)} />
+              <Input
+                label={t('database.name')}
+                value={database}
+                onChange={(event) => setDatabase(event.target.value)}
+              />
+              <Input
+                label={t('database.username')}
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+              />
+              <Input
+                label={t('database.password')}
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
             </>
           )}
           {driver === 'sqlite' && (
             <Input
-              label="Database file path (optional)"
+              label={t('database.sqlitePath')}
               value={database}
               onChange={(event) => setDatabase(event.target.value)}
-              placeholder="Leave empty for default database/database.sqlite"
+              placeholder={t('database.sqlitePlaceholder')}
             />
           )}
           <div className="flex justify-between gap-2">
-            <Button variant="secondary" onClick={() => setStepIndex(1)}>Back</Button>
-            <Button onClick={() => void handleDatabaseNext()} disabled={testMutation.isPending || saveMutation.isPending}>
+            <Button variant="secondary" onClick={() => setStepIndex(1)}>
+              {t('common.back')}
+            </Button>
+            <Button
+              onClick={() => void handleDatabaseNext()}
+              disabled={testMutation.isPending || saveMutation.isPending}
+            >
               {testMutation.isPending
-                ? 'Testing…'
+                ? t('database.testing')
                 : saveMutation.isPending
-                  ? 'Saving…'
-                  : 'Test connection & continue'}
+                  ? t('database.saving')
+                  : t('database.testAndContinue')}
             </Button>
           </div>
         </Card>
@@ -338,17 +416,17 @@ export function SetupWizardPage() {
       {stepIndex === 3 && (
         <Card className="space-y-4">
           <Input
-            label="Site title"
+            label={t('site.title')}
             value={siteTitle}
             onChange={(event) => setSiteTitle(event.target.value)}
-            placeholder="Bohdan Portfolio"
+            placeholder={t('site.titlePlaceholder')}
           />
-          <HelpText>
-            Used as the site name in settings and as a fallback label for your owner profile.
-          </HelpText>
+          <HelpText>{t('site.help')}</HelpText>
           <div className="flex justify-between gap-2">
-            <Button variant="secondary" onClick={() => setStepIndex(2)}>Back</Button>
-            <Button onClick={() => setStepIndex(4)}>Continue</Button>
+            <Button variant="secondary" onClick={() => setStepIndex(2)}>
+              {t('common.back')}
+            </Button>
+            <Button onClick={() => setStepIndex(4)}>{t('common.continue')}</Button>
           </div>
         </Card>
       )}
@@ -356,52 +434,78 @@ export function SetupWizardPage() {
       {stepIndex === 4 && (
         <Card className="space-y-4">
           <Input
-            label="Owner name"
+            label={t('owner.name')}
             value={ownerName}
             onChange={(event) => setOwnerName(event.target.value)}
-            placeholder="Your name"
+            placeholder={t('owner.namePlaceholder')}
           />
-          <Input label="Owner email" type="email" value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)} />
-          <Input label="Owner password" type="password" value={adminPassword} onChange={(event) => setAdminPassword(event.target.value)} />
           <Input
-            label="Confirm password"
+            label={t('owner.email')}
+            type="email"
+            value={adminEmail}
+            onChange={(event) => setAdminEmail(event.target.value)}
+          />
+          <Input
+            label={t('owner.password')}
+            type="password"
+            value={adminPassword}
+            onChange={(event) => setAdminPassword(event.target.value)}
+          />
+          <Input
+            label={t('owner.passwordConfirm')}
             type="password"
             value={adminPasswordConfirm}
             onChange={(event) => setAdminPasswordConfirm(event.target.value)}
           />
-          <HelpText>
-            Minimum 12 characters. The first account receives the owner role with full system access.
-          </HelpText>
+          <HelpText>{allowWeakPassword ? t('owner.passwordHelpWeak') : t('owner.passwordHelp')}</HelpText>
           <Checkbox
-            label="Install starter business site (home page, menus, contact form)"
+            label={t('owner.allowWeakPassword')}
+            checked={allowWeakPassword}
+            onChange={(event) => setAllowWeakPassword(event.target.checked)}
+          />
+          {allowWeakPassword && <HelpText>{t('owner.allowWeakPasswordHelp')}</HelpText>}
+          <Checkbox
+            label={t('owner.starterSite')}
             checked={withStarterSite}
             onChange={(event) => setWithStarterSite(event.target.checked)}
           />
           <div className="flex justify-between gap-2">
-            <Button variant="secondary" onClick={() => setStepIndex(3)}>Back</Button>
-            <Button onClick={handleOwnerNext}>Continue</Button>
+            <Button variant="secondary" onClick={() => setStepIndex(3)}>
+              {t('common.back')}
+            </Button>
+            <Button onClick={handleOwnerNext}>{t('common.continue')}</Button>
           </div>
         </Card>
       )}
 
       {stepIndex === 5 && (
         <Card className="space-y-4">
-          <HelpText>
-            Luma CMS will write your configuration, run migrations, create the owner account, and
-            optionally install starter content. Session, cache, and queue use file/file/database
-            drivers — no Redis required.
-          </HelpText>
+          <HelpText>{t('install.help')}</HelpText>
           <ul className="list-disc space-y-1 pl-5 text-sm text-[var(--luma-color-text)]">
-            <li>Generate application key if missing</li>
-            <li>Run database migrations and seed roles</li>
-            <li>Create owner: {adminEmail || '(email not set)'}</li>
-            <li>Site title: {siteTitle || ownerName || 'My Luma Site'}</li>
-            <li>Starter site: {withStarterSite ? 'Yes' : 'No'}</li>
+            <li>{t('install.generateKey')}</li>
+            <li>{t('install.migrations')}</li>
+            <li>
+              {t('install.createOwner', {
+                email: adminEmail || t('install.emailNotSet'),
+              })}
+            </li>
+            <li>
+              {t('install.siteTitle', {
+                title: siteTitle || ownerName || t('install.defaultSiteTitle'),
+              })}
+            </li>
+            <li>
+              {t('install.starterSite', {
+                value: withStarterSite ? t('common.yes') : t('common.no'),
+              })}
+            </li>
           </ul>
           <div className="flex justify-between gap-2">
-            <Button variant="secondary" onClick={() => setStepIndex(4)}>Back</Button>
+            <Button variant="secondary" onClick={() => setStepIndex(4)}>
+              {t('common.back')}
+            </Button>
             <Button onClick={() => void handleFinish()} disabled={finishMutation.isPending}>
-              {finishMutation.isPending ? 'Installing…' : 'Install Luma CMS'}
+              {finishMutation.isPending ? t('install.installing') : t('install.button')}
             </Button>
           </div>
         </Card>
@@ -409,11 +513,11 @@ export function SetupWizardPage() {
 
       <Card>
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--luma-color-muted-text)]">
-          Setup log
+          {t('log.title')}
         </p>
         <div className="max-h-48 space-y-2 overflow-y-auto text-sm">
           {(logsQuery.data?.logs ?? []).length === 0 && (
-            <p className="text-[var(--luma-color-text-muted)]">Log entries appear as setup steps run.</p>
+            <p className="text-[var(--luma-color-text-muted)]">{t('log.empty')}</p>
           )}
           {(logsQuery.data?.logs ?? []).map((entry) => (
             <div key={entry.id} className={listItemPanelClassName()}>
@@ -428,4 +532,10 @@ export function SetupWizardPage() {
       </Card>
     </InstallerShell>
   )
+}
+
+export function SetupWizardPage() {
+  const savedState = loadSetupWizardState()
+
+  return <SetupI18nProvider initialLocale={savedState?.locale}><SetupWizardContent /></SetupI18nProvider>
 }

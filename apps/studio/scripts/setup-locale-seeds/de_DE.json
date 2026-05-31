@@ -1,0 +1,14 @@
+{
+  "common.continue": "Weiter",
+  "welcome.start": "Einrichtung starten",
+  "welcome.title": "Willkommen bei Luma CMS",
+  "steps.welcome": "Willkommen",
+  "steps.requirements": "Anforderungen",
+  "steps.database": "Datenbank",
+  "steps.site": "Website",
+  "steps.owner": "Inhaber",
+  "steps.install": "Installation",
+  "language.label": "Sprache",
+  "common.back": "Zurück",
+  "install.button": "Luma CMS installieren"
+}

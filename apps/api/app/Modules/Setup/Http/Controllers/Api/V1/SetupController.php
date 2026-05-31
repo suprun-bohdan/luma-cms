@@ -57,10 +57,10 @@ final class SetupController extends Controller
         } catch (Throwable $exception) {
             $setupLog->write('database.test', 'error', $exception->getMessage());
 
-            return response()->json([
-                'ok' => false,
-                'message' => $exception->getMessage(),
-            ], 422);
+            return $this->setupError(
+                message: $exception->getMessage(),
+                messageKey: 'errors.database.connectionFailed',
+            );
         }
     }
 
@@ -77,9 +77,10 @@ final class SetupController extends Controller
         } catch (Throwable $exception) {
             $setupLog->write('database.save', 'error', $exception->getMessage());
 
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
+            return $this->setupError(
+                message: $exception->getMessage(),
+                messageKey: 'errors.database.connectionFailed',
+            );
         }
 
         $driver = $config['driver'];
@@ -88,9 +89,10 @@ final class SetupController extends Controller
 
         if (! is_file($envPath) && is_file($envExample)) {
             if (! @copy($envExample, $envPath)) {
-                return response()->json([
-                    'message' => 'Unable to create apps/api/.env. Make the apps/api folder writable by the web server.',
-                ], 422);
+                return $this->setupError(
+                    message: 'Unable to create apps/api/.env. Make the apps/api folder writable by the web server.',
+                    messageKey: 'errors.database.envNotWritable',
+                );
             }
         }
 
@@ -114,9 +116,10 @@ final class SetupController extends Controller
         } catch (Throwable $exception) {
             $setupLog->write('database.save', 'error', $exception->getMessage());
 
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
+            return $this->setupError(
+                message: $exception->getMessage(),
+                messageKey: 'errors.database.envMergeFailed',
+            );
         }
 
         $setupLog->write('database.save', 'success', 'Database settings saved to .env');
@@ -128,7 +131,15 @@ final class SetupController extends Controller
         SetupFinishRequest $request,
         InstallService $installService,
         EnvFileWriter $envFileWriter,
+        InstallationStateService $installationState,
     ): JsonResponse {
+        if ($installationState->isInstalled()) {
+            return $this->setupError(
+                message: 'Luma CMS is already installed.',
+                messageKey: 'errors.finish.alreadyInstalled',
+            );
+        }
+
         if ($request->filled('site_title')) {
             $envFileWriter->merge(base_path('.env'), [
                 'APP_NAME' => $request->string('site_title')->toString(),
@@ -142,16 +153,34 @@ final class SetupController extends Controller
                 adminPassword: $request->string('admin_password')->toString(),
                 withStarterSite: $request->boolean('with_starter_site', true),
                 siteTitle: $request->input('site_title'),
+                allowWeakPassword: $request->boolean('allow_weak_password'),
             ));
         } catch (Throwable $exception) {
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
+            return $this->setupError(
+                message: $exception->getMessage(),
+                messageKey: 'errors.finish.installFailed',
+            );
         }
 
         return response()->json([
             'ok' => true,
             'redirect' => '/admin/login',
         ]);
+    }
+
+    /**
+     * @param  array<string, string|int|float>  $messageParams
+     */
+    private function setupError(
+        string $message,
+        string $messageKey,
+        array $messageParams = [],
+        int $status = 422,
+    ): JsonResponse {
+        return response()->json([
+            'message' => $message,
+            'message_key' => $messageKey,
+            'message_params' => $messageParams === [] ? new \stdClass() : $messageParams,
+        ], $status);
     }
 }

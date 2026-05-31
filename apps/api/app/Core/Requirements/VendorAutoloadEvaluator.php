@@ -18,6 +18,7 @@ final class VendorAutoloadEvaluator implements RequirementEvaluator
                 label: 'Application vendor bundle',
                 status: RequirementStatus::Failed,
                 message: 'vendor/autoload.php is missing. Use a release archive with bundled vendor or run composer install locally.',
+                messageKey: RequirementCheck::messageKeyFor('vendor.autoload', 'failed'),
             );
         }
 
@@ -26,6 +27,7 @@ final class VendorAutoloadEvaluator implements RequirementEvaluator
             label: 'Application vendor bundle',
             status: RequirementStatus::Passed,
             message: 'Vendor autoload is present.',
+            messageKey: RequirementCheck::messageKeyFor('vendor.autoload', 'passed'),
         );
     }
 }

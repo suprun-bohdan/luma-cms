@@ -18,10 +18,26 @@ final class AllowedProductionPassword implements ValidationRule
             return;
         }
 
+        $allowWeak = request()->boolean('allow_weak_password');
+
         try {
-            app(ProductionPasswordGuard::class)->assertAllowed($value);
+            app(ProductionPasswordGuard::class)->assertAllowed($value, $allowWeak);
         } catch (\InvalidArgumentException $exception) {
-            $fail($exception->getMessage());
+            $message = $exception->getMessage();
+
+            if (str_contains($message, 'at least 12 characters')) {
+                $fail('errors.password.minLength');
+
+                return;
+            }
+
+            if (str_contains($message, 'not allowed')) {
+                $fail('errors.password.blocked');
+
+                return;
+            }
+
+            $fail($message);
         }
     }
 }

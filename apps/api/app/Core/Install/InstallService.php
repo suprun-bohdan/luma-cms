@@ -197,7 +197,7 @@ final class InstallService
         $email = $options->adminEmail ?: env('LUMA_SEED_ADMIN_EMAIL', 'admin@luma.test');
         $password = $options->adminPassword ?: env('LUMA_SEED_ADMIN_PASSWORD', 'password');
 
-        $this->passwordGuard->assertAllowed($password);
+        $this->passwordGuard->assertAllowed($password, $options->allowWeakPassword);
 
         $ownerRole = Role::query()->where('slug', 'owner')->firstOrFail();
 

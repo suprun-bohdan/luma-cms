@@ -20,10 +20,14 @@ final class ProductionPasswordGuard
         'changeme',
     ];
 
-    public function assertAllowed(string $password): void
+    public function assertAllowed(string $password, bool $allowWeak = false): void
     {
         if (trim($password) === '') {
             throw new InvalidArgumentException('Admin password cannot be empty.');
+        }
+
+        if ($allowWeak) {
+            return;
         }
 
         if (! $this->isEnforced()) {

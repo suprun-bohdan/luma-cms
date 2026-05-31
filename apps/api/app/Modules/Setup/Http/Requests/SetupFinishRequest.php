@@ -22,6 +22,7 @@ final class SetupFinishRequest extends FormRequest
             'admin_email' => ['required', 'email', 'max:255'],
             'admin_password' => ['required', 'string', 'min:8', 'max:255', new AllowedProductionPassword()],
             'with_starter_site' => ['sometimes', 'boolean'],
+            'allow_weak_password' => ['sometimes', 'boolean'],
         ];
     }
 }

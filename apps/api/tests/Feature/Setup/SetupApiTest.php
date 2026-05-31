@@ -20,7 +20,7 @@ final class SetupApiTest extends TestCase
         $this->getJson('/api/v1/setup/status')
             ->assertOk()
             ->assertJsonPath('installed', false)
-            ->assertJsonPath('version', '0.0.25-rc.11');
+            ->assertJsonPath('version', '0.0.25-rc.12');
     }
 
     public function test_sqlite_database_test_uses_default_path_when_empty(): void
@@ -210,6 +210,77 @@ final class SetupApiTest extends TestCase
         $this->getJson('/api/v1/setup/requirements', [
             'X-Luma-Setup-Token' => 'wrong-token',
         ])->assertForbidden();
+    }
+
+    public function test_system_requirements_include_message_keys(): void
+    {
+        config(['luma.setup_token' => '']);
+
+        $response = $this->getJson('/api/v1/system/requirements')
+            ->assertOk()
+            ->assertJsonStructure([
+                'passed',
+                'checks' => [
+                    '*' => [
+                        'id',
+                        'label',
+                        'status',
+                        'message',
+                        'label_key',
+                        'message_key',
+                        'message_params',
+                    ],
+                ],
+            ]);
+
+        $checks = $response->json('checks');
+        $this->assertNotEmpty($checks);
+
+        foreach ($checks as $check) {
+            $this->assertNotEmpty($check['label_key']);
+            $this->assertNotEmpty($check['message_key']);
+        }
+    }
+
+    public function test_setup_finish_allows_weak_password_when_opted_in(): void
+    {
+        $this->seed(\App\Modules\Users\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        config(['luma.enforce_strong_passwords' => true]);
+
+        $state = app(InstallationStateService::class);
+        $installPath = $state->installScriptPath();
+
+        try {
+            $this->postJson('/api/v1/setup/finish', [
+                'site_title' => 'Weak Pass Site',
+                'admin_email' => 'weak@luma.test',
+                'admin_password' => 'short123',
+                'allow_weak_password' => true,
+            ])
+                ->assertOk()
+                ->assertJsonPath('ok', true);
+
+            $this->assertDatabaseHas('users', ['email' => 'weak@luma.test']);
+        } finally {
+            SharedHostingInstallScript::restore();
+        }
+    }
+
+    public function test_setup_finish_rejects_weak_password_without_opt_in(): void
+    {
+        $this->seed(\App\Modules\Users\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        config(['luma.enforce_strong_passwords' => true]);
+
+        $this->postJson('/api/v1/setup/finish', [
+            'site_title' => 'Prod Site',
+            'admin_email' => 'prod2@luma.test',
+            'admin_password' => 'short123',
+            'allow_weak_password' => false,
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['admin_password']);
     }
 
     public function test_production_rejects_weak_admin_password(): void

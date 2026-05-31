@@ -6,16 +6,22 @@ const apiBase = import.meta.env.VITE_API_BASE_URL ?? ''
 export class ApiError extends Error {
   public readonly status: number
   public readonly errors?: Record<string, string[]>
+  public readonly messageKey?: string
+  public readonly messageParams?: Record<string, string | number>
 
   constructor(
     message: string,
     status: number,
     errors?: Record<string, string[]>,
+    messageKey?: string,
+    messageParams?: Record<string, string | number>,
   ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.errors = errors
+    this.messageKey = messageKey
+    this.messageParams = messageParams
   }
 }
 
@@ -37,6 +43,43 @@ async function parseJson(response: Response): Promise<unknown> {
   }
 
   return JSON.parse(text) as unknown
+}
+
+function throwApiError(payload: unknown, status: number): never {
+  const messageKey =
+    typeof payload === 'object' &&
+    payload !== null &&
+    'message_key' in payload &&
+    typeof payload.message_key === 'string'
+      ? payload.message_key
+      : undefined
+
+  const messageParams =
+    typeof payload === 'object' &&
+    payload !== null &&
+    'message_params' in payload &&
+    typeof payload.message_params === 'object' &&
+    payload.message_params !== null
+      ? (payload.message_params as Record<string, string | number>)
+      : undefined
+
+  const message =
+    typeof payload === 'object' &&
+    payload !== null &&
+    'message' in payload &&
+    typeof payload.message === 'string'
+      ? payload.message
+      : `Request failed: ${status}`
+
+  const errors =
+    typeof payload === 'object' &&
+    payload !== null &&
+    'errors' in payload &&
+    typeof payload.errors === 'object'
+      ? (payload.errors as Record<string, string[]>)
+      : undefined
+
+  throw new ApiError(message, status, errors, messageKey, messageParams)
 }
 
 export async function apiRequest<T>({
@@ -71,23 +114,7 @@ export async function apiRequest<T>({
   const payload = await parseJson(response)
 
   if (!response.ok) {
-    const message =
-      typeof payload === 'object' &&
-      payload !== null &&
-      'message' in payload &&
-      typeof payload.message === 'string'
-        ? payload.message
-        : `Request failed: ${response.status}`
-
-    const errors =
-      typeof payload === 'object' &&
-      payload !== null &&
-      'errors' in payload &&
-      typeof payload.errors === 'object'
-        ? (payload.errors as Record<string, string[]>)
-        : undefined
-
-    throw new ApiError(message, response.status, errors)
+    throwApiError(payload, response.status)
   }
 
   if (response.status === 204) {
@@ -152,23 +179,7 @@ export async function apiUpload<T>(
   const payload = await parseJson(response)
 
   if (!response.ok) {
-    const message =
-      typeof payload === 'object' &&
-      payload !== null &&
-      'message' in payload &&
-      typeof payload.message === 'string'
-        ? payload.message
-        : `Request failed: ${response.status}`
-
-    const errors =
-      typeof payload === 'object' &&
-      payload !== null &&
-      'errors' in payload &&
-      typeof payload.errors === 'object'
-        ? (payload.errors as Record<string, string[]>)
-        : undefined
-
-    throw new ApiError(message, response.status, errors)
+    throwApiError(payload, response.status)
   }
 
   const parsed = wrappedSchema(itemSchema).parse(payload)

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.12] - 2026-05-31
+
+### Added
+
+- Multilingual setup wizard (~130 WordPress locales, browser/region suggestion, language selector on welcome step)
+- Structured setup/requirements API messages via `message_key` and `message_params` for Studio translation
+- Owner step option to allow weak passwords during setup (`allow_weak_password` on finish API)
+- Studio scripts: `validate:setup-i18n`, `generate:setup-locales`, `build-setup-language-catalog.mjs`
+
 ## [0.0.25-rc.11] - 2026-05-31
 
 ### Fixed
