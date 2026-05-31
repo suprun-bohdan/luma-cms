@@ -2,6 +2,10 @@
 **/vendor/
 node_modules/
 **/node_modules/
+
+# Product docs (maintained outside git / in outer workspace)
+/docs/
+
 npm-debug.log
 yarn-error.log
 
