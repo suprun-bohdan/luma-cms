@@ -297,4 +297,45 @@ final class PageApiTest extends TestCase
 
         $response->assertUnprocessable();
     }
+
+    public function test_admin_creates_page_with_feature_grid_and_faq_blocks(): void
+    {
+        $response = $this->postJson(
+            '/api/v1/pages',
+            [
+                'title' => 'Services',
+                'slug' => 'services',
+                'content' => [
+                    'blocks' => [
+                        [
+                            'id' => 'features-1',
+                            'type' => 'feature_grid',
+                            'props' => [
+                                'heading' => 'Why us',
+                                'items' => [
+                                    ['title' => 'Fast', 'body' => 'Ship quickly'],
+                                ],
+                            ],
+                        ],
+                        [
+                            'id' => 'faq-1',
+                            'type' => 'faq',
+                            'props' => [
+                                'heading' => 'FAQ',
+                                'items' => [
+                                    ['question' => 'How?', 'answer' => 'With blocks.'],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response
+            ->assertCreated()
+            ->assertJsonPath('slug', 'services')
+            ->assertJsonCount(2, 'content.blocks');
+    }
 }

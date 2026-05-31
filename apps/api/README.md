@@ -93,6 +93,7 @@ POST   /api/v1/plugins/{plugin_id}/disable    requires plugins.manage
 POST   /api/v1/plugins/{plugin_id}/capabilities/approve  requires plugins.manage
 DELETE /api/v1/plugins/{plugin_id}            requires plugins.manage
 GET    /api/v1/audit-logs                     requires plugins.audit
+POST   /api/v1/pages/preview-html               requires pages.view (unsaved page preview)
 GET    /api/v1/pages/{slug}/preview-html       requires pages.view
 POST   /api/v1/pages/{slug}/preview-html       requires pages.view (live preview body)
 ```

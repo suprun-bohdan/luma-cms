@@ -2,15 +2,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
 import { LoadingState } from '../../../shared/components/LoadingState'
 import { PreviewPane } from '../../../shared/layout/SplitPane'
-import { previewPageHtml } from '../api/pagesApi'
+import { previewDraftPageHtml, previewPageHtml } from '../api/pagesApi'
 import type { PageContent, PageSeo } from '../schemas/page'
+
+const slugPattern = /^[a-z0-9-]+$/
 
 type PagePreviewPaneProps = {
   pageSlug: string
   title: string
   content: PageContent
   seo: PageSeo | null
-  enabled: boolean
+  isNew?: boolean
 }
 
 export function PagePreviewPane({
@@ -18,17 +20,21 @@ export function PagePreviewPane({
   title,
   content,
   seo,
-  enabled,
+  isNew = false,
 }: PagePreviewPaneProps) {
   const [html, setHtml] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const canPreview = enabled && pageSlug.trim() !== ''
+  const slug = pageSlug.trim()
+  const canPreview =
+    slug !== '' &&
+    slugPattern.test(slug) &&
+    title.trim() !== ''
 
   const previewPayload = useMemo(
-    () => JSON.stringify({ title, content, seo }),
-    [title, content, seo],
+    () => JSON.stringify({ slug, title, content, seo, isNew }),
+    [slug, title, content, seo, isNew],
   )
 
   useEffect(() => {
@@ -40,11 +46,11 @@ export function PagePreviewPane({
       setLoading(true)
       setError(null)
 
-      void previewPageHtml(pageSlug, {
-        title,
-        content,
-        seo,
-      })
+      const request = isNew
+        ? previewDraftPageHtml({ slug, title, content, seo })
+        : previewPageHtml(slug, { title, content, seo })
+
+      void request
         .then((response) => {
           setHtml(response.html)
         })
@@ -60,13 +66,13 @@ export function PagePreviewPane({
     return () => {
       window.clearTimeout(timer)
     }
-  }, [canPreview, pageSlug, previewPayload, title, content, seo])
+  }, [canPreview, slug, title, content, seo, isNew, previewPayload])
 
   if (!canPreview) {
     return (
       <PreviewPane title="Page preview">
         <p className="text-sm text-slate-500">
-          Save the page with a slug to enable live server-side preview.
+          Enter a title and valid slug (lowercase letters, numbers, hyphens) to enable live preview.
         </p>
       </PreviewPane>
     )

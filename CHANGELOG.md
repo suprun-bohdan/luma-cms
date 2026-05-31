@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.17] - 2026-05-31
+
+### Added
+
+- Ephemeral page preview API (`POST /api/v1/pages/preview-html`) for unsaved pages on `/pages/new`
+- Section templates in Studio (Blank, Landing, Contact page, Full landing)
+- New block types: `feature_grid`, `faq` (renderer, validator, inspector with item lists)
+- Grouped block palette (Content / Actions / Forms)
+
 ## [0.0.16] - 2026-05-31
 
 ### Added

@@ -63,6 +63,7 @@ Route::prefix('v1')->group(function (): void {
         Route::delete('/pages/{page:slug}', [PageController::class, 'destroy']);
         Route::post('/pages/{page:slug}/publish', [PageController::class, 'publish']);
         Route::post('/pages/{page:slug}/unpublish', [PageController::class, 'unpublish']);
+        Route::post('/pages/preview-html', [PagePreviewController::class, 'draft']);
         Route::get('/pages/{page:slug}/preview-html', [PagePreviewController::class, 'show']);
         Route::post('/pages/{page:slug}/preview-html', [PagePreviewController::class, 'store']);
 

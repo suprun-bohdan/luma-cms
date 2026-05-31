@@ -9,6 +9,7 @@ import { BlockInspector } from './BlockInspector'
 import { BlockListEditor } from './BlockListEditor'
 import { BlockPalette } from './BlockPalette'
 import { PagePreviewPane } from './PagePreviewPane'
+import { SectionTemplatePicker } from './SectionTemplatePicker'
 import { SeoPreviewPane } from './SeoPreviewPane'
 import { VisualBlockList } from './VisualBlockList'
 import { createUniqueBlockId, getBlockDefinition } from '../data/blockDefinitions'
@@ -23,7 +24,7 @@ import {
 
 type PageFormProps = {
   initialValues?: Partial<PageFormValues>
-  previewEnabled?: boolean
+  isNew?: boolean
   submitLabel: string
   loading?: boolean
   onSubmit: (values: PageFormValues) => void
@@ -56,7 +57,7 @@ function buildSeo(seoTitle: string, seoDescription: string, seoOgImage: string):
 
 export function PageForm({
   initialValues,
-  previewEnabled = true,
+  isNew = false,
   submitLabel,
   loading = false,
   onSubmit,
@@ -138,7 +139,7 @@ export function PageForm({
         {
           id,
           type,
-          props: { ...definition.defaultProps },
+          props: JSON.parse(JSON.stringify(definition.defaultProps)) as Record<string, unknown>,
         },
       ],
     }
@@ -209,7 +210,16 @@ export function PageForm({
       />
 
       <Fieldset legend="Page blocks">
-        <BlockPalette onAdd={handleAddBlock} />
+        <SectionTemplatePicker
+          content={content}
+          onApply={(next) => {
+            updateContent(next)
+            setSelectedBlockId(next.blocks[0]?.id ?? null)
+          }}
+        />
+        <div className="mt-4">
+          <BlockPalette onAdd={handleAddBlock} />
+        </div>
         <div className="mt-4">
           <VisualBlockList
             content={content}
@@ -292,7 +302,7 @@ export function PageForm({
           title={title}
           content={content}
           seo={seo}
-          enabled={previewEnabled}
+          isNew={isNew}
         />
       }
       right={rightColumn}

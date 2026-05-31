@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 
 final class PageContentValidator
 {
-    private const ALLOWED_TYPES = ['hero', 'rich_text', 'cta', 'contact_form'];
+    private const ALLOWED_TYPES = ['hero', 'rich_text', 'cta', 'contact_form', 'feature_grid', 'faq'];
 
     /**
      * @param  array<string, mixed>|null  $content
@@ -76,9 +76,78 @@ final class PageContentValidator
                 }
             }
 
+            if (in_array($type, ['feature_grid', 'faq'], true)) {
+                $normalized['props'] = $this->validateListBlockProps($type, $props, $index);
+            }
+
             $blocks[] = $normalized;
         }
 
         return ['blocks' => $blocks];
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     * @return array<string, mixed>
+     */
+    private function validateListBlockProps(string $type, array $props, int $index): array
+    {
+        $heading = $props['heading'] ?? '';
+        if (! is_string($heading)) {
+            throw ValidationException::withMessages([
+                "content.blocks.{$index}.props.heading" => ['Heading must be a string.'],
+            ]);
+        }
+
+        $items = $props['items'] ?? [];
+        if (! is_array($items)) {
+            throw ValidationException::withMessages([
+                "content.blocks.{$index}.props.items" => ['Items must be an array.'],
+            ]);
+        }
+
+        $normalizedItems = [];
+        foreach ($items as $itemIndex => $item) {
+            if (! is_array($item)) {
+                throw ValidationException::withMessages([
+                    "content.blocks.{$index}.props.items.{$itemIndex}" => ['Each item must be an object.'],
+                ]);
+            }
+
+            if ($type === 'feature_grid') {
+                $title = $item['title'] ?? '';
+                $body = $item['body'] ?? '';
+                if (! is_string($title) || ! is_string($body)) {
+                    throw ValidationException::withMessages([
+                        "content.blocks.{$index}.props.items.{$itemIndex}" => ['Feature items require string title and body.'],
+                    ]);
+                }
+
+                $normalizedItems[] = [
+                    'title' => $title,
+                    'body' => $body,
+                ];
+            }
+
+            if ($type === 'faq') {
+                $question = $item['question'] ?? '';
+                $answer = $item['answer'] ?? '';
+                if (! is_string($question) || ! is_string($answer)) {
+                    throw ValidationException::withMessages([
+                        "content.blocks.{$index}.props.items.{$itemIndex}" => ['FAQ items require string question and answer.'],
+                    ]);
+                }
+
+                $normalizedItems[] = [
+                    'question' => $question,
+                    'answer' => $answer,
+                ];
+            }
+        }
+
+        $props['heading'] = $heading;
+        $props['items'] = $normalizedItems;
+
+        return $props;
     }
 }

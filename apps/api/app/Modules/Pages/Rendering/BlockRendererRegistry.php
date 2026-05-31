@@ -29,6 +29,8 @@ final class BlockRendererRegistry
             'rich_text' => $this->renderRichText($props),
             'cta' => $this->renderCta($props),
             'contact_form' => $this->renderContactForm($props),
+            'feature_grid' => $this->renderFeatureGrid($props),
+            'faq' => $this->renderFaq($props),
             default => '',
         };
     }
@@ -102,6 +104,56 @@ final class BlockRendererRegistry
             'form' => $form,
             'title' => $title,
             'submitLabel' => $submitLabel,
+        ])->render();
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     */
+    private function renderFeatureGrid(array $props): string
+    {
+        $heading = e(is_string($props['heading'] ?? null) ? $props['heading'] : '');
+        $items = [];
+
+        foreach (is_array($props['items'] ?? null) ? $props['items'] : [] as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $items[] = [
+                'title' => e(is_string($item['title'] ?? null) ? $item['title'] : ''),
+                'body' => e(is_string($item['body'] ?? null) ? $item['body'] : ''),
+            ];
+        }
+
+        return View::make('pages.blocks.feature_grid', [
+            'heading' => $heading,
+            'items' => $items,
+        ])->render();
+    }
+
+    /**
+     * @param  array<string, mixed>  $props
+     */
+    private function renderFaq(array $props): string
+    {
+        $heading = e(is_string($props['heading'] ?? null) ? $props['heading'] : '');
+        $items = [];
+
+        foreach (is_array($props['items'] ?? null) ? $props['items'] : [] as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $items[] = [
+                'question' => e(is_string($item['question'] ?? null) ? $item['question'] : ''),
+                'answer' => e(is_string($item['answer'] ?? null) ? $item['answer'] : ''),
+            ];
+        }
+
+        return View::make('pages.blocks.faq', [
+            'heading' => $heading,
+            'items' => $items,
         ])->render();
     }
 

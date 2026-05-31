@@ -147,4 +147,34 @@ final class PagePreviewTest extends TestCase
 
         $response->assertForbidden();
     }
+
+    public function test_admin_previews_unsaved_page_without_database_record(): void
+    {
+        $this->assertDatabaseMissing('pages', ['slug' => 'preview-only']);
+
+        $response = $this->postJson(
+            '/api/v1/pages/preview-html',
+            [
+                'slug' => 'preview-only',
+                'title' => 'Preview Only',
+                'content' => [
+                    'blocks' => [
+                        [
+                            'id' => 'text-1',
+                            'type' => 'rich_text',
+                            'props' => ['body' => 'Ephemeral preview body'],
+                        ],
+                    ],
+                ],
+            ],
+            $this->withBearer($this->adminUser()),
+        );
+
+        $response
+            ->assertOk()
+            ->assertSee('Ephemeral preview body', false)
+            ->assertSee('Preview Only', false);
+
+        $this->assertDatabaseMissing('pages', ['slug' => 'preview-only']);
+    }
 }

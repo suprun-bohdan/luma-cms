@@ -113,4 +113,44 @@ final class PublicPageViewTest extends TestCase
             ->assertSee('name="name"', false)
             ->assertSee('/public/forms/contact/submit', false);
     }
+
+    public function test_published_page_renders_feature_grid_and_faq_blocks(): void
+    {
+        $page = Page::factory()->published()->create([
+            'slug' => 'services-public',
+            'content' => [
+                'blocks' => [
+                    [
+                        'id' => 'features-1',
+                        'type' => 'feature_grid',
+                        'props' => [
+                            'heading' => 'Why us',
+                            'items' => [
+                                ['title' => 'Fast delivery', 'body' => 'Launch in days'],
+                            ],
+                        ],
+                    ],
+                    [
+                        'id' => 'faq-1',
+                        'type' => 'faq',
+                        'props' => [
+                            'heading' => 'FAQ',
+                            'items' => [
+                                ['question' => 'Can I edit pages?', 'answer' => 'Yes, in Studio.'],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $response = $this->get('/p/'.$page->slug);
+
+        $response
+            ->assertOk()
+            ->assertSee('Why us')
+            ->assertSee('Fast delivery')
+            ->assertSee('Can I edit pages?')
+            ->assertSee('Yes, in Studio.');
+    }
 }

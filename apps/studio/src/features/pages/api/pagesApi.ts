@@ -88,3 +88,23 @@ export async function previewPageHtml(
     auth: true,
   })
 }
+
+export async function previewDraftPageHtml(body: {
+  slug: string
+  title: string
+  content: PageContent
+  seo: PageSeo | null
+}): Promise<{ html: string }> {
+  return apiRequest({
+    method: 'POST',
+    path: '/api/v1/pages/preview-html',
+    body: {
+      slug: body.slug,
+      title: body.title,
+      content: body.content,
+      seo: body.seo,
+    },
+    schema: previewHtmlSchema,
+    auth: true,
+  })
+}

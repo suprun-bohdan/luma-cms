@@ -2,7 +2,7 @@
 
 React TypeScript admin interface for Luma CMS.
 
-> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Business Website Kit + Forms + Visual Editing + Plugin admin.
+> **Status:** Phase 2 Studio Core + Media + Pages + Navigation + Business Website Kit + Forms + Visual Editing (4.3) + Plugin admin.
 
 ## Design system
 
@@ -62,7 +62,7 @@ apps/studio/src/
 | `/entries/:id/preview` | Admin + public preview |
 | `/media` | Media library (upload, alt text, delete) |
 | `/pages` | Pages list |
-| `/pages/new` | Create page (block templates + SEO preview) |
+| `/pages/new` | Create page (section templates, blocks, live preview before save) |
 | `/pages/:slug/edit` | Visual page editor (drag-and-drop blocks, preview, inspector) |
 | `/menus` | Navigation hub (header + footer) |
 | `/menus/footer` | Footer menu editor |
@@ -105,13 +105,14 @@ npm run lint
 
 1. Sign in at `/login` with dev credentials
 2. Upload an image at `/media`
-3. Create a page at `/pages/new` — save draft, then at `/pages/{slug}/edit` use block palette, drag-and-drop reorder, inspector, and live preview
-4. Publish and open public URL `/p/{slug}`
-5. Edit header menu at `/menus/header` — link to your page slug
-6. Optional: run demo seeder and open `/p/home` (includes contact form)
-7. Check `/forms/contact/submissions` after a form submit
-8. At `/plugins` — discover and install `luma.demo`, then enable
-9. Sign out — protected routes redirect to login; API returns 401 without token
+3. Create a page at `/pages/new` — pick a section template, add `feature_grid` or `faq` blocks, confirm live preview before save
+4. Save draft, then continue editing at `/pages/{slug}/edit` with drag-and-drop reorder and inspector
+5. Publish and open public URL `/p/{slug}`
+6. Edit header menu at `/menus/header` — link to your page slug
+7. Optional: run demo seeder and open `/p/home` (includes contact form)
+8. Check `/forms/contact/submissions` after a form submit
+9. At `/plugins` — discover and install `luma.demo`, then enable
+10. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling
 

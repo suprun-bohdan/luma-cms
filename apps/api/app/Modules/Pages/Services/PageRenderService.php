@@ -72,6 +72,23 @@ final class PageRenderService
         ])->render();
     }
 
+    /**
+     * @param  array<string, mixed>  $content
+     * @param  array<string, mixed>|null  $seo
+     */
+    public function renderDraftHtml(string $slug, string $title, array $content, ?array $seo = null): string
+    {
+        $page = new Page([
+            'slug' => $slug,
+            'title' => $title,
+            'template' => 'default-page',
+            'content' => $content,
+            'seo' => $seo,
+        ]);
+
+        return $this->renderHtml($page, $content, $seo, $title);
+    }
+
     private function resolveOgImageUrl(mixed $uuid): ?string
     {
         if (! is_string($uuid) || $uuid === '') {

@@ -131,7 +131,7 @@ export function PageEditPage() {
           <PageForm
             key={isNew ? 'new' : pageQuery.data!.updated_at ?? pageQuery.data!.slug}
             initialValues={isNew ? undefined : pageToFormValues(pageQuery.data!)}
-            previewEnabled={!isNew}
+            isNew={isNew}
             submitLabel={isNew ? 'Save draft' : 'Save changes'}
             loading={mutation.isPending}
             onSubmit={(values) => {
