@@ -93,6 +93,7 @@ POST   /api/v1/plugins/{plugin_id}/disable    requires plugins.manage
 POST   /api/v1/plugins/{plugin_id}/capabilities/approve  requires plugins.manage
 DELETE /api/v1/plugins/{plugin_id}            requires plugins.manage
 GET    /api/v1/audit-logs                     requires plugins.audit
+GET    /api/v1/admin/navigation-items           requires pages.view (Studio admin access)
 POST   /api/v1/pages/preview-html               requires pages.view (unsaved page preview)
 GET    /api/v1/pages/{slug}/preview-html       requires pages.view
 POST   /api/v1/pages/{slug}/preview-html       requires pages.view (live preview body)
@@ -147,7 +148,19 @@ Each plugin ships `luma.plugin.json` and a backend class implementing `App\Modul
 
 Dangerous capabilities require explicit admin approval before enable. Lifecycle events are written to `audit_logs`.
 
-Demo plugin: `plugins/luma.demo/` (extension point `system.booted`).
+**Extension points (Phase 5.1):**
+
+| Point | Required capability |
+|-------|---------------------|
+| `system.booted` | (none — boot hook) |
+| `content.afterCreate` | `content.create` |
+| `content.afterUpdate` | `content.update` |
+| `content.afterPublish` | `content.publish` |
+| `admin.navigation` | `admin.extend` |
+
+Hook listeners run only when the plugin is enabled, the capability is granted, and the point is declared in the manifest snapshot. Listener failures are logged and do not roll back the core action.
+
+Demo plugin: `plugins/luma.demo/` v0.2.0 — `system.booted`, `content.afterPublish`, `admin.navigation`. After upgrading manifest on disk, uninstall and reinstall the plugin to refresh the DB snapshot (no auto-upgrade path yet).
 
 ### Media
 

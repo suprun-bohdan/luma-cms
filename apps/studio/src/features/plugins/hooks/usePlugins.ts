@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  approvePluginCapability,
   disablePlugin,
   discoverPlugins,
   enablePlugin,
@@ -51,5 +52,11 @@ export function usePluginActions() {
     onSuccess: refresh,
   })
 
-  return { install, enable, disable, uninstall }
+  const approveCapability = useMutation({
+    mutationFn: ({ pluginId, capability }: { pluginId: string; capability: string }) =>
+      approvePluginCapability(pluginId, capability),
+    onSuccess: refresh,
+  })
+
+  return { install, enable, disable, uninstall, approveCapability }
 }

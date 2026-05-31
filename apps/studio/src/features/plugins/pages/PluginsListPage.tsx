@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { ApiError } from '../../../shared/api/client'
+import { Badge } from '../../../shared/components/Badge'
 import { Button } from '../../../shared/components/Button'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
 import {
@@ -11,27 +14,131 @@ import {
 } from '../../../shared/components/Table'
 import { ListPage } from '../../../shared/layout'
 import { useDiscoveredPlugins, usePluginActions, usePlugins } from '../hooks/usePlugins'
+import type { Plugin, PluginCapability } from '../schemas/plugin'
+
+function CapabilityRow({
+  pluginId,
+  capability,
+  onApproved,
+}: {
+  pluginId: string
+  capability: PluginCapability
+  onApproved: () => void
+}) {
+  const actions = usePluginActions()
+  const [approvedMessage, setApprovedMessage] = useState<string | null>(null)
+
+  return (
+    <TableRow>
+      <TableCell className="font-mono text-xs">{capability.capability}</TableCell>
+      <TableCell>{capability.granted ? 'Yes' : 'Pending'}</TableCell>
+      <TableCell>
+        {capability.is_dangerous ? <Badge tone="warning">Dangerous</Badge> : '—'}
+      </TableCell>
+      <TableCell className="text-right">
+        {!capability.granted && (
+          <Button
+            variant="secondary"
+            disabled={actions.approveCapability.isPending}
+            onClick={() => {
+              actions.approveCapability.mutate(
+                { pluginId, capability: capability.capability },
+                {
+                  onSuccess: () => {
+                    setApprovedMessage(`Approved ${capability.capability}`)
+                    onApproved()
+                  },
+                },
+              )
+            }}
+          >
+            Approve
+          </Button>
+        )}
+        {approvedMessage && <p className="mt-1 text-xs text-emerald-700">{approvedMessage}</p>}
+      </TableCell>
+    </TableRow>
+  )
+}
+
+function PluginCapabilitiesPanel({ plugin }: { plugin: Plugin }) {
+  const capabilities = plugin.capabilities ?? []
+
+  if (capabilities.length === 0) {
+    return <p className="text-sm text-slate-500">No capabilities declared in manifest.</p>
+  }
+
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Capability</TableHeaderCell>
+          <TableHeaderCell>Granted</TableHeaderCell>
+          <TableHeaderCell>Dangerous</TableHeaderCell>
+          <TableHeaderCell />
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {capabilities.map((capability) => (
+          <CapabilityRow
+            key={capability.capability}
+            pluginId={plugin.plugin_id}
+            capability={capability}
+            onApproved={() => undefined}
+          />
+        ))}
+      </TableBody>
+    </Table>
+  )
+}
 
 export function PluginsListPage() {
   const [showDiscover, setShowDiscover] = useState(false)
+  const [expandedPluginId, setExpandedPluginId] = useState<string | null>(null)
+  const [enableHintPluginId, setEnableHintPluginId] = useState<string | null>(null)
+  const capabilitiesRef = useRef<HTMLDivElement | null>(null)
   const pluginsQuery = usePlugins()
   const discoverQuery = useDiscoveredPlugins(showDiscover)
   const actions = usePluginActions()
+
+  useEffect(() => {
+    if (enableHintPluginId && expandedPluginId === enableHintPluginId) {
+      capabilitiesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [enableHintPluginId, expandedPluginId])
 
   const mutationError =
     actions.install.error ??
     actions.enable.error ??
     actions.disable.error ??
-    actions.uninstall.error
+    actions.uninstall.error ??
+    actions.approveCapability.error
+
+  function handleEnable(pluginId: string) {
+    setEnableHintPluginId(null)
+    actions.enable.mutate(pluginId, {
+      onError: (error) => {
+        if (error instanceof ApiError && error.message.includes('Dangerous capabilities')) {
+          setEnableHintPluginId(pluginId)
+          setExpandedPluginId(pluginId)
+        }
+      },
+    })
+  }
 
   return (
     <ListPage
       title="Plugins"
-      description="Install and manage internal plugins. Capabilities are granted per manifest."
+      description="Install and manage internal plugins. Dangerous capabilities require explicit approval."
       actions={
-        <Button variant="secondary" onClick={() => setShowDiscover((current) => !current)}>
-          {showDiscover ? 'Hide discover' : 'Discover plugins'}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/plugins/audit-logs">
+            <Button variant="secondary">Audit log</Button>
+          </Link>
+          <Button variant="secondary" onClick={() => setShowDiscover((current) => !current)}>
+            {showDiscover ? 'Hide discover' : 'Discover plugins'}
+          </Button>
+        </div>
       }
       loading={pluginsQuery.isLoading}
       loadingMessage="Loading plugins…"
@@ -50,6 +157,12 @@ export function PluginsListPage() {
       {mutationError instanceof Error && (
         <div className="mb-4">
           <ErrorAlert message={mutationError.message} />
+        </div>
+      )}
+
+      {enableHintPluginId && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Approve pending dangerous capabilities below, then enable the plugin again.
         </div>
       )}
 
@@ -87,30 +200,36 @@ export function PluginsListPage() {
       )}
 
       {pluginsQuery.data && pluginsQuery.data.length > 0 && (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell>Plugin</TableHeaderCell>
-              <TableHeaderCell>Version</TableHeaderCell>
-              <TableHeaderCell>Status</TableHeaderCell>
-              <TableHeaderCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {pluginsQuery.data.map((plugin) => (
-              <TableRow key={plugin.plugin_id}>
-                <TableCell>
+        <div className="space-y-4">
+          {pluginsQuery.data.map((plugin) => (
+            <section
+              key={plugin.plugin_id}
+              ref={expandedPluginId === plugin.plugin_id ? capabilitiesRef : undefined}
+              className="rounded-lg border border-slate-200 bg-white"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div>
                   <p className="font-medium text-slate-900">{plugin.name}</p>
-                  <p className="font-mono text-xs text-slate-500">{plugin.plugin_id}</p>
-                </TableCell>
-                <TableCell>{plugin.version}</TableCell>
-                <TableCell className="capitalize">{plugin.status}</TableCell>
-                <TableCell className="space-x-2 text-right">
+                  <p className="font-mono text-xs text-slate-500">
+                    {plugin.plugin_id} · v{plugin.version} · {plugin.status}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      setExpandedPluginId((current) =>
+                        current === plugin.plugin_id ? null : plugin.plugin_id,
+                      )
+                    }
+                  >
+                    {expandedPluginId === plugin.plugin_id ? 'Hide capabilities' : 'Capabilities'}
+                  </Button>
                   {plugin.status !== 'enabled' ? (
                     <Button
                       variant="secondary"
                       disabled={actions.enable.isPending}
-                      onClick={() => actions.enable.mutate(plugin.plugin_id)}
+                      onClick={() => handleEnable(plugin.plugin_id)}
                     >
                       Enable
                     </Button>
@@ -130,11 +249,17 @@ export function PluginsListPage() {
                   >
                     Uninstall
                   </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </div>
+              </div>
+
+              {expandedPluginId === plugin.plugin_id && (
+                <div className="border-t border-slate-200 px-4 py-3">
+                  <PluginCapabilitiesPanel plugin={plugin} />
+                </div>
+              )}
+            </section>
+          ))}
+        </div>
       )}
 
       {pluginsQuery.data?.length === 0 && (

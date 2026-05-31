@@ -14,6 +14,7 @@ use App\Modules\Pages\Http\Controllers\Api\V1\PageController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PagePreviewController;
 use App\Modules\Pages\Http\Controllers\Api\V1\PublicPageController;
 use App\Modules\Forms\Http\Controllers\Api\V1\FormController;
+use App\Modules\Plugins\Http\Controllers\Api\V1\AdminNavigationController;
 use App\Modules\Plugins\Http\Controllers\Api\V1\PluginController;
 use App\Modules\Seo\Http\Controllers\Api\V1\RedirectController;
 use Illuminate\Support\Facades\Route;
@@ -94,5 +95,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/plugins/{plugin:plugin_id}/capabilities/approve', [PluginController::class, 'approveCapability']);
         Route::delete('/plugins/{plugin:plugin_id}', [PluginController::class, 'destroy']);
         Route::get('/audit-logs', [PluginController::class, 'auditLogs']);
+
+        Route::get('/admin/navigation-items', [AdminNavigationController::class, 'index']);
     });
 });

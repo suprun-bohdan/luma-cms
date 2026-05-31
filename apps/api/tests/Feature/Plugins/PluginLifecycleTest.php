@@ -6,6 +6,8 @@ namespace Tests\Feature\Plugins;
 
 use App\Modules\Plugins\Enums\PluginStatus;
 use App\Modules\Plugins\Models\Plugin;
+use App\Modules\Plugins\Services\AdminNavigationRegistry;
+use App\Modules\Plugins\Services\ExtensionPointDispatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Concerns\AuthenticatesApiUsers;
 use Tests\TestCase;
@@ -22,6 +24,9 @@ final class PluginLifecycleTest extends TestCase
         config([
             'plugins.path' => dirname(__DIR__, 5).'/plugins',
         ]);
+
+        app(ExtensionPointDispatcher::class)->clear();
+        app(AdminNavigationRegistry::class)->clear();
 
         $this->seedRbac();
     }
@@ -92,6 +97,41 @@ final class PluginLifecycleTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonPath('data.0.action', 'plugin.installed');
+    }
+
+    public function test_dangerous_capability_requires_approval_before_enable(): void
+    {
+        config([
+            'plugins.path' => base_path('tests/fixtures/plugins'),
+        ]);
+
+        $this->postJson(
+            '/api/v1/plugins/install',
+            ['plugin_id' => 'luma.test-dangerous'],
+            $this->withBearer($this->adminUser()),
+        )->assertCreated();
+
+        $this->postJson(
+            '/api/v1/plugins/luma.test-dangerous/enable',
+            [],
+            $this->withBearer($this->adminUser()),
+        )
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Dangerous capabilities require approval before enable.');
+
+        $this->postJson(
+            '/api/v1/plugins/luma.test-dangerous/capabilities/approve',
+            ['capability' => 'routes.register'],
+            $this->withBearer($this->adminUser()),
+        )->assertOk();
+
+        $this->postJson(
+            '/api/v1/plugins/luma.test-dangerous/enable',
+            [],
+            $this->withBearer($this->adminUser()),
+        )
+            ->assertOk()
+            ->assertJsonPath('status', PluginStatus::Enabled->value);
     }
 
     public function test_admin_uninstalls_plugin(): void

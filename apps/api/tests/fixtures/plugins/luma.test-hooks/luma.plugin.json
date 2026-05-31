@@ -1,13 +1,12 @@
 {
   "schemaVersion": "1.0",
-  "id": "luma.demo",
-  "name": "Luma Demo Plugin",
-  "description": "Internal demo plugin for validating the plugin lifecycle.",
-  "version": "0.2.0",
+  "id": "luma.test-hooks",
+  "name": "Test Hooks Plugin",
+  "description": "Test fixture for content lifecycle hooks.",
+  "version": "0.1.0",
   "type": "plugin",
   "author": {
-    "name": "Luma CMS",
-    "url": "https://github.com/suprun-bohdan/luma-cms"
+    "name": "Luma CMS Tests"
   },
   "compatibility": {
     "luma": "^0.1.0",
@@ -15,13 +14,10 @@
     "php": "^8.3"
   },
   "capabilities": [
-    "admin.extend",
     "content.publish"
   ],
   "extensionPoints": [
-    "system.booted",
-    "content.afterPublish",
-    "admin.navigation"
+    "content.afterPublish"
   ],
   "entrypoints": {
     "backend": "src/Plugin.php"

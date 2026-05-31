@@ -3,11 +3,14 @@ import { Badge } from '../components/Badge'
 import { Button } from '../components/Button'
 import { useAuth } from '../auth/useAuth'
 import { logout } from '../../features/auth/api/authApi'
+import { useAdminNavigation } from '../../features/plugins/hooks/useAdminNavigation'
 
 type NavItem = {
   to: string
   label: string
   soon?: boolean
+  external?: boolean
+  plugin?: boolean
 }
 
 const navItems: NavItem[] = [
@@ -21,28 +24,70 @@ const navItems: NavItem[] = [
   { to: '/media', label: 'Media' },
 ]
 
+function isExternalUrl(path: string): boolean {
+  return path.startsWith('http://') || path.startsWith('https://')
+}
+
+function SidebarLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) {
+  const className = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition ${
+      isActive ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
+    }`
+
+  if (item.external) {
+    return (
+      <a
+        href={item.to}
+        target="_blank"
+        rel="noreferrer"
+        onClick={onNavigate}
+        className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      >
+        <span>{item.label}</span>
+        {item.plugin && <Badge tone="muted">Plugin</Badge>}
+      </a>
+    )
+  }
+
+  return (
+    <NavLink to={item.to} onClick={onNavigate} className={className}>
+      <span>{item.label}</span>
+      <span className="flex items-center gap-1">
+        {item.plugin && <Badge tone="muted">Plugin</Badge>}
+        {item.soon && <Badge tone="muted">Soon</Badge>}
+      </span>
+    </NavLink>
+  )
+}
+
 type SidebarNavProps = {
   onNavigate?: () => void
 }
 
 export function SidebarNav({ onNavigate }: SidebarNavProps) {
+  const adminNavigationQuery = useAdminNavigation()
+  const pluginItems: NavItem[] =
+    adminNavigationQuery.data?.map((item) => ({
+      to: item.to,
+      label: item.label,
+      external: isExternalUrl(item.to),
+      plugin: true,
+    })) ?? []
+
   return (
     <nav className="space-y-1">
       {navItems.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          onClick={onNavigate}
-          className={({ isActive }) =>
-            `flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition ${
-              isActive ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
-            }`
-          }
-        >
-          <span>{item.label}</span>
-          {item.soon && <Badge tone="muted">Soon</Badge>}
-        </NavLink>
+        <SidebarLink key={item.to} item={item} onNavigate={onNavigate} />
       ))}
+
+      {pluginItems.length > 0 && (
+        <>
+          <div className="my-2 border-t border-slate-200" />
+          {pluginItems.map((item) => (
+            <SidebarLink key={`${item.to}-${item.label}`} item={item} onNavigate={onNavigate} />
+          ))}
+        </>
+      )}
     </nav>
   )
 }

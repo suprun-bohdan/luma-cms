@@ -7,11 +7,13 @@ namespace App\Modules\Content\Actions;
 use App\Models\User;
 use App\Modules\Content\Models\Entry;
 use App\Modules\Content\Services\EntryDataValidator;
+use App\Modules\Plugins\Services\PluginHookService;
 
 final class UpdateEntryAction
 {
     public function __construct(
         private readonly EntryDataValidator $validator,
+        private readonly PluginHookService $pluginHooks,
     ) {
     }
 
@@ -34,6 +36,8 @@ final class UpdateEntryAction
 
         $entry->updated_by = $user->id;
         $entry->save();
+
+        $this->pluginHooks->afterEntryUpdated($entry->refresh(), $user);
 
         return $entry->refresh();
     }

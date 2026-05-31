@@ -17,6 +17,7 @@ final class PluginRuntimeService
     public function __construct(
         private readonly PluginRegistryService $registry,
         private readonly ExtensionPointDispatcher $dispatcher,
+        private readonly AdminNavigationRegistry $adminNavigation,
     ) {
     }
 
@@ -39,7 +40,7 @@ final class PluginRuntimeService
         }
 
         $instance = $this->instantiate($plugin);
-        $context = new DefaultPluginContext($plugin, $this->dispatcher);
+        $context = new DefaultPluginContext($plugin, $this->dispatcher, $this->adminNavigation);
 
         $instance->register($context);
         $instance->boot($context);
@@ -51,6 +52,7 @@ final class PluginRuntimeService
     {
         unset($this->loaded[$plugin->plugin_id]);
         $this->dispatcher->forgetPlugin($plugin->plugin_id);
+        $this->adminNavigation->forgetPlugin($plugin->plugin_id);
     }
 
     private function instantiate(Plugin $plugin): PluginContract

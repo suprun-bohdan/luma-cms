@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.18] - 2026-05-30
+
+### Added
+
+- Content lifecycle hooks: `content.afterCreate`, `content.afterUpdate`, `content.afterPublish` via `PluginHookService`
+- `ContentLifecycleEvent` payload DTO wired into Create/Update/Publish Entry and Publish Page actions
+- `admin.navigation` extension point with `AdminNavigationRegistry` and `GET /api/v1/admin/navigation-items`
+- Studio plugin capabilities panel with dangerous-capability **Approve** flow
+- Studio audit log page at `/plugins/audit-logs`
+- Plugin sidebar items merged from enabled plugins (`admin.extend`)
+- Demo plugin v0.2.0: `content.afterPublish` logging + «Demo insights» nav item
+- Tests: `PluginHookServiceTest`, `ContentHookTest`, `AdminNavigationTest`, dangerous-capability lifecycle test
+
 ## [0.0.17] - 2026-05-31
 
 ### Added

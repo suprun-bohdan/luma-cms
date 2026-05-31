@@ -20,6 +20,8 @@ use App\Modules\Plugins\Models\AuditLog;
 use App\Modules\Plugins\Models\Plugin;
 use App\Modules\Plugins\Policies\AuditLogPolicy;
 use App\Modules\Plugins\Policies\PluginPolicy;
+use App\Modules\Plugins\Services\AdminNavigationRegistry;
+use App\Modules\Plugins\Services\ExtensionPointDispatcher;
 use App\Modules\Plugins\Services\PluginRuntimeService;
 use App\Modules\Seo\Models\Redirect;
 use App\Modules\Seo\Policies\RedirectPolicy;
@@ -31,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(ExtensionPointDispatcher::class);
+        $this->app->singleton(AdminNavigationRegistry::class);
     }
 
     public function boot(): void

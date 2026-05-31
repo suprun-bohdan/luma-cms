@@ -20,9 +20,13 @@ final class ExtensionPointDispatcher
         ];
     }
 
-    public function dispatch(string $extensionPoint, mixed $payload = null): void
+    public function dispatch(string $extensionPoint, mixed $payload = null, ?callable $listenerFilter = null): void
     {
         foreach ($this->listeners[$extensionPoint] ?? [] as $registration) {
+            if ($listenerFilter !== null && ! $listenerFilter($registration['plugin_id'])) {
+                continue;
+            }
+
             try {
                 ($registration['listener'])($payload);
             } catch (Throwable $exception) {

@@ -69,7 +69,8 @@ apps/studio/src/
 | `/forms` | Forms list |
 | `/forms/:slug/edit` | Edit form fields |
 | `/forms/:slug/submissions` | Form submissions inbox |
-| `/plugins` | Discover, install, enable/disable plugins |
+| `/plugins` | Discover, install, enable/disable plugins; approve capabilities |
+| `/plugins/audit-logs` | Plugin lifecycle audit log (requires `plugins.audit`) |
 | `/seo/redirects` | URL redirects list |
 | `/seo/redirects/new` | Create redirect |
 
@@ -111,7 +112,7 @@ npm run lint
 6. Edit header menu at `/menus/header` — link to your page slug
 7. Optional: run demo seeder and open `/p/home` (includes contact form)
 8. Check `/forms/contact/submissions` after a form submit
-9. At `/plugins` — discover and install `luma.demo`, then enable
+9. At `/plugins` — discover and install `luma.demo`, approve any pending capabilities, enable; check sidebar **Demo insights** and `/plugins/audit-logs`
 10. Sign out — protected routes redirect to login; API returns 401 without token
 
 ## Styling

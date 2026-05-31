@@ -18,6 +18,7 @@ import { FormEditPage } from '../features/forms/pages/FormEditPage'
 import { FormsListPage } from '../features/forms/pages/FormsListPage'
 import { SubmissionsListPage } from '../features/forms/pages/SubmissionsListPage'
 import { PluginsListPage } from '../features/plugins/pages/PluginsListPage'
+import { AuditLogsListPage } from '../features/plugins/pages/AuditLogsListPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { NotFoundPage } from '../pages/NotFoundPage'
 
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
       { path: 'forms/:slug/edit', element: <FormEditPage /> },
       { path: 'forms/:slug/submissions', element: <SubmissionsListPage /> },
       { path: 'plugins', element: <PluginsListPage /> },
+      { path: 'plugins/audit-logs', element: <AuditLogsListPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

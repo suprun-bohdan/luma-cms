@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.0",
+  "id": "luma.test-dangerous",
+  "name": "Test Dangerous Plugin",
+  "description": "Test fixture for dangerous capability approval.",
+  "version": "0.1.0",
+  "type": "plugin",
+  "author": {
+    "name": "Luma CMS Tests"
+  },
+  "compatibility": {
+    "luma": "^0.1.0",
+    "pluginApi": "^1.0",
+    "php": "^8.3"
+  },
+  "capabilities": [
+    "routes.register"
+  ],
+  "extensionPoints": [
+    "system.booted"
+  ],
+  "entrypoints": {
+    "backend": "src/Plugin.php"
+  },
+  "migrations": {
+    "path": "database/migrations"
+  }
+}

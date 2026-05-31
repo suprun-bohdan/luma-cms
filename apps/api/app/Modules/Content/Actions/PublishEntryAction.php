@@ -9,11 +9,13 @@ use App\Modules\Content\Enums\EntryStatus;
 use App\Modules\Content\Models\Entry;
 use App\Modules\Content\Models\EntryVersion;
 use App\Modules\Content\Services\EntryDataValidator;
+use App\Modules\Plugins\Services\PluginHookService;
 
 final class PublishEntryAction
 {
     public function __construct(
         private readonly EntryDataValidator $validator,
+        private readonly PluginHookService $pluginHooks,
     ) {
     }
 
@@ -36,6 +38,9 @@ final class PublishEntryAction
             'created_at' => now(),
         ]);
 
-        return $entry->refresh();
+        $entry = $entry->refresh();
+        $this->pluginHooks->afterEntryPublished($entry, $user);
+
+        return $entry;
     }
 }

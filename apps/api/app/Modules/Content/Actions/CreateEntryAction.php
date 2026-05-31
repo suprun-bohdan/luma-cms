@@ -9,11 +9,13 @@ use App\Modules\Content\Enums\EntryStatus;
 use App\Modules\Content\Models\Collection;
 use App\Modules\Content\Models\Entry;
 use App\Modules\Content\Services\EntryDataValidator;
+use App\Modules\Plugins\Services\PluginHookService;
 
 final class CreateEntryAction
 {
     public function __construct(
         private readonly EntryDataValidator $validator,
+        private readonly PluginHookService $pluginHooks,
     ) {
     }
 
@@ -24,12 +26,16 @@ final class CreateEntryAction
     {
         $validatedData = $this->validator->validate($collection, $data['data']);
 
-        return Entry::query()->create([
+        $entry = Entry::query()->create([
             'collection_id' => $collection->id,
             'status' => EntryStatus::Draft,
             'data' => $validatedData,
             'created_by' => $user->id,
             'updated_by' => $user->id,
         ]);
+
+        $this->pluginHooks->afterEntryCreated($entry, $user);
+
+        return $entry;
     }
 }

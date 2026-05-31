@@ -2,36 +2,32 @@
 
 declare(strict_types=1);
 
-namespace Luma\Demo;
+namespace Luma\TestHooks;
 
 use App\Modules\Plugins\Contracts\PluginContext;
 use App\Modules\Plugins\Contracts\PluginContract;
 use App\Modules\Plugins\Events\ContentLifecycleEvent;
+use Illuminate\Support\Facades\Cache;
 
 final class Plugin implements PluginContract
 {
     public function register(PluginContext $context): void
     {
-        $context->listen('system.booted', static function () use ($context): void {
-            $context->log('info', 'Demo plugin received system.booted.');
-        });
-
         $context->listen('content.afterPublish', static function (mixed $payload) use ($context): void {
             if (! $payload instanceof ContentLifecycleEvent) {
                 return;
             }
 
-            $context->log('info', 'Demo plugin received content.afterPublish.', [
+            Cache::put('luma.test-hooks.last_publish', [
                 'entity' => $payload->entity,
                 'slug' => $payload->slug,
+                'plugin_id' => $context->pluginId(),
             ]);
         });
-
-        $context->registerAdminNavigation('Demo insights', '/plugins', 90);
     }
 
     public function boot(PluginContext $context): void
     {
-        $context->log('info', 'Demo plugin boot complete.');
+        //
     }
 }

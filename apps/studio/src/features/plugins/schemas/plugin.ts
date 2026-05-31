@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const pluginCapabilitySchema = z.object({
   capability: z.string(),
   granted: z.boolean(),
+  is_dangerous: z.boolean().optional(),
   approved_at: z.string().nullable().optional(),
 })
 
@@ -27,3 +28,23 @@ export const discoveredPluginSchema = z.object({
 
 export type Plugin = z.infer<typeof pluginSchema>
 export type DiscoveredPlugin = z.infer<typeof discoveredPluginSchema>
+export type PluginCapability = z.infer<typeof pluginCapabilitySchema>
+
+export const auditLogSchema = z.object({
+  id: z.number(),
+  action: z.string(),
+  subject_type: z.string().nullable(),
+  subject_id: z.string().nullable(),
+  metadata: z.record(z.string(), z.unknown()).nullable(),
+  actor: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string(),
+    })
+    .nullable()
+    .optional(),
+  created_at: z.string().nullable().optional(),
+})
+
+export type AuditLog = z.infer<typeof auditLogSchema>

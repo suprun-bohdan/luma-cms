@@ -26,6 +26,15 @@ final class ManifestValidator
         'migrations',
     ];
 
+    /** @var list<string> */
+    private const ALLOWED_EXTENSION_POINTS = [
+        'system.booted',
+        'content.afterCreate',
+        'content.afterUpdate',
+        'content.afterPublish',
+        'admin.navigation',
+    ];
+
     /**
      * @return array<string, mixed>
      */
@@ -47,6 +56,16 @@ final class ManifestValidator
 
         if (! is_array($manifest['capabilities'])) {
             throw new InvalidArgumentException('Manifest capabilities must be an array.');
+        }
+
+        if (! is_array($manifest['extensionPoints'])) {
+            throw new InvalidArgumentException('Manifest extensionPoints must be an array.');
+        }
+
+        foreach ($manifest['extensionPoints'] as $extensionPoint) {
+            if (! is_string($extensionPoint) || ! in_array($extensionPoint, self::ALLOWED_EXTENSION_POINTS, true)) {
+                throw new InvalidArgumentException('Manifest contains unsupported extension point.');
+            }
         }
 
         if (! is_array($manifest['entrypoints']) || ! is_string($manifest['entrypoints']['backend'] ?? null)) {

@@ -15,5 +15,7 @@ interface PluginContext
      */
     public function listen(string $extensionPoint, callable $listener): void;
 
+    public function registerAdminNavigation(string $label, string $to, int $sortOrder = 100): void;
+
     public function log(string $level, string $message, array $context = []): void;
 }

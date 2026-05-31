@@ -13,6 +13,7 @@ final class DefaultPluginContext implements PluginContext
     public function __construct(
         private readonly Plugin $plugin,
         private readonly ExtensionPointDispatcher $dispatcher,
+        private readonly AdminNavigationRegistry $adminNavigation,
     ) {
     }
 
@@ -29,6 +30,11 @@ final class DefaultPluginContext implements PluginContext
     public function listen(string $extensionPoint, callable $listener): void
     {
         $this->dispatcher->listen($this->plugin->plugin_id, $extensionPoint, $listener);
+    }
+
+    public function registerAdminNavigation(string $label, string $to, int $sortOrder = 100): void
+    {
+        $this->adminNavigation->register($this->plugin->plugin_id, $label, $to, $sortOrder);
     }
 
     public function log(string $level, string $message, array $context = []): void
