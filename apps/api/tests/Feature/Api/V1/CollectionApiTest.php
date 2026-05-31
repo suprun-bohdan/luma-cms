@@ -6,17 +6,36 @@ namespace Tests\Feature\Api\V1;
 
 use App\Modules\Content\Models\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\AuthenticatesApiUsers;
 use Tests\TestCase;
 
 final class CollectionApiTest extends TestCase
 {
+    use AuthenticatesApiUsers;
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seedRbac();
+    }
+
+    public function test_unauthenticated_requests_are_rejected(): void
+    {
+        $response = $this->getJson('/api/v1/collections');
+
+        $response->assertUnauthorized();
+    }
 
     public function test_lists_collections(): void
     {
         Collection::factory()->count(2)->create();
 
-        $response = $this->getJson('/api/v1/collections');
+        $response = $this->getJson(
+            '/api/v1/collections',
+            $this->withBearer($this->adminUser()),
+        );
 
         $response
             ->assertOk()
@@ -39,10 +58,14 @@ final class CollectionApiTest extends TestCase
 
     public function test_creates_collection(): void
     {
-        $response = $this->postJson('/api/v1/collections', [
-            'name' => 'Blog Posts',
-            'description' => 'Articles and news',
-        ]);
+        $response = $this->postJson(
+            '/api/v1/collections',
+            [
+                'name' => 'Blog Posts',
+                'description' => 'Articles and news',
+            ],
+            $this->withBearer($this->adminUser()),
+        );
 
         $response
             ->assertCreated()
@@ -63,7 +86,10 @@ final class CollectionApiTest extends TestCase
             'slug' => 'pages',
         ]);
 
-        $response = $this->getJson('/api/v1/collections/'.$collection->slug);
+        $response = $this->getJson(
+            '/api/v1/collections/'.$collection->slug,
+            $this->withBearer($this->adminUser()),
+        );
 
         $response
             ->assertOk()
@@ -77,10 +103,14 @@ final class CollectionApiTest extends TestCase
             'slug' => 'old-name',
         ]);
 
-        $response = $this->putJson('/api/v1/collections/'.$collection->slug, [
-            'name' => 'New Name',
-            'slug' => 'new-name',
-        ]);
+        $response = $this->putJson(
+            '/api/v1/collections/'.$collection->slug,
+            [
+                'name' => 'New Name',
+                'slug' => 'new-name',
+            ],
+            $this->withBearer($this->adminUser()),
+        );
 
         $response
             ->assertOk()
@@ -88,11 +118,15 @@ final class CollectionApiTest extends TestCase
             ->assertJsonPath('data.slug', 'new-name');
     }
 
-    public function test_deletes_collection(): void
+    public function test_deletes_collection_as_admin(): void
     {
         $collection = Collection::factory()->create();
 
-        $response = $this->deleteJson('/api/v1/collections/'.$collection->slug);
+        $response = $this->deleteJson(
+            '/api/v1/collections/'.$collection->slug,
+            [],
+            $this->withBearer($this->adminUser()),
+        );
 
         $response->assertNoContent();
 
@@ -101,14 +135,35 @@ final class CollectionApiTest extends TestCase
         ]);
     }
 
+    public function test_editor_cannot_delete_collection(): void
+    {
+        $collection = Collection::factory()->create();
+
+        $response = $this->deleteJson(
+            '/api/v1/collections/'.$collection->slug,
+            [],
+            $this->withBearer($this->editorUser()),
+        );
+
+        $response->assertForbidden();
+
+        $this->assertDatabaseHas('collections', [
+            'id' => $collection->id,
+        ]);
+    }
+
     public function test_rejects_duplicate_slug_on_create(): void
     {
         Collection::factory()->create(['slug' => 'taken']);
 
-        $response = $this->postJson('/api/v1/collections', [
-            'name' => 'Other',
-            'slug' => 'taken',
-        ]);
+        $response = $this->postJson(
+            '/api/v1/collections',
+            [
+                'name' => 'Other',
+                'slug' => 'taken',
+            ],
+            $this->withBearer($this->adminUser()),
+        );
 
         $response->assertUnprocessable();
     }

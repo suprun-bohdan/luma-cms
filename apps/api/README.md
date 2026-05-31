@@ -2,12 +2,13 @@
 
 Laravel backend for Luma CMS.
 
-> **Status:** Pre-alpha scaffold (Phase 1B). Content Core API not implemented yet.
+> **Status:** Pre-alpha (Phase 1D). Collections CRUD API with Sanctum auth and RBAC.
 
 ## Stack
 
 - PHP 8.3+
 - Laravel 13
+- Laravel Sanctum (API tokens)
 - SQLite (local dev default); PostgreSQL planned for production
 
 ## Structure
@@ -17,8 +18,9 @@ apps/api/
   app/
     Core/           # Kernel, contracts, bootstrapping
     Modules/
-      Auth/
-      Content/
+      Auth/         # Login, logout, me
+      Users/        # Roles, permissions, RBAC
+      Content/      # Collections, fields, entries
       Media/
       Seo/
       Plugins/
@@ -33,10 +35,23 @@ apps/api/
 
 ## API
 
-Versioned public routes:
+Public routes:
 
 ```
-GET /api/v1/health
+GET  /api/v1/health
+POST /api/v1/auth/login
+```
+
+Authenticated routes (`Authorization: Bearer {token}`):
+
+```
+POST   /api/v1/auth/logout
+GET    /api/v1/auth/me
+GET    /api/v1/collections
+POST   /api/v1/collections
+GET    /api/v1/collections/{slug}
+PUT    /api/v1/collections/{slug}
+DELETE /api/v1/collections/{slug}
 ```
 
 Laravel health check:
@@ -44,6 +59,36 @@ Laravel health check:
 ```
 GET /up
 ```
+
+### Auth (local dev)
+
+After migrate + seed:
+
+```bash
+docker compose exec php bash -c "cd apps/api && php artisan migrate && php artisan db:seed"
+```
+
+Default admin (override via `.env`):
+
+| Variable | Default |
+|----------|---------|
+| `LUMA_SEED_ADMIN_EMAIL` | `admin@luma.test` |
+| `LUMA_SEED_ADMIN_PASSWORD` | `password` |
+
+Login:
+
+```bash
+curl -s -X POST http://localhost:8080/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@luma.test","password":"password"}'
+```
+
+### RBAC
+
+| Role | Permissions |
+|------|-------------|
+| `admin` | content.view, content.create, content.update, content.delete |
+| `editor` | content.view, content.create, content.update |
 
 ## Local development
 
@@ -64,6 +109,7 @@ docker compose exec php bash -c "cd apps/api && php artisan test"
 
 - Thin controllers; business logic in Actions, Services, Policies
 - Public API uses `/api/v1/` prefix
-- API Resources for all public responses (when endpoints exist)
+- API Resources for all public responses
+- SQLite is source of truth; policies enforce RBAC permissions
 
 See [../../docs/architecture.md](../../docs/architecture.md).

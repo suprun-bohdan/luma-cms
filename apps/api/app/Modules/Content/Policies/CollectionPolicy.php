@@ -6,43 +6,37 @@ namespace App\Modules\Content\Policies;
 
 use App\Models\User;
 use App\Modules\Content\Models\Collection;
+use App\Modules\Users\Services\PermissionEvaluator;
 
 final class CollectionPolicy
 {
-    /**
-     * Temporary: allow all operations until Auth module is wired.
-     */
-    public function before(?User $user, string $ability): ?bool
-    {
-        if (app()->environment(['local', 'testing'])) {
-            return true;
-        }
-
-        return null;
+    public function __construct(
+        private readonly PermissionEvaluator $permissions,
+    ) {
     }
 
     public function viewAny(?User $user): bool
     {
-        return false;
+        return $this->permissions->hasPermission($user, 'content.view');
     }
 
     public function view(?User $user, Collection $collection): bool
     {
-        return false;
+        return $this->permissions->hasPermission($user, 'content.view');
     }
 
     public function create(?User $user): bool
     {
-        return false;
+        return $this->permissions->hasPermission($user, 'content.create');
     }
 
     public function update(?User $user, Collection $collection): bool
     {
-        return false;
+        return $this->permissions->hasPermission($user, 'content.update');
     }
 
     public function delete(?User $user, Collection $collection): bool
     {
-        return false;
+        return $this->permissions->hasPermission($user, 'content.delete');
     }
 }

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.5] - 2026-05-31
+
+### Added
+
+- Laravel Sanctum API token authentication
+- RBAC: roles, permissions, role/permission pivots
+- Auth module: `POST /api/v1/auth/login`, `POST /api/v1/auth/logout`, `GET /api/v1/auth/me`
+- Users module: Role/Permission models, PermissionEvaluator, RolesAndPermissionsSeeder
+- Collections API protected with `auth:sanctum` and permission-based CollectionPolicy
+- Feature tests for auth and collection authorization (401/403)
+
+### Changed
+
+- Collections API now requires Bearer token
+- Removed temporary CollectionPolicy local/testing bypass
+
 ## [0.0.4] - 2026-05-30
 
 ### Added
