@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.25-rc.14] - 2026-05-31
+
+### Fixed
+
+- Web root `/` redirects to published starter page `/p/home` after install instead of JSON API stub
+
 ## [0.0.25-rc.13] - 2026-05-31
 
 ### Fixed
