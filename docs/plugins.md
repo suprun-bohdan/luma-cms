@@ -24,6 +24,10 @@ Plugins live under `plugins/<plugin-id>/` with a `luma.plugin.json` manifest. Co
 
 Manage plugins at **Luma Studio → Plugins**. A warning banner reminds operators to trust plugin sources before enabling.
 
+## Future work
+
+Plugin manifests may gain an explicit backend PHP class name field so runtime loading does not rely on regex discovery of `class …Plugin` in entrypoint files. Not implemented in pre-alpha; current discovery remains manifest path + convention.
+
 ## Development
 
 See `plugins/README.md` for manifest schema, capability flags, and test fixtures.

@@ -26,6 +26,8 @@ final class DistributionArtifactsTest extends TestCase
 
         $this->assertStringContainsString('/admin/setup', $install);
         $this->assertStringContainsString('LUMA_SETUP_TOKEN', $install);
+        $this->assertStringContainsString('browser', strtolower($install));
+        $this->assertStringContainsString('apps/api/public', $install);
     }
 
     public function test_nginx_deploy_sample_serves_admin_and_redirects_studio(): void

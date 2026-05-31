@@ -28,19 +28,26 @@ final class SetupApiTest extends TestCase
         $this->postJson('/api/v1/setup/finish', [
             'site_title' => 'Test Site',
             'admin_email' => 'setup@luma.test',
-            'admin_password' => 'secret-pass',
+            'admin_password' => 'secure-owner-pass',
             'with_starter_site' => true,
         ])
             ->assertOk()
             ->assertJsonPath('ok', true);
 
         $this->assertTrue(app(InstallationStateService::class)->isInstalled());
+        $this->assertFileExists(app(InstallationStateService::class)->installedMarkerPath());
         $this->assertDatabaseHas('users', ['email' => 'setup@luma.test']);
         $this->assertDatabaseHas('pages', ['slug' => 'home']);
 
         $user = \App\Models\User::query()->where('email', 'setup@luma.test')->firstOrFail();
         $ownerRole = Role::query()->where('slug', 'owner')->firstOrFail();
         $this->assertTrue($user->roles()->where('roles.id', $ownerRole->id)->exists());
+    }
+
+    public function test_web_root_redirects_to_setup_when_not_installed(): void
+    {
+        $this->get('/')
+            ->assertRedirect('/admin/setup');
     }
 
     public function test_setup_routes_are_locked_after_install(): void

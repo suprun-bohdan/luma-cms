@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Browser-first install polish: expanded `/admin/setup` wizard (welcome, site/owner steps, MySQL default), login/setup redirects when not installed, `INSTALL.txt` user guide, install marker for `/luma-requirements.php`
+
 ## [0.0.25-rc.1] - 2026-05-31
 
 ### Added

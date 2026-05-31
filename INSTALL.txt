@@ -1,25 +1,94 @@
-Luma CMS — Shared hosting install (no Composer required)
-=======================================================
+Luma CMS — Install guide (shared hosting, no Composer required)
+===============================================================
 
-1. Upload and extract `luma-cms-{version}-shared.zip` outside public_html (e.g. ~/luma/).
+This guide is for a normal hosting user. You do NOT need Composer, npm, Docker,
+or terminal commands. Install Luma CMS in your browser.
 
-2. In hosting panel select PHP 8.3 or 8.4 for your domain.
+Primary install path
+--------------------
 
-3. Set document root to: `~/luma/apps/api/public`
+1. Upload and extract the release zip outside public_html, for example:
 
-4. Copy environment file:
-   `cp apps/api/.env.shared.example apps/api/.env`
-   Edit DB credentials in File Manager if using MySQL.
-   Leave `CACHE_STORE=file` until setup finishes (database cache needs migrated tables).
+   ~/luma/
 
-5. Open in browser:
-   `/luma-requirements.php`  — PHP version check
-   `/admin/setup`            — guided installer (Luma Studio UI)
+2. In your hosting panel, select PHP 8.3 or 8.4 for your domain.
 
-6. Optional: set `LUMA_SETUP_TOKEN` in `.env` before exposing the installer to the internet.
-   Build Studio with the same value as `VITE_LUMA_SETUP_TOKEN` so the setup wizard sends header `X-Luma-Setup-Token`.
+3. Set the document root (web root) to:
 
-7. Optional cron (webhooks / queue):
-   `* * * * * php ~/luma/apps/api/artisan schedule:run`
+   ~/luma/apps/api/public
 
-See `deploy/nginx/luma.conf` or `deploy/apache/luma-vhost.conf.example` for web server samples.
+   IMPORTANT: Never point the web root at the archive root or at apps/api/.
+   Only apps/api/public should be publicly reachable. This keeps .env and
+   application code private.
+
+4. Copy the environment file:
+
+   cp apps/api/.env.shared.example apps/api/.env
+
+   Edit apps/api/.env in File Manager if needed:
+   - Set APP_URL to your site URL (https://example.com)
+   - Set DB_* credentials if you use MySQL/MariaDB before the wizard
+   - Leave SESSION_DRIVER=file and CACHE_STORE=file until setup finishes
+     (database cache needs migrated tables that do not exist yet)
+
+5. Make these directories writable by the web server user:
+
+   apps/api/storage/
+   apps/api/bootstrap/cache/
+
+6. Open in your browser:
+
+   https://example.com/luma-requirements.php
+
+   Fix any failed PHP checks, then continue to the setup wizard.
+
+7. Complete the visual installer:
+
+   https://example.com/admin/setup
+
+   Steps: requirements → database → site settings → owner account → Install.
+
+8. After installation, sign in at:
+
+   https://example.com/admin/login
+
+9. Complete onboarding, create your first page, publish it, and open the public URL:
+
+   https://example.com/p/your-page-slug
+
+Optional security (recommended before exposing setup to the internet)
+---------------------------------------------------------------------
+
+Set a setup token in apps/api/.env:
+
+   LUMA_SETUP_TOKEN=your-long-random-token
+
+The release Studio build must include the same value as VITE_LUMA_SETUP_TOKEN
+so the wizard sends header X-Luma-Setup-Token on setup API requests.
+
+Passwords
+---------
+
+Use a strong owner password (minimum 12 characters). Avoid password, admin,
+change-me, and other common defaults.
+
+Optional cron (webhooks / queue)
+--------------------------------
+
+   * * * * * php ~/luma/apps/api/artisan schedule:run
+
+Legacy admin URL
+----------------
+
+/studio/ redirects to /admin/ — use /admin/ as the canonical admin path.
+
+Developer install (secondary)
+-----------------------------
+
+CLI install (php artisan luma:install) exists for developers and automation.
+It is not the primary path for shared-hosting users. See docs/installation.md.
+
+Web server samples
+------------------
+
+See deploy/nginx/luma.conf or deploy/apache/luma-vhost.conf.example

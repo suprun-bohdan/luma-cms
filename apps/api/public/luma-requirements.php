@@ -6,6 +6,17 @@ declare(strict_types=1);
  * Pre-bootstrap PHP gate for shared hosting (no Composer required).
  * Open directly after upload or link from INSTALL.txt.
  */
+$installedMarker = __DIR__.'/../storage/app/.luma-installed';
+
+if (is_file($installedMarker)) {
+    header('Location: /admin/login', true, 302);
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Luma CMS</title></head><body>';
+    echo '<p>Luma CMS is already installed. Continue to <a href="/admin/login">/admin/login</a>.</p>';
+    echo '</body></html>';
+
+    exit(0);
+}
+
 $requirements = require __DIR__.'/../bootstrap/luma-requirements.php';
 $minimum = $requirements['php']['minimum'] ?? '8.3.0';
 $recommended = $requirements['php']['recommended'] ?? '8.4.0';

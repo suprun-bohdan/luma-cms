@@ -3,17 +3,29 @@ import { Navigate } from 'react-router-dom'
 import { Button } from '../../../shared/components/Button'
 import { Card } from '../../../shared/components/Card'
 import { ErrorAlert } from '../../../shared/components/ErrorAlert'
+import { HelpText } from '../../../shared/components/HelpText'
 import { Input } from '../../../shared/components/Input'
+import { LoadingState } from '../../../shared/components/LoadingState'
 import { ApiError } from '../../../shared/api/client'
 import { formatFieldErrors } from '../../../shared/utils/format'
 import { useAuth } from '../../../shared/auth/useAuth'
+import { useSetupStatus } from '../../setup/hooks/useSetup'
 import { useLoginMutation } from '../hooks/useLoginMutation'
 
 export function LoginPage() {
   const { isAuthenticated } = useAuth()
+  const statusQuery = useSetupStatus()
   const loginMutation = useLoginMutation()
-  const [email, setEmail] = useState('admin@luma.test')
-  const [password, setPassword] = useState('password')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  if (statusQuery.isLoading) {
+    return <LoadingState message="Checking installation status…" />
+  }
+
+  if (!statusQuery.data?.installed) {
+    return <Navigate to="/setup" replace />
+  }
 
   if (isAuthenticated) {
     return <Navigate to="/collections" replace />
@@ -30,10 +42,11 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Luma CMS</p>
-        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Sign in to Studio</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Use your Luma CMS account. Local default: <code>admin@luma.test</code>
-        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-slate-900">Sign in to Luma Studio</h1>
+        <HelpText className="mt-2">
+          Use the owner account you created during setup. If you have not installed Luma CMS yet,
+          open <code>/admin/setup</code> in your browser.
+        </HelpText>
 
         <form
           className="mt-6 space-y-4"
@@ -67,10 +80,6 @@ export function LoginPage() {
             {loginMutation.isPending ? 'Signing in…' : 'Sign in'}
           </Button>
         </form>
-
-        <p className="mt-4 text-center text-xs text-slate-500">
-          API must be running on port 8080 for the Vite proxy.
-        </p>
       </Card>
     </div>
   )

@@ -148,3 +148,19 @@ Automated smoke (same HTTP/API steps as manual R1–R7): outer [`scripts/rehears
 
 **Phase 8.5 gate:** **Pass** — ready for tag `v0.0.25-rc.1`.
 
+---
+
+## v0.0.25-rc.1 release candidate validation (browser-first polish)
+
+| Item | Result | Notes |
+|------|--------|-------|
+| Browser-first INSTALL.txt | **Pass** | User-facing guide; CLI secondary; document root warning |
+| `/` redirect when not installed | **Pass** | PHPUnit `SetupApiTest::test_web_root_redirects_to_setup_when_not_installed` |
+| Studio login → setup when not installed | **Pass** | `LoginPage` + `InstallGate` redirect |
+| Setup wizard steps | **Pass** | Welcome, requirements, database, site, owner, install |
+| Install marker for requirements page | **Pass** | `storage/app/.luma-installed`; `/luma-requirements.php` → login when present |
+| MySQL + setup token browser E2E | **Not run** | Deferred (see Phase 8.4 friction table) |
+| GitHub Actions post-push | **Manual** | Verify in GitHub UI after push |
+
+**RC polish gate:** **Pass** — browser-first flow documented and wired; tag when ready.
+
